@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSlot, QThread, QMutex, QWaitCondition, pyqtSignal, 
 import sys
 import numpy as np
 import ximea as xi
-
+import time
 
 class Camera(QObject):
     ImageReadySignal = pyqtSignal(np.ndarray)
@@ -13,7 +13,7 @@ class Camera(QObject):
         self.__class__._has_instance = True
 
         try:
-            super(GamepadThread, self).__init__(parent)
+            super(Camera, self).__init__(parent)
             self.abort = False
             self.thread = QThread()
             print(xi.get_device_count())
@@ -48,7 +48,7 @@ class Camera(QObject):
         self._cam.set_param('exposure', us)
 
     def start(self):
-        self.thread.start(QThread.HighPriority)
+        self.thread.start()
 
     @pyqtSlot()
     def stop(self):
@@ -62,6 +62,7 @@ class Camera(QObject):
     def process(self):
         while not self.abort:
             try:
+                time.sleep(0.1)
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()

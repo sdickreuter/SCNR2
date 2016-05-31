@@ -32,7 +32,7 @@ class SCNR(QMainWindow):
         self.l.addWidget(self.gv)
         self.cam = camera.Camera()
         self.cam.ImageReadySignal.connect(self.update)
-
+        self.cam.start()
 
         #self.timer = QTimer(self)
         #self.timer.timeout.connect(self.update)
