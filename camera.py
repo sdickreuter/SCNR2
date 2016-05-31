@@ -6,6 +6,8 @@ import time
 
 class Camera(QObject):
     ImageReadySignal = pyqtSignal(np.ndarray)
+    exposure_us = 10000.0
+
 
     def __init__(self, parent=None):
         if getattr(self.__class__, '_has_instance', False):
@@ -21,7 +23,7 @@ class Camera(QObject):
 
             self._cam = xi.Xi_Camera(DevID=0)
             self._cam.set_debug_level("Warning")
-            self._cam.set_param('exposure', 10000.0)
+            self._cam.set_param('exposure', self.exposure_us)
             self._cam.set_param('aeag', 1)
             self._cam.set_param('exp_priority', 0)
 
@@ -45,6 +47,7 @@ class Camera(QObject):
         return self._cam.get_image()
 
     def setexposure(self,us):
+        self.exposure_us = us
         self._cam.set_param('exposure', us)
 
     def start(self):
@@ -62,7 +65,7 @@ class Camera(QObject):
     def process(self):
         while not self.abort:
             try:
-                time.sleep(0.1)
+                time.sleep(self.exposure_us/1e6)
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
