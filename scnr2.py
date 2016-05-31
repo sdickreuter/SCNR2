@@ -11,7 +11,7 @@ from PyQt5 import uic
 #Ui_MainWindow = uic.loadUiType("ui"+path.sep+"SCNR_main.ui")[0]
 Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 
-import camera
+import camerathread
 
 class SCNR(QMainWindow):
     _window_title = "SCNR"
@@ -30,16 +30,17 @@ class SCNR(QMainWindow):
         self.gv.setCentralWidget(self.vb)
         self.l = QVBoxLayout(self.ui.camwidget)
         self.l.addWidget(self.gv)
-        self.cam = camera.Camera()
-        self.cam.ImageReadySignal.connect(self.update)
-        self.cam.start()
+        self.cam = camerathread.CameraThread()
+        if self.cam.isinitialized:
+            self.cam.ImageReadySignal.connect(self.update_camera)
+            self.cam.start()
 
         #self.timer = QTimer(self)
         #self.timer.timeout.connect(self.update)
         #self.timer.start(50)
 
     @pyqtSlot(np.ndarray)
-    def update(self, img):
+    def update_camera(self, img):
         self.img.setImage(img)
 
 
