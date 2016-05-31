@@ -4,6 +4,8 @@ from PyQt5.QtCore import pyqtSlot, QTimer, QSocketNotifier, QAbstractTableModel,
 from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog
 import pyqtgraph as pg
 
+import numpy as np
+
 from PyQt5 import uic
 #from sys import path
 #Ui_MainWindow = uic.loadUiType("ui"+path.sep+"SCNR_main.ui")[0]
@@ -26,20 +28,19 @@ class SCNR(QMainWindow):
         self.img = pg.ImageItem()
         self.vb.addItem(self.img)
         self.gv.setCentralWidget(self.vb)
-        self.l = QVBoxLayout(self.ui.imgwidget)
+        self.l = QVBoxLayout(self.ui.camwidget)
         self.l.addWidget(self.gv)
         self.cam = camera.Camera()
+        self.cam.ImageReadySignal.connect(self.update)
 
 
+        #self.timer = QTimer(self)
+        #self.timer.timeout.connect(self.update)
+        #self.timer.start(50)
 
-
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update)
-        self.timer.start(50)
-
-
-    def update(self):
-        self.img.setImage(self.cam.getimage())
+    @pyqtSlot(np.ndarray)
+    def update(self, img):
+        self.img.setImage(img)
 
 
 if __name__ == '__main__':
