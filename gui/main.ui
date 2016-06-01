@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>985</width>
-    <height>941</height>
+    <width>1022</width>
+    <height>907</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,10 +27,13 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>1</number>
+      <property name="enabled">
+       <bool>true</bool>
       </property>
-      <widget class="QWidget" name="tab">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="spec_tab">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -53,7 +56,10 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="cam_tab">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -82,6 +88,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTabWidget" name="tabWidget_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -101,7 +110,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="usesScrollButtons">
          <bool>true</bool>
@@ -258,7 +267,10 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="scannong_tab">
+        <widget class="QWidget" name="scanning_tab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -297,6 +309,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="searchgrid_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Search Max Grid</string>
             </property>
@@ -314,6 +329,9 @@
           </item>
           <item>
            <widget class="QCheckBox" name="search_checkBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>with Search</string>
             </property>
@@ -520,6 +538,35 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="searchmax_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Search Maximum</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="correct_checkBox">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Correct Spectrum</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QGridLayout" name="stepsize_layout">
         <item row="0" column="0">
          <widget class="QPushButton" name="Button_stepup">
@@ -548,33 +595,10 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="correct_checkBox">
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Correct Spectrum</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="searchmax_button">
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Search Maximum</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QFrame" name="stage_frame">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -847,7 +871,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>985</width>
+     <width>1022</width>
      <height>23</height>
     </rect>
    </property>

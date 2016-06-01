@@ -10,26 +10,28 @@ class GamepadThread(QObject):
     XSignal = pyqtSignal()
     YSignal = pyqtSignal()
 
+
     def __init__(self, parent=None):
         if getattr(self.__class__, '_has_instance', False):
             RuntimeError('Cannot create another instance')
         self.__class__._has_instance = True
+        self.isinitialized = False
+        super(GamepadThread, self).__init__(parent)
+        self.pad = None
         try:
-            super(GamepadThread, self).__init__(parent)
-            self.abort = False
-            self.thread = QThread()
-            # try:
             self.pad = pygamepad.Gamepad()
-            # except:
-            #    print("Could not initialize Gamepad")
-            #    self.pad = None
-            # else:
-            self.thread.started.connect(self.process)
-            self.thread.finished.connect(self.stop)
-            self.moveToThread(self.thread)
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
+
+        if (not self.pad is None):
+            if self.pad.is_initialized:
+                self.abort = False
+                self.thread = QThread()
+                self.thread.started.connect(self.process)
+                self.thread.finished.connect(self.stop)
+                self.moveToThread(self.thread)
+                self.isinitialized = True
 
     def start(self):
         self.thread.start(QThread.HighPriority)
