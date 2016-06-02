@@ -3,12 +3,14 @@ import time
 
 import numpy as np
 import ximea as xi
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject#, QMutex
 
 
 class CameraThread(QObject):
     ImageReadySignal = pyqtSignal(np.ndarray)
-    exposure_us = 10000.0
+    exposure_us = 100000.0
+    #mutex = QMutex()
+    enabled = False
 
     def __init__(self, parent=None):
         if getattr(self.__class__, '_has_instance', False):
@@ -20,7 +22,6 @@ class CameraThread(QObject):
         try:
             self.abort = False
             self.thread = QThread()
-
             num_dev = xi.get_device_count()
 
             if num_dev > 0:
@@ -31,9 +32,9 @@ class CameraThread(QObject):
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 1)
                 self._cam.set_param('exp_priority', 0)
-
+                self._cam.set_param('binning',4)
                 self._cam.set_param('imgdataformat',2)
-
+                self._cam.get_image()
 
                 self.thread.started.connect(self.process)
                 self.thread.finished.connect(self.stop)
@@ -60,13 +61,20 @@ class CameraThread(QObject):
     def start(self):
         self.thread.start()
 
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
+
     @pyqtSlot()
     def stop(self):
         self.abort = True
 
     def work(self):
-        img = self._cam.get_image()
-        self.ImageReadySignal.emit(img)
+        if self.enabled:
+            img = self._cam.get_image()
+            self.ImageReadySignal.emit(img)
 
     @pyqtSlot()
     def process(self):

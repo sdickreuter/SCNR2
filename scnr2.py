@@ -50,7 +50,7 @@ class SCNR(QMainWindow):
             print("Error initializing Camera")
         if self.cam.isinitialized:
             self.cam.ImageReadySignal.connect(self.update_camera)
-            #self.cam.start()
+            self.cam.start()
         else:
             self.cam = None
             self.ui.tabWidget.setEnabled(False)
@@ -140,9 +140,9 @@ class SCNR(QMainWindow):
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
         if index == 1:
-            self.cam.start()
+            self.cam.enable()
         if index == 0:
-            self.cam.stop()
+            self.cam.disable()
 
 # ----- END Slots for Camera Stuff
 
