@@ -31,7 +31,8 @@ class CameraThread(QObject):
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 1)
                 self._cam.set_param('exp_priority', 0)
-                self._cam.set_param('imgdataformat',3)
+
+                self._cam.set_param('imgdataformat',2)
 
 
                 self.thread.started.connect(self.process)
@@ -51,9 +52,6 @@ class CameraThread(QObject):
             self.ImageReadySignal.disconnect()
         except TypeError:
             pass
-
-    def getimage(self):
-        return self._cam.get_image()
 
     def setexposure(self, us):
         self.exposure_us = us
@@ -79,4 +77,4 @@ class CameraThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-        self._cam.stop_aquisition()
+        #self._cam.stop_aquisition()

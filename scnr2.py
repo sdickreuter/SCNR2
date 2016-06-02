@@ -6,10 +6,10 @@ import pyqtgraph as pg
 
 import numpy as np
 
-#from PyQt5 import uic
-#Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
+from PyQt5 import uic
+Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 
-from gui.main import Ui_MainWindow
+#from gui.main import Ui_MainWindow
 
 import PIStage
 
@@ -139,9 +139,9 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
-        if index == 0:
-            self.cam.start()
         if index == 1:
+            self.cam.start()
+        if index == 0:
             self.cam.stop()
 
 # ----- END Slots for Camera Stuff
