@@ -6,18 +6,21 @@ import pyqtgraph as pg
 
 import numpy as np
 
-from PyQt5 import uic
-Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
+#from PyQt5 import uic
+#Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 
-#from gui.main import Ui_MainWindow
+from gui.main import Ui_MainWindow
 
 import PIStage
+from AndorSpectrometer import Spectrometer
 
 import spectrum
 import settings
 import dialogs
 import camerathread
 import gamepadthread
+
+
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -32,9 +35,9 @@ class SCNR(QMainWindow):
         # init settings
         self.settings = settings.Settings()
 
-
-        # init spectrum stuff
-        #self.spectrum = spectrum.Spectrum(None, self.settings, None, None, None, None)
+        # init Spectrometer
+        #self.spectrometer = Spectrometer()
+        self.spectrometer = None
 
         # init camera stuff
         self.gv = pg.GraphicsView()
@@ -53,7 +56,7 @@ class SCNR(QMainWindow):
             self.cam.start()
         else:
             self.cam = None
-            self.ui.tabWidget.setEnabled(False)
+            self.ui.left_tab.setEnabled(False)
             print("Could not initialize Camera")
 
         # init stage
@@ -100,13 +103,19 @@ class SCNR(QMainWindow):
         self.slit_dialog = dialogs.SlitWidth_Dialog(10) # TODO: read out slit width and use as parameter
         self.slit_dialog.changeSlitSignal.connect(self.update_slit)
 
+        # init spectrum stuff
+        self.spectrum = spectrum.Spectrum(self.spectrometer, self.stage, self.settings)
+        self.spectrum.updateStatus.connect(self.on_updateStatus)
+        self.spectrum.updatePositions.connect(self.on_updatePositions)
+        self.spectrum.disableButtons.connect(self.on_disableButtons)
+        self.spectrum.enableButtons.connect(self.on_enableButtons)
 
-# ----- Settings Dialog Stuff
+    # ----- Settings Dialog Stuff
 
     # Slot for Settings Dialog
     @pyqtSlot()
     def update_settings(self):
-        #self.spectrum._spectrometer.integration_time_micros(self.settings.integration_time * 1000)
+        #self.spectrometer.set_Exposure(self.settings.cam_exposure_time)
         pass
 
     # Button For Settings Dialog
@@ -145,6 +154,45 @@ class SCNR(QMainWindow):
             self.cam.disable()
 
 # ----- END Slots for Camera Stuff
+
+# ----- Slots for Spectrum Stuff
+
+    @pyqtSlot(str)
+    def on_updateStatus(self, status):
+        self.ui.status.setLabel(status)
+
+    @pyqtSlot(float)
+    def on_updateProgress(self, progress):
+        self.ui.progressBar.setValue(progress)
+
+    @pyqtSlot(np.ndarray)
+    def on_updatePositions(self, pos):
+        self.posModel.update(pos)
+
+    @pyqtSlot()
+    def on_disableButtons(self):
+        self.ui.right_tab.setDisabled(True)
+        self.ui.stage_frame.setDisabled(True)
+        self.ui.searchmax_button.setDisabled(True)
+        self.ui.stepup_button.setDisabled(True)
+        self.ui.stepup_button.setDisabled(True)
+        self.ui.stop_button.setDisabled(False)
+
+    @pyqtSlot()
+    def on_enableButtons(self):
+        self.ui.right_tab.setDisabled(False)
+        self.ui.stage_frame.setDisabled(False)
+        self.ui.searchmax_button.setDisabled(False)
+        self.ui.stepup_button.setDisabled(False)
+        self.ui.stepup_button.setDisabled(False)
+        self.ui.stop_button.setDisabled(True)
+        self.pad_active = True
+
+# ----- END Slots for Spectrum Stuff
+
+
+
+
 
 
 if __name__ == '__main__':

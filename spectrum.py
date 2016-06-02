@@ -3,7 +3,7 @@ __author__ = 'sei'
 from spectrumthreads import *
 import numpy as np
 from datetime import datetime
-
+from PyQt5.QtCore import pyqtSignal, QObject
 from AndorSpectrometer import Spectrometer
 
 # eol={"win32":"\n", 'linux':"\n" }
@@ -16,19 +16,20 @@ class Spectrum(QObject):
     specSignal = pyqtSignal(np.ndarray)
     updatePositions = pyqtSignal(np.ndarray)
 
-    def __init__(self, stage, settings, status, progressbar, enable_buttons, disable_buttons):
+    updateStatus = pyqtSignal(str)
+    updateProgress = pyqtSignal(float)
+    disableButtons = pyqtSignal()
+    enableButtons = pyqtSignal()
+
+
+    def __init__(self, spectrometer, stage, settings):
         super(Spectrum, self).__init__(None)
         self._spectrometer = None
 
         self.settings = settings
         self.stage = stage
-        self.status = status
-        self.progressbar = progressbar
-        self.enable_buttons = enable_buttons
-        self.disable_buttons = disable_buttons
-
-        self._init_spectrometer()
-
+        self._spectrometer = spectrometer
+        
         self._cycle_time_start = 60
         self._data = None
         self.prev_time = None
@@ -42,27 +43,19 @@ class Spectrum(QObject):
 
         #self._spec = self._spectrometer.intensities(correct_nonlinearity=True)
         self._spec = None
-        self._wl = self._spectrometer.wavelengths()
+        if not self._spectrometer is None:
+            self._wl = self._spectrometer.Get_wl()
 
         self.workingthread = None
 
     def __del__(self):
         self._spectrometer = None
 
-    def _init_spectrometer(self):
-        self._spectrometer = Spectrometer()
-
-        #try:
-        #    self._spectrometer = Spectrometer()
-        #    #print("Spectrometer " + str(self._spectrometer.serial_number) + " initialized and working")
-        #except:
-        #    raise RuntimeError("Error accessing Spectrometer")
-
 
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
-        self.progressbar.setValue(progress)
-        self.status.setText('ETA: ' + eta)
+        self.updateProgress.emit(progress)
+        self.updateStatus.emit('ETA: ' + eta)
 
     @pyqtSlot(np.ndarray)
     def specCallback(self, spec):
@@ -91,7 +84,7 @@ class Spectrum(QObject):
     def stop_process(self):
         self.workingthread.stop()
         self.workingthread = None
-        # self.enable_buttons()
+        # self.enableButtons.emit()
 
     def take_live(self):
         # self.workingthread = LiveThread(self.getspecthread)
@@ -102,36 +95,36 @@ class Spectrum(QObject):
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
         self.lockin = spec
-        self.enable_buttons()
-        self.status.setText('Lockin Spectrum acquired')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Lockin Spectrum acquired')
         self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedDarkCallback(self, spec):
         self.dark = spec
-        self.enable_buttons()
-        self.status.setText('Dark Spectrum acquired')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Dark Spectrum acquired')
         self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedLampCallback(self, spec):
         self.lamp = spec
-        self.enable_buttons()
-        self.status.setText('Lamp Spectrum acquired')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Lamp Spectrum acquired')
         self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedMeanCallback(self, spec):
         self.mean = spec
-        self.enable_buttons()
-        self.status.setText('Mean Spectrum acquired')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Mean Spectrum acquired')
         self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedBGCallback(self, spec):
         self.bg = spec
-        self.enable_buttons()
-        self.status.setText('Background Spectrum acquired')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Background Spectrum acquired')
         self.workingthread = None
 
     def startMeanThread(self):
@@ -188,8 +181,8 @@ class Spectrum(QObject):
     @pyqtSlot(np.ndarray)
     def finishedSearch(self, pos):
         # print(pos)
-        self.enable_buttons()
-        self.status.setText('Search finished')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Search finished')
         self.workingthread = None
 
     @pyqtSlot(np.ndarray)
@@ -201,8 +194,8 @@ class Spectrum(QObject):
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
         plt.close()
-        self.enable_buttons()
-        self.status.setText('Scan Search finished')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Scan Search finished')
         self.workingthread = None
         self.updatePositions.emit(pos)
 
@@ -232,8 +225,8 @@ class Spectrum(QObject):
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
         plt.close()
-        self.enable_buttons()
-        self.status.setText('Scan Mean finished')
+        self.enableButtons.emit()
+        self.updateStatus.emit('Scan Mean finished')
         self.workingthread = None
 
     def take_series(self, path):

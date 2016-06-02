@@ -88,6 +88,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QPushButton" name="stop_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Stop</string>
         </property>
@@ -595,16 +598,44 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_step_size">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Set Step Size [um]</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QGridLayout" name="stepsize_layout">
         <item row="0" column="0">
-         <widget class="QPushButton" name="Button_stepup">
+         <widget class="QPushButton" name="stepup_button">
           <property name="text">
            <string>+</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QPushButton" name="Button_stepdown">
+         <widget class="QPushButton" name="stepdown_button">
           <property name="text">
            <string>-</string>
           </property>
@@ -777,34 +808,6 @@
           </spacer>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_step_size">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Set Step Size [um]</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
        </widget>
       </item>
       <item>
