@@ -18,13 +18,17 @@ class Spectrum(QObject):
 
     def __init__(self, stage, settings, status, progressbar, enable_buttons, disable_buttons):
         super(Spectrum, self).__init__(None)
+        self._spectrometer = None
+
         self.settings = settings
         self.stage = stage
         self.status = status
         self.progressbar = progressbar
         self.enable_buttons = enable_buttons
         self.disable_buttons = disable_buttons
+
         self._init_spectrometer()
+
         self._cycle_time_start = 60
         self._data = None
         self.prev_time = None
@@ -36,12 +40,9 @@ class Spectrum(QObject):
         self.bg = None
         self.lockin = None
 
-        self._spec = np.zeros(1024, dtype=np.float)
-        self._spec = self._spectrometer.intensities(correct_nonlinearity=True)
-        self._spec = self._spec[0:1024]
-
+        #self._spec = self._spectrometer.intensities(correct_nonlinearity=True)
+        self._spec = None
         self._wl = self._spectrometer.wavelengths()
-        self._wl = self._wl[0:1024]
 
         self.workingthread = None
 
@@ -49,13 +50,13 @@ class Spectrum(QObject):
         self._spectrometer = None
 
     def _init_spectrometer(self):
+        self._spectrometer = Spectrometer()
 
-        try:
-            self._spectrometer = Spectrometer()
-            #print("Spectrometer " + str(self._spectrometer.serial_number) + " initialized and working")
-            print("Spectrometer initialized")
-        except:
-            print("Error accessing Spectrometer")
+        #try:
+        #    self._spectrometer = Spectrometer()
+        #    #print("Spectrometer " + str(self._spectrometer.serial_number) + " initialized and working")
+        #except:
+        #    raise RuntimeError("Error accessing Spectrometer")
 
 
     @pyqtSlot(float, str)
@@ -82,6 +83,9 @@ class Spectrum(QObject):
                     if not self.lamp is None:
                         return (self._spec - self.dark) / (self.lamp - self.dark)
                     return self._spec - self.dark
+            else:
+                if not self.ng is None:
+                    return self._spec - self.bg
         return self._spec
 
     def stop_process(self):

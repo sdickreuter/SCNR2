@@ -79,3 +79,4 @@ class CameraThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
+        self._cam.stop_aquisition()

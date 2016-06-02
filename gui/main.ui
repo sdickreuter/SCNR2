@@ -26,7 +26,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="left_tab">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -87,7 +87,14 @@
     <item row="0" column="1" rowspan="2">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QTabWidget" name="tabWidget_2">
+       <widget class="QPushButton" name="stop_button">
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="right_tab">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -141,6 +148,27 @@
           </item>
           <item>
            <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="livedetector_button">
+            <property name="text">
+             <string>Liveview Detector</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="slit_button">
+            <property name="text">
+             <string>Set Slit Width</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -881,5 +909,59 @@
  <resources>
   <include location="../resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>slit_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_slit_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>672</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>837</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>settings_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_settings_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>726</x>
+     <y>514</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>846</x>
+     <y>511</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>left_tab</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_lefttab_changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>214</x>
+     <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>on_slit_clicked()</slot>
+  <slot>on_settings_clicked()</slot>
+  <slot>on_lefttab_changed(int)</slot>
+ </slots>
 </ui>

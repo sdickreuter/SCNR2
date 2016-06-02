@@ -13,7 +13,9 @@ from gui.main import Ui_MainWindow
 
 import PIStage
 
+import spectrum
 import settings
+import dialogs
 import camerathread
 import gamepadthread
 
@@ -31,6 +33,9 @@ class SCNR(QMainWindow):
         self.settings = settings.Settings()
 
 
+        # init spectrum stuff
+        #self.spectrum = spectrum.Spectrum(None, self.settings, None, None, None, None)
+
         # init camera stuff
         self.gv = pg.GraphicsView()
         self.vb = pg.ViewBox()
@@ -45,7 +50,7 @@ class SCNR(QMainWindow):
             print("Error initializing Camera")
         if self.cam.isinitialized:
             self.cam.ImageReadySignal.connect(self.update_camera)
-            self.cam.start()
+            #self.cam.start()
         else:
             self.cam = None
             self.ui.tabWidget.setEnabled(False)
@@ -85,9 +90,61 @@ class SCNR(QMainWindow):
             self.padthread = None
             print("Could not initialize Gamepad")
 
+
+        # init Settings Dialog
+        self.settings_dialog = dialogs.Settings_Dialog(self.settings)
+        self.settings_dialog.updateSignal.connect(self.update_settings)
+        self.update_settings()
+
+        # init Slit Width Dialog
+        self.slit_dialog = dialogs.SlitWidth_Dialog(10) # TODO: read out slit width and use as parameter
+        self.slit_dialog.changeSlitSignal.connect(self.update_slit)
+
+
+# ----- Settings Dialog Stuff
+
+    # Slot for Settings Dialog
+    @pyqtSlot()
+    def update_settings(self):
+        #self.spectrum._spectrometer.integration_time_micros(self.settings.integration_time * 1000)
+        pass
+
+    # Button For Settings Dialog
+    @pyqtSlot()
+    def on_settings_clicked(self):
+        self.settings_dialog.show()
+
+# ----- END Settings Dialog Stuff
+
+# ----- Slit Width Dialog Stuff
+
+    # Slot for Settings Dialog
+    @pyqtSlot(int)
+    def update_slit(self,slitwidth):
+        print(slitwidth)
+        #self.spectrum.setSlitWidth(slitwidth)
+
+    # Button For Settings Dialog
+    @pyqtSlot()
+    def on_slit_clicked(self):
+        self.slit_dialog.show()
+
+# ----- END Slit Width Dialog Stuff
+
+# ----- Slots for Camera Stuff
+
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
         self.img.setImage(img)
+
+    @pyqtSlot(int)
+    def on_lefttab_changed(self, index):
+        if index == 0:
+            self.cam.start()
+        if index == 1:
+            self.cam.stop()
+
+# ----- END Slots for Camera Stuff
 
 
 if __name__ == '__main__':
