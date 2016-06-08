@@ -21,7 +21,6 @@ class Spectrum(QObject):
     disableButtons = pyqtSignal()
     enableButtons = pyqtSignal()
 
-
     def __init__(self, spectrometer, stage, settings):
         super(Spectrum, self).__init__(None)
         self._spectrometer = None
@@ -41,10 +40,7 @@ class Spectrum(QObject):
         self.bg = None
         self.lockin = None
 
-        #self._spec = self._spectrometer.intensities(correct_nonlinearity=True)
         self._spec = None
-        if not self._spectrometer is None:
-            self._wl = self._spectrometer.Get_wl()
 
         self.workingthread = None
 
@@ -63,7 +59,7 @@ class Spectrum(QObject):
         self.specSignal.emit(spec)
 
     def get_wl(self):
-        return self._wl
+        return self._spectrometer.Get_wl()
 
     def get_spec(self, corrected=False):
         if corrected:
@@ -256,7 +252,8 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
     def save_spectrum(self, spec, filename, pos, lockin, fullPath):
-        data = np.append(np.round(self._wl, 1).reshape(self._wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
+        wl = self._spectrometer.Get_wl()
+        data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
         if fullPath:
             f = open(filename, 'w')
         else:

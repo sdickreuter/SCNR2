@@ -88,7 +88,6 @@ class MeasurementThread(QObject):
         while not self.abort:
             try:
                 self.spec = self.spectrometer.intensities()
-                self.spec = self.spec[0:1024]
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
