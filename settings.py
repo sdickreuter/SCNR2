@@ -56,7 +56,7 @@ class Settings(object):
         self.config.set('searchmax', 'rasterwidth', str(self.rasterwidth))
         self.config.set('searchmax', 'integration_time', str(self.search_integration_time))
 
-        self.config.set('camera', 'exposure_tine', str(self.cam_exposure_time))
+        self.config.set('camera', 'exposure_time', str(self.cam_exposure_time))
 
         try:
             with open(self._filename, 'w') as configfile:
