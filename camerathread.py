@@ -32,7 +32,7 @@ class CameraThread(QObject):
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 1)
                 self._cam.set_param('exp_priority', 0)
-                self._cam.set_param('binning',4)
+                self._cam.set_binning(4, skipping=False)
                 self._cam.set_param('imgdataformat',2)
                 self._cam.get_image()
 
@@ -54,9 +54,13 @@ class CameraThread(QObject):
         except TypeError:
             pass
 
-    def setexposure(self, us):
+    def set_exposure(self, us):
         self.exposure_us = us
         self._cam.set_param('exposure', us)
+
+    def get_exposure(self):
+        us = self._cam.get_param('exposure')
+        return us
 
     def start(self):
         self.thread.start()

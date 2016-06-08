@@ -51,6 +51,7 @@ class SCNR(QMainWindow):
         except:
             print("Error initializing Camera")
         if self.cam.isinitialized:
+            self.cam.set_exposure(self.settings.cam_exposure_time * 1000)
             self.cam.ImageReadySignal.connect(self.update_camera)
             self.cam.start()
         else:
@@ -120,6 +121,7 @@ class SCNR(QMainWindow):
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
         self.img.setImage(img)
+        print(self.cam.get_exposure())
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
@@ -348,6 +350,7 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_exposure_time_edited(self):
         self.settings.cam_exposure_time = self.ui.exposure_time_spin.value()
+        self.cam.set_exposure(self.settings.cam_exposure_time * 1000)
         print(self.ui.exposure_time_spin.value())
 
     @pyqtSlot()

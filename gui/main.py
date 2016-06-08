@@ -674,7 +674,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.left_tab.setCurrentIndex(0)
-        self.right_tab.setCurrentIndex(2)
+        self.right_tab.setCurrentIndex(0)
         self.left_tab.currentChanged['int'].connect(MainWindow.on_lefttab_changed)
         self.scan_button.clicked.connect(MainWindow.on_start_scan_clicked)
         self.stop_button.clicked.connect(MainWindow.on_stop_clicked)
