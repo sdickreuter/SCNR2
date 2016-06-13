@@ -21,7 +21,6 @@ import camerathread
 import gamepadthread
 
 
-
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
     _heartbeat = 100  # ms delay at which the plot/gui is refreshed, and the gamepad moves the stage
@@ -81,13 +80,15 @@ class SCNR(QMainWindow):
         except:
             print("Error initializing Gamepad")
         if self.padthread.isinitialized:
-            self.padthread.BSignal.connect(self.on_search_clicked)
-            self.padthread.XSignal.connect(self.on_addpos_clicked)
-            self.padthread.YSignal.connect(self.on_stepup_clicked)
-            self.padthread.ASignal.connect(self.on_stepdown_clicked)
+            #self.padthread.BSignal.connect(self.on_search_clicked)
+            #self.padthread.XSignal.connect(self.on_addpos_clicked)
+            #self.padthread.YSignal.connect(self.on_stepup_clicked)
+            #self.padthread.ASignal.connect(self.on_stepdown_clicked)
+            self.padthread.xaxisSignal.connect(self.on_xaxis)
+            self.padthread.yaxisSignal.connect(self.on_yaxis)
             self.padthread.start()
             self.timer = QTimer(self)
-            self.timer.timeout.connect(self.check_pad_analog)
+            #self.timer.timeout.connect(self.check_pad_analog)
             self.timer.start(100)
         else:
             self.padthread = None
@@ -132,7 +133,6 @@ class SCNR(QMainWindow):
 
 # ----- END Slots for Camera Stuff
 
-# ----- Slots for Spectrum Stuff
 
     @pyqtSlot(str)
     def on_updateStatus(self, status):
@@ -167,6 +167,17 @@ class SCNR(QMainWindow):
         self.pad_active = True
 
 # ----- END Slots for Spectrum Stuff
+
+# ----- Slots for Gamepad
+
+    @pyqtSlot(float)
+    def on_xaxis(self,x):
+        print(x)
+
+    @pyqtSlot(float)
+    def on_yaxis(self,y):
+        print(y)
+
 
 
 # ----- Slots for Buttons
