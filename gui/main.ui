@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
+    <width>976</width>
     <height>963</height>
    </rect>
   </property>
@@ -52,8 +52,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <zorder></zorder>
-          <zorder>frame_2</zorder>
          </widget>
         </item>
        </layout>
@@ -1556,11 +1554,11 @@
    <slot>on_stop_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>813</x>
-     <y>21</y>
+     <x>791</x>
+     <y>31</y>
     </hint>
     <hint type="destinationlabel">
-     <x>982</x>
+     <x>975</x>
      <y>69</y>
     </hint>
    </hints>
@@ -1620,8 +1618,8 @@
    <slot>on_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>797</x>
-     <y>707</y>
+     <x>791</x>
+     <y>711</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -1716,8 +1714,8 @@
    <slot>on_bg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>236</y>
+     <x>780</x>
+     <y>248</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -1924,8 +1922,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
-     <y>501</y>
+     <x>779</x>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -1956,8 +1954,8 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>788</x>
-     <y>567</y>
+     <x>779</x>
+     <y>580</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>

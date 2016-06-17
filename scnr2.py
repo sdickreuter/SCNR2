@@ -35,7 +35,7 @@ class SCNR(QMainWindow):
         self.settings = settings.Settings()
 
         # init Spectrometer
-        self.spectrometer = AndorSpectrometer.Spectrometer()
+        self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True)
         #self.spectrometer = None
         pw = pg.PlotWidget()
         pw.setLabel('left', 'Intensity', units='a.u.')
