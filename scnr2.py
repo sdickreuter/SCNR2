@@ -36,14 +36,15 @@ class SCNR(QMainWindow):
         # init Spectrometer
         #self.spectrometer = Spectrometer()
         self.spectrometer = None
-        gv1 = pg.GraphicsView()
-        vb1 = pg.ViewBox()
+        #gv1 = pg.GraphicsView()
+        #vb1 = pg.ViewBox()
         pw = pg.PlotWidget()
-        pw.setLabel('left', 'Intensity', units='a.u.')
-        pw.setLabel('bottom', 'Wavelength', units='nm')
         self.plot = pw.plot()
-        vb1.addItem(pw)
-        gv1.setCentralWidget(vb1)
+        xd = np.linspace(0,1,1000)
+        yd = np.random.rand(1000)
+        self.plot.setData(y=yd, x=xd)
+        #vb1.addItem(pw)
+        #gv1.setCentralWidget(vb1)
         l1 = QVBoxLayout(self.ui.specwidget)
         l1.addWidget(pw)
         #l1 = pg.QtGui.QGraphicsGridLayout()
@@ -57,9 +58,7 @@ class SCNR(QMainWindow):
         #l1.addItem(yScale, 0, 0)
         #xScale.setLabel('Intensity', units="a.u.")
         #yScale.setLabel('Wavelength', units='nm')
-        xd = np.linspace(0,1,1000)
-        yd = np.random.rand(1000)
-        self.plot.setData(y=yd, x=xd)
+
 
         # init camera stuff
         self.gv2 = pg.GraphicsView()
