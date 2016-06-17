@@ -1,7 +1,8 @@
 
 
 from PyQt5.QtCore import pyqtSlot, QTimer, QSocketNotifier, QAbstractTableModel, Qt, QVariant, QModelIndex
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog, QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog,         QFrame
+
 import pyqtgraph as pg
 
 import os
@@ -13,7 +14,7 @@ import numpy as np
 from gui.main import Ui_MainWindow
 
 import PIStage
-from AndorSpectrometer import Spectrometer
+import AndorSpectrometer
 
 import spectrum
 import settings
@@ -34,31 +35,17 @@ class SCNR(QMainWindow):
         self.settings = settings.Settings()
 
         # init Spectrometer
-        #self.spectrometer = Spectrometer()
-        self.spectrometer = None
-        #gv1 = pg.GraphicsView()
-        #vb1 = pg.ViewBox()
+        self.spectrometer = AndorSpectrometer.Spectrometer()
+        #self.spectrometer = None
         pw = pg.PlotWidget()
+        pw.setLabel('left', 'Intensity', units='a.u.')
+        pw.setLabel('bottom', 'Wavelength', units='nm')
         self.plot = pw.plot()
+        l1 = QVBoxLayout(self.ui.specwidget)
+        l1.addWidget(pw)
         xd = np.linspace(0,1,1000)
         yd = np.random.rand(1000)
         self.plot.setData(y=yd, x=xd)
-        #vb1.addItem(pw)
-        #gv1.setCentralWidget(vb1)
-        l1 = QVBoxLayout(self.ui.specwidget)
-        l1.addWidget(pw)
-        #l1 = pg.QtGui.QGraphicsGridLayout()
-        #l1 = pg.QtGui.QLayout(self.ui.specwidget)
-        #self.ui.specwidget.setLayout(l1)
-        #l1.setSpacing(0)
-        #l1.addItem(gv1)
-        #xScale = pg.AxisItem(orientation='bottom', linkView=vb1)
-        #l1.addItem(xScale, 1, 1)
-        #yScale = pg.AxisItem(orientation='left', linkView=vb1)
-        #l1.addItem(yScale, 0, 0)
-        #xScale.setLabel('Intensity', units="a.u.")
-        #yScale.setLabel('Wavelength', units='nm')
-
 
         # init camera stuff
         self.gv2 = pg.GraphicsView()
@@ -128,6 +115,7 @@ class SCNR(QMainWindow):
         self.spectrum.updatePositions.connect(self.on_updatePositions)
         self.spectrum.disableButtons.connect(self.on_disableButtons)
         self.spectrum.enableButtons.connect(self.on_enableButtons)
+        self.spectrum.specSignal.connect(self.on_update_spectrum)
 
         # init grating combobox
         self.ui.grating_combobox.addItem("300 l/mm")
@@ -164,6 +152,10 @@ class SCNR(QMainWindow):
 
 # ----- Slots for Spectrum Stuff
 
+    @pyqtSlot(np.ndarray)
+    def on_update_spectrum(self,spec):
+        self.plot.setData(spec,self.spectrum.get_wl())
+
     @pyqtSlot(str)
     def on_updateStatus(self, status):
         self.ui.status.setLabel(status)
@@ -182,7 +174,7 @@ class SCNR(QMainWindow):
         self.ui.stage_frame.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
         self.ui.stepup_button.setDisabled(True)
-        self.ui.stepup_button.setDisabled(True)
+        self.ui.stepdown_button.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
 
     @pyqtSlot()
@@ -192,7 +184,7 @@ class SCNR(QMainWindow):
             self.ui.stage_frame.setDisabled(False)
             self.ui.searchmax_button.setDisabled(False)
             self.ui.stepup_button.setDisabled(False)
-            self.ui.stepup_button.setDisabled(False)
+            self.ui.stepdown_button.setDisabled(False)
         self.ui.stop_button.setDisabled(True)
         self.pad_active = True
 
@@ -232,9 +224,8 @@ class SCNR(QMainWindow):
                 self.stage.moverel(dy=y_step)
             self.show_pos()
 
+# ----- END Slots for Gamepad
 
-
-            # ----- END Slots for Gamepad
 
 # ----- Slots for Buttons
 
@@ -268,19 +259,20 @@ class SCNR(QMainWindow):
     def on_reset_clicked(self):
         self.spectrum.reset()
 
-    @pyqtSlot()
-    def on_acquirelockin_clicked(self):
-        self.ui.status.setText('Acquiring ...')
-        self.spectrum.take_lockin()
-        self.disable_buttons()
-
-    @pyqtSlot()
-    def on_direction_clicked(self):
-        self.direction_dialog.rundialog()
+    # @pyqtSlot()
+    # def on_acquirelockin_clicked(self):
+    #     self.ui.status.setText('Acquiring ...')
+    #     self.spectrum.take_lockin()
+    #     self.disable_buttons()
+    #
+    # @pyqtSlot()
+    # def on_direction_clicked(self):
+    #     self.direction_dialog.rundialog()
 
     @pyqtSlot()
     def on_live_clicked(self):
         self.ui.status.setText('Liveview')
+        self.spectrometer.SetSingleTrack()
         self.spectrum.take_live()
         self.disable_buttons()
 
@@ -448,7 +440,11 @@ class SCNR(QMainWindow):
 if __name__ == '__main__':
     import sys
 
-    app = QApplication(sys.argv)
-    main = SCNR()
-    main.show()
+    try:
+        app = QApplication(sys.argv)
+        main = SCNR()
+        main.show()
+    finally:
+        AndorSpectrometer.Andor.Shutdown()
+
     sys.exit(app.exec_())
