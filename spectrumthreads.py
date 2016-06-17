@@ -50,6 +50,7 @@ class MeasurementThread(QObject):
     def __init__(self, spectrometer, parent=None):
         if getattr(self.__class__, '_has_instance', False):
             RuntimeError('Cannot create another instance')
+            return None
         self.__class__._has_instance = True
         try:
             super(MeasurementThread, self).__init__(parent)
@@ -72,15 +73,8 @@ class MeasurementThread(QObject):
         self.thread.quit()
         self.thread.wait(5000)
 
-
     def __del__(self):
         self.__class__.has_instance = False
-        try:
-            self.specSignal.disconnect()
-            self.progressSignal.disconnect()
-            self.finishSignal.disconnect()
-        except TypeError as e:
-            print(e)
 
     def work(self):
         self.specSignal.emit(self.spec)
@@ -94,7 +88,9 @@ class MeasurementThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-
+        self.specSignal.disconnect()
+        self.progressSignal.disconnect()
+        self.finishSignal.disconnect()
 
 class MeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):
@@ -236,7 +232,6 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
                     return False
                 spec = self.spectrometer.TakeSingleTrack()
-                spec = np.mean(spec, 1)
                 # spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
                 # measured[k] = np.max(spec[400:800])
@@ -305,17 +300,6 @@ class ScanThread(MeasurementThread):
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
-
-    @pyqtSlot()
-    def run(self):
-        while True:
-            if self.abort:
-                return
-            try:
-                self.work()
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
 
     def intermediatework(self):
         pass

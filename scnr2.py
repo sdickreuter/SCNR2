@@ -24,6 +24,7 @@ import gamepadthread
 init_pad = False
 init_cam = False
 init_stage = False
+init_spectrometer = False
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -31,6 +32,7 @@ class SCNR(QMainWindow):
     stage = None
     cam = None
     padthread = None
+    spectrometer = None
 
     def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
@@ -42,15 +44,16 @@ class SCNR(QMainWindow):
 
 
         # init Spectrometer
-        print('Initializing Spectrometer')
-        self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True)
-        self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
-        #self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
-        self.spectrometer.SetSlitWidth(50)
-        self.spectrometer.SetSingleTrack()
-        #self.spectrometer.SetExposureTime(self.settings.integration_time/1000)
-        self.spectrometer.SetExposureTime(1)
-        print('Spectrometer initialized')
+        if init_spectrometer:
+            print('Initializing Spectrometer')
+            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True)
+            self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
+            #self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
+            self.spectrometer.SetSlitWidth(50)
+            self.spectrometer.SetSingleTrack()
+            #self.spectrometer.SetExposureTime(self.settings.integration_time/1000)
+            self.spectrometer.SetExposureTime(1)
+            print('Spectrometer initialized')
 
         #self.spectrometer = None
         pw = pg.PlotWidget()
@@ -292,20 +295,20 @@ class SCNR(QMainWindow):
     def on_live_clicked(self):
         self.ui.status.setText('Liveview')
         self.spectrometer.SetSingleTrack()
-        #spec = self.spectrometer.TakeSingleTrack()
-        #self.on_update_spectrum(spec)
         self.spectrum.take_live()
-        #self.disable_buttons()
+        self.disable_buttons()
 
     @pyqtSlot()
     def on_searchgrid_clicked(self):
         self.ui.status.setText("Searching Max.")
+        self.spectrometer.SetSingleTrack()
         self.spectrum.scan_search_max(self.posModel.getMatrix())
         self.disable_buttons()
 
     @pyqtSlot()
     def on_search_clicked(self):
         self.ui.status.setText("Searching Max.")
+        self.spectrometer.SetSingleTrack()
         self.spectrum.search_max()
         self.disable_buttons()
 
@@ -340,30 +343,35 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_dark_clicked(self):
         self.ui.status.setText('Taking Dark Spectrum')
+        self.spectrometer.SetSingleTrack()
         self.spectrum.take_dark()
         self.disable_buttons()
 
     @pyqtSlot()
     def on_lamp_clicked(self):
         self.ui.status.setText('Taking Lamp Spectrum')
+        self.spectrometer.SetSingleTrack()
         self.spectrum.take_lamp()
         self.disable_buttons()
 
     @pyqtSlot()
     def on_mean_clicked(self):
         self.ui.status.setText('Taking Normal Spectrum')
+        self.spectrometer.SetSingleTrack()
         self.spectrum.take_mean()
         self.disable_buttons()
 
     @pyqtSlot()
     def on_bg_clicked(self):
         self.ui.status.setText('Taking Background Spectrum')
+        self.spectrometer.SetSingleTrack()
         self.spectrum.take_bg()
         self.disable_buttons()
 
     @pyqtSlot()
     def on_series_clicked(self):
         self.ui.status.setText('Taking Time Series')
+        self.spectrometer.SetSingleTrack()
         prefix = self.prefix_dialog.rundialog()
         if prefix is not None:
             try:
@@ -404,7 +412,8 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_int_time_edited(self):
-        print(self.ui.integration_time_spin.value())
+        self.settings.integration_time = self.ui.integration_time_spin.value()
+        self.spectrometer.SetExosureTime(self.ui.integration_time_spin.value()/1000)
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
@@ -413,11 +422,11 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_slit_width_edited(self):
-        print(self.ui.slitwidth_spin.value())
+        self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
 
     @pyqtSlot()
     def on_centre_wavelength_edited(self):
-        print(self.ui.slitwidth_spin.value())
+        self.spectrometer.SetCentreWavelength(self.ui.slitwidth_spin.value())
 
     @pyqtSlot(int)
     def on_grating_changed(self, index):
@@ -431,27 +440,22 @@ class SCNR(QMainWindow):
     def on_exposure_time_edited(self):
         self.settings.cam_exposure_time = self.ui.exposure_time_spin.value()
         self.cam.set_exposure(self.settings.cam_exposure_time * 1000)
-        print(self.ui.exposure_time_spin.value())
 
     @pyqtSlot()
     def on_search_int_time_edited(self):
         self.settings.search_integration_time = self.ui.search_int_time_spin.value()
-        print(self.ui.search_int_time_spin.value())
 
     @pyqtSlot()
     def on_rasterdim_edited(self):
         self.settings.rasterdim = self.ui.rasterdim_spin.value()
-        print(self.ui.rasterdim_spin.value())
 
     @pyqtSlot()
     def on_rasterwidth_edited(self):
         self.settings.rasterwidth = self.ui.rasterwidth_spin.value()
-        print(self.ui.rasterwidth_spin.value())
 
     @pyqtSlot()
     def on_sigma_edited(self):
         self.settings.sigma = self.ui.sigma_spin.value()
-        print(self.ui.sigma_spin.value())
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
