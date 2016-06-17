@@ -4,6 +4,7 @@ from spectrumthreads import *
 import numpy as np
 from datetime import datetime
 from PyQt5.QtCore import pyqtSignal, QObject
+import time
 from AndorSpectrometer import Spectrometer
 
 # eol={"win32":"\n", 'linux':"\n" }
@@ -79,6 +80,7 @@ class Spectrum(QObject):
 
     def stop_process(self):
         self.workingthread.stop()
+        time.sleep(0.1)
         self.workingthread = None
         # self.enableButtons.emit()
 
@@ -90,38 +92,38 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
+        self.stop_process()
         self.lockin = spec
         self.enableButtons.emit()
         self.updateStatus.emit('Lockin Spectrum acquired')
-        self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedDarkCallback(self, spec):
+        self.stop_process()
         self.dark = spec
         self.enableButtons.emit()
         self.updateStatus.emit('Dark Spectrum acquired')
-        self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedLampCallback(self, spec):
+        self.stop_process()
         self.lamp = spec
         self.enableButtons.emit()
         self.updateStatus.emit('Lamp Spectrum acquired')
-        self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedMeanCallback(self, spec):
+        self.stop_process()
         self.mean = spec
         self.enableButtons.emit()
         self.updateStatus.emit('Mean Spectrum acquired')
-        self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedBGCallback(self, spec):
+        self.stop_process()
         self.bg = spec
         self.enableButtons.emit()
         self.updateStatus.emit('Background Spectrum acquired')
-        self.workingthread = None
 
     def startMeanThread(self):
         self.workingthread = MeanThread(self._spectrometer, self.settings.number_of_samples)
@@ -176,14 +178,13 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedSearch(self, pos):
-        # print(pos)
+        self.stop_process()
         self.enableButtons.emit()
         self.updateStatus.emit('Search finished')
-        self.workingthread = None
 
     @pyqtSlot(np.ndarray)
     def finishedScanSearch(self, pos):
-        # print(pos)
+        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
@@ -192,7 +193,6 @@ class Spectrum(QObject):
         plt.close()
         self.enableButtons.emit()
         self.updateStatus.emit('Scan Search finished')
-        self.workingthread = None
         self.updatePositions.emit(pos)
 
     def make_scan(self, positions, savedir, with_lockin, with_search):
@@ -214,7 +214,7 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedScanMean(self, pos):
-        # print(pos)
+        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
@@ -223,7 +223,6 @@ class Spectrum(QObject):
         plt.close()
         self.enableButtons.emit()
         self.updateStatus.emit('Scan Mean finished')
-        self.workingthread = None
 
     def take_series(self, path):
         self.series_path = path

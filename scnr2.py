@@ -1,7 +1,7 @@
 
 
 from PyQt5.QtCore import pyqtSlot, QTimer, QSocketNotifier, QAbstractTableModel, Qt, QVariant, QModelIndex
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog, QGridLayout
 import pyqtgraph as pg
 
 import os
@@ -36,15 +36,40 @@ class SCNR(QMainWindow):
         # init Spectrometer
         #self.spectrometer = Spectrometer()
         self.spectrometer = None
+        gv1 = pg.GraphicsView()
+        vb1 = pg.ViewBox()
+        pw = pg.PlotWidget()
+        pw.setLabel('left', 'Intensity', units='a.u.')
+        pw.setLabel('bottom', 'Wavelength', units='nm')
+        self.plot = pw.plot()
+        vb1.addItem(pw)
+        gv1.setCentralWidget(vb1)
+        l1 = QVBoxLayout(self.ui.specwidget)
+        l1.addWidget(pw)
+        #l1 = pg.QtGui.QGraphicsGridLayout()
+        #l1 = pg.QtGui.QLayout(self.ui.specwidget)
+        #self.ui.specwidget.setLayout(l1)
+        #l1.setSpacing(0)
+        #l1.addItem(gv1)
+        #xScale = pg.AxisItem(orientation='bottom', linkView=vb1)
+        #l1.addItem(xScale, 1, 1)
+        #yScale = pg.AxisItem(orientation='left', linkView=vb1)
+        #l1.addItem(yScale, 0, 0)
+        #xScale.setLabel('Intensity', units="a.u.")
+        #yScale.setLabel('Wavelength', units='nm')
+        xd = np.linspace(0,1,1000)
+        yd = np.random.rand(1000)
+        self.plot.setData(y=yd, x=xd)
 
         # init camera stuff
-        self.gv = pg.GraphicsView()
-        self.vb = pg.ViewBox()
+        self.gv2 = pg.GraphicsView()
+        self.vb2 = pg.ViewBox()
         self.img = pg.ImageItem()
-        self.vb.addItem(self.img)
-        self.gv.setCentralWidget(self.vb)
-        self.l = QVBoxLayout(self.ui.camwidget)
-        self.l.addWidget(self.gv)
+        self.vb2.addItem(self.img)
+        self.gv2.setCentralWidget(self.vb2)
+        self.l2 = QVBoxLayout(self.ui.camwidget)
+        self.l2.setSpacing(0)
+        self.l2.addWidget(self.gv2)
         try:
             self.cam = camerathread.CameraThread()
         except:
@@ -80,16 +105,19 @@ class SCNR(QMainWindow):
         except:
             print("Error initializing Gamepad")
         if self.padthread.isinitialized:
-            #self.padthread.BSignal.connect(self.on_search_clicked)
+            self.padthread.BSignal.connect(self.on_search_clicked)
             #self.padthread.XSignal.connect(self.on_addpos_clicked)
             #self.padthread.YSignal.connect(self.on_stepup_clicked)
             #self.padthread.ASignal.connect(self.on_stepdown_clicked)
             self.padthread.xaxisSignal.connect(self.on_xaxis)
+            self.xaxis = 0.0
             self.padthread.yaxisSignal.connect(self.on_yaxis)
+            self.yaxis = 0.0
             self.padthread.start()
             self.timer = QTimer(self)
-            #self.timer.timeout.connect(self.check_pad_analog)
+            self.timer.timeout.connect(self.check_pad_analog)
             self.timer.start(100)
+            self.pad_active = False
         else:
             self.padthread = None
             print("Could not initialize Gamepad")
@@ -135,6 +163,7 @@ class SCNR(QMainWindow):
 
 # ----- END Slots for Camera Stuff
 
+# ----- Slots for Spectrum Stuff
 
     @pyqtSlot(str)
     def on_updateStatus(self, status):
@@ -174,13 +203,39 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(float)
     def on_xaxis(self,x):
-        print(x)
+        self.xaxis = x
 
     @pyqtSlot(float)
     def on_yaxis(self,y):
-        print(y)
+        self.yaxis = y
+
+    @pyqtSlot()
+    def check_pad_analog(self):
+        if self.pad_active:
+            x_step = self.xaxis
+            if abs(x_step) > 0.001:
+                x_step = x_step * self.settings.stepsize
+            else:
+                x_step = 0.0
+
+            y_step = self.yaxis
+            if abs(y_step) > 0.001:
+                y_step = y_step * self.settings.stepsize
+            else:
+                y_step = 0.0
+
+            if abs(x_step) > 0.0001:
+                if abs(y_step) > 0.0001:
+                    self.stage.moverel(dx=x_step, dy=y_step)
+                else:
+                    self.stage.moverel(dx=x_step)
+            elif abs(y_step) > 0.001:
+                self.stage.moverel(dy=y_step)
+            self.show_pos()
 
 
+
+            # ----- END Slots for Gamepad
 
 # ----- Slots for Buttons
 

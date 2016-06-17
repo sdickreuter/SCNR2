@@ -206,6 +206,8 @@ class GamepadThread(QObject):
             self.BSignal.disconnect()
             self.XSignal.disconnect()
             self.YSignal.disconnect()
+            self.xaxisSignal.disconnect()
+            self.yaxisSignal.disconnect()
         except TypeError:
             pass
         self.abort = True

@@ -69,6 +69,9 @@ class MeasurementThread(QObject):
     @pyqtSlot()
     def stop(self):
         self.abort = True
+        self.thread.quit()
+        self.thread.wait(5000)
+
 
     def __del__(self):
         self.__class__.has_instance = False
@@ -76,9 +79,8 @@ class MeasurementThread(QObject):
             self.specSignal.disconnect()
             self.progressSignal.disconnect()
             self.finishSignal.disconnect()
-        except TypeError:
-            pass
-        self.abort = True
+        except TypeError as e:
+            print(e)
 
     def work(self):
         self.specSignal.emit(self.spec)
@@ -87,7 +89,8 @@ class MeasurementThread(QObject):
     def process(self):
         while not self.abort:
             try:
-                self.spec = self.spectrometer.intensities()
+                self.spec = self.spectrometer.TakeSingleTrack
+                self.spec = np.mean(self.spec,1)
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
@@ -171,8 +174,7 @@ class SearchThread(MeasurementThread):
             self.settings = settings
             self.stage = stage
             super(SearchThread, self).__init__(spectrometer)
-            self.wl = self.spectrometer.wavelengths()
-            self.wl = self.wl[0:1024]
+            self.wl = self.spectrometer.GetWavelength()
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
@@ -191,7 +193,6 @@ class SearchThread(MeasurementThread):
     def work(self):
         self.search()
         x, y, z = self.stage.last_pos()
-        self.spectrometer.intensities()
         self.finishSignal.emit(np.array([x, y]))
         self.abort = True
 
@@ -200,10 +201,10 @@ class SearchThread(MeasurementThread):
 
     def search(self):
         # self.mutex.lock()
-        self.spectrometer.integration_time_micros(self.settings.search_integration_time * 1000)
+        self.spectrometer.SetExposureTime(self.settings.search_integration_time / 1000)
         # self.mutex.unlock()
-        spec = self.spectrometer.intensities()
-        spec = spec[0:1024]
+        spec = self.spectrometer.TakeSingleTrack()
+        spec = np.mean(spec,1)
         spec = smooth(self.wl, spec)
 
         self.stage.query_pos()
@@ -235,8 +236,8 @@ class SearchThread(MeasurementThread):
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
                     return False
-                spec = self.spectrometer.intensities()
-                spec = spec[0:1024]
+                spec = self.spectrometer.TakeSingleTrack()
+                spec = np.mean(spec, 1)
                 # spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
                 # measured[k] = np.max(spec[400:800])
@@ -284,8 +285,7 @@ class SearchThread(MeasurementThread):
             plt.close()
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        self.spectrometer.integration_time_micros(self.settings.integration_time * 1000)
-        self.spectrometer.intensities()
+        self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
         # self.stage.query_pos()
         # spec = self.getspec()
         # self.specSignal.emit(spec)
