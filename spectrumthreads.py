@@ -89,8 +89,7 @@ class MeasurementThread(QObject):
     def process(self):
         while not self.abort:
             try:
-                self.spec = self.spectrometer.TakeSingleTrack
-                self.spec = np.mean(self.spec,1)
+                self.spec = self.spectrometer.TakeSingleTrack()
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()

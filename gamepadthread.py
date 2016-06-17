@@ -95,13 +95,21 @@ class GamepadThread(QObject):
             RuntimeError('Cannot create another instance')
         self.__class__._has_instance = True
         self.isinitialized = False
+        self.isconnected = False
         super(GamepadThread, self).__init__(parent)
         try:
-            self._initialize()
-            self.isinitialized = True
-        except:
+            # Open the joystick device.
+            fn = '/dev/input/js0'
+            print('Opening %s...' % fn)
+            self.jsdev = open(fn, 'rb')
+            self.isconnected = True
+        except :
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
+
+        if self.isconnected:
+            self._initialize()
+            self.isinitialized = True
 
         if self.isinitialized:
             self.abort = False
@@ -111,10 +119,7 @@ class GamepadThread(QObject):
             self.moveToThread(self.thread)
 
     def _initialize(self):
-        # Open the joystick device.
-        fn = '/dev/input/js0'
-        print('Opening %s...' % fn)
-        self.jsdev = open(fn, 'rb')
+
 
         # Get the device name.
         # buf = bytearray(63)

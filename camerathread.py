@@ -32,7 +32,7 @@ class CameraThread(QObject):
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 1)
                 self._cam.set_param('exp_priority', 0)
-                self._cam.set_binning(2, skipping=False)
+                #self._cam.set_binning(2, skipping=False)
                 self._cam.set_param('imgdataformat',2)
                 self._cam.get_image()
 
@@ -85,10 +85,10 @@ class CameraThread(QObject):
         while not self.abort:
             try:
                 t = self.exposure_us / 1e6
-                if t > 0.01 :
+                if t > 0.1 :
                     time.sleep(t)
                 else:
-                    time.sleep(0.01)
+                    time.sleep(0.1)
                 self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
