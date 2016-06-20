@@ -24,7 +24,7 @@ import gamepadthread
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -47,12 +47,13 @@ class SCNR(QMainWindow):
         if init_spectrometer:
             print('Initializing Spectrometer')
             self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True)
-            self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
+            #self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
+            self.spectrometer.SetCentreWavelength(650)
             #self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
             self.spectrometer.SetSlitWidth(50)
             self.spectrometer.SetSingleTrack()
             #self.spectrometer.SetExposureTime(self.settings.integration_time/1000)
-            self.spectrometer.SetExposureTime(1)
+            self.spectrometer.SetExposureTime(0.2)
             print('Spectrometer initialized')
 
         #self.spectrometer = None
@@ -275,7 +276,7 @@ class SCNR(QMainWindow):
     def on_stop_clicked(self):
         self.ui.status.setText('Stopped')
         self.spectrum.stop_process()
-        self.enable_buttons()
+        self.on_enableButtons()
 
     @pyqtSlot()
     def on_reset_clicked(self):
@@ -296,21 +297,21 @@ class SCNR(QMainWindow):
         self.ui.status.setText('Liveview')
         self.spectrometer.SetSingleTrack()
         self.spectrum.take_live()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_searchgrid_clicked(self):
         self.ui.status.setText("Searching Max.")
         self.spectrometer.SetSingleTrack()
         self.spectrum.scan_search_max(self.posModel.getMatrix())
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_search_clicked(self):
         self.ui.status.setText("Searching Max.")
         self.spectrometer.SetSingleTrack()
         self.spectrum.search_max()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_save_clicked(self):
@@ -345,28 +346,28 @@ class SCNR(QMainWindow):
         self.ui.status.setText('Taking Dark Spectrum')
         self.spectrometer.SetSingleTrack()
         self.spectrum.take_dark()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_lamp_clicked(self):
         self.ui.status.setText('Taking Lamp Spectrum')
         self.spectrometer.SetSingleTrack()
         self.spectrum.take_lamp()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_mean_clicked(self):
         self.ui.status.setText('Taking Normal Spectrum')
         self.spectrometer.SetSingleTrack()
         self.spectrum.take_mean()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_bg_clicked(self):
         self.ui.status.setText('Taking Background Spectrum')
         self.spectrometer.SetSingleTrack()
         self.spectrum.take_bg()
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_series_clicked(self):
@@ -385,7 +386,7 @@ class SCNR(QMainWindow):
         else:
             self.ui.status.setText("Error")
         self.spectrum.take_series(path)
-        self.disable_buttons()
+        self.on_disableButtons()
 
     @pyqtSlot()
     def on_loaddark_clicked(self):
