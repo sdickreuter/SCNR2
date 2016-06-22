@@ -50,7 +50,7 @@ class MeasurementThread(QObject):
     def __init__(self, spectrometer, parent=None):
         if getattr(self.__class__, '_has_instance', False):
             RuntimeError('Cannot create another instance')
-            return None
+            #return None
         self.__class__._has_instance = True
         try:
             super(MeasurementThread, self).__init__(parent)
@@ -59,13 +59,14 @@ class MeasurementThread(QObject):
             self.thread = QThread(parent)
             self.moveToThread(self.thread)
             self.thread.started.connect(self.process)
-            self.thread.finished.connect(self.stop)
+            #self.thread.finished.connect(self.stop)
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
+        self.spec = np.zeros(self.spectrometer._width)
 
     def start(self):
-        self.thread.start(QThread.HighPriority)
+        self.thread.start()
 
     @pyqtSlot()
     def stop(self):
@@ -88,44 +89,45 @@ class MeasurementThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-        self.specSignal.disconnect()
-        self.progressSignal.disconnect()
-        self.finishSignal.disconnect()
+        #self.spectrometer.AbortAcquisition()
+        #self.specSignal.disconnect()
+        #self.progressSignal.disconnect()
+        #self.finishSignal.disconnect()
 
 class MeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
-        self.init()
         super(MeanThread, self).__init__(spectrometer)
+        self.init()
 
     def init(self):
         self.progress = progress.Progress(max=self.number_of_samples)
-        self.mean = np.zeros(1024, dtype=np.float)
+        self.mean = np.zeros(self.spectrometer._width)
         self.i = 0
         self.abort = False
 
     def work(self):
         self.mean = (self.mean + self.spec)  # / 2
-        self.specSignal.emit(self.mean / (self.i + 1))
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
         self.i += 1
-        if self.i >= self.number_of_samples:
-            self.abort = True
+        self.specSignal.emit(self.mean / (self.i + 1))
+        if self.i >= (self.number_of_samples-1):
+            self.progressSignal.emit(100, str(self.progress.eta_td))
             self.finishSignal.emit(self.mean / (self.number_of_samples))
-
+            self.stop()
 
 class LockinThread(MeasurementThread):
     def __init__(self, spectrometer, settings, stage, parent=None):
         self.number_of_samples = settings.number_of_samples
         self.stage = stage
         self.settings = settings
-        self.init()
         super(MeanThread, self).__init__(spectrometer)
+        self.init()
 
     def init(self):
         self.progress = progress.Progress(max=self.number_of_samples)
-        self.lockin = np.zeros((1024, self.number_of_samples), dtype=np.float)
+        self.lockin = np.zeros((self.spectrometer._width, self.number_of_samples), dtype=np.float)
         self.i = 0
         self.stage.query_pos()
         self.startpos = self.stage.last_pos()
@@ -139,8 +141,8 @@ class LockinThread(MeasurementThread):
         self.stage.moveabs(x=x, y=y, z=z)
 
     def calc_lockin(self):
-        res = np.zeros(1024)
-        for i in range(1024):
+        res = np.zeros(self.spectrometer._width)
+        for i in range(self.spectrometer._width):
             ref = np.cos(2 * np.pi * np.arange(0, self.number_of_samples) * self.settings.f)
             buf = ref * self.lockin[:, 1]
             buf = np.sum(buf)
@@ -152,16 +154,16 @@ class LockinThread(MeasurementThread):
         ref = np.cos(2 * np.pi * self.i * self.settings.f)
         self.move_stage(ref / 2)
         spec = self._spectrometer.intensities(correct_nonlinearity=True)
-        self.lockin[:, self.i] = spec[0:1024]
+        self.lockin[:, self.i] = spec
 
         self.specSignal.emit(self.lockin[:, self.i])
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
         self.i += 1
         if self.i >= self.number_of_samples:
-            self.abort = True
+            self.progressSignal.emit(100, str(self.progress.eta_td))
             self.finishSignal.emit(self.mean / (self.number_of_samples))
-
+            self.stop()
 
 class SearchThread(MeasurementThread):
     def __init__(self, spectrometer, settings, stage, parent=None):
@@ -189,7 +191,7 @@ class SearchThread(MeasurementThread):
         self.search()
         x, y, z = self.stage.last_pos()
         self.finishSignal.emit(np.array([x, y]))
-        self.abort = True
+        self.stop()
 
     def stop(self):
         super(SearchThread, self).stop()
@@ -314,12 +316,13 @@ class ScanThread(MeasurementThread):
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
         self.i += 1
         if self.i >= self.n:
-            self.stop()
             # plt.plot(self.scanning_points[:, 0], self.scanning_points[:, 1], "r.")
             # plt.plot(self.positions[:, 0], self.positions[:, 1], "bx")
             # plt.savefig("search_max/grid.png")
             # plt.close()
+            self.progressSignal.emit(100, str(self.progress.eta_td))
             self.finishSignal.emit(self.positions)
+            self.stop()
             # self.spec = self.getspec()
             # self.specSignal.emit(self.spec)
 
