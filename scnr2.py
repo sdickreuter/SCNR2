@@ -26,7 +26,8 @@ import dialogs
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
+start_cooler = False
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -47,7 +48,7 @@ class SCNR(QMainWindow):
         # init Spectrometer
         if init_spectrometer:
             print('Initializing Spectrometer')
-            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True)
+            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True)
             #self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
             self.spectrometer.SetCentreWavelength(650)
             #self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
@@ -152,18 +153,20 @@ class SCNR(QMainWindow):
         #init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
         self.ui.number_of_samples_spin.setValue(self.settings.number_of_samples)
-        if init_spectrometer:
-            self.ui.slitwidth_spin.setValue(self.spectrometer.GetSlitWidth())
-            self.ui.centre_wavelength_spin.setValue(650)
-            gratings = self.spectrometer.GetGratingInfo()
-            print(gratings)
-            # init grating combobox
-            self.ui.grating_combobox.addItem("300 l/mm")
-            self.ui.grating_combobox.addItem("1000 l/mm")
-            self.ui.grating_combobox.addItem("2000 l/mm")
+        # if init_spectrometer:
+        #     self.ui.slitwidth_spin.setValue(self.spectrometer.GetSlitWidth())
+        #     self.ui.centre_wavelength_spin.setValue(650)
+        #
+        #     # init grating combobox
+        #     gratings = self.spectrometer.GetGratingInfo()
+        #     for i in range(len(gratings)):
+        #         self.ui.grating_combobox.addItem(str(round(gratings[i+1]))+' lines/mm')
+        #
+        #     active_grating = self.spectrometer.GetGrating()
+        #     self.ui.grating_combobox.setCurrentIndex(active_grating)
 
         #Temperature  Display
-        if init_spectrometer:
+        if start_cooler:
             self.temperature_timer = QTimer(self)
             self.temperature_timer.timeout.connect(self.check_temperature)
             self.temperature_timer.start(500)
@@ -515,6 +518,7 @@ class SCNR(QMainWindow):
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
         self.spectrometer.SetExosureTime(self.ui.integration_time_spin.value()/1000)
+        print(self.ui.integration_time_spin.value()/1000)
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
@@ -531,7 +535,8 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_grating_changed(self, index):
-        print("grating: " + str(index))
+        print(index)
+        self.spectrometer.SetGrating(index+1)
 
     @pyqtSlot(int)
     def on_image_readout_changed(int, index):
@@ -574,6 +579,5 @@ if __name__ == '__main__':
         (type, value, traceback) = sys.exc_info()
         sys.excepthook(type, value, traceback)
         AndorSpectrometer.andor.Shutdown()
+    finally:
         sys.exit(app.exec_())
-
-    sys.exit(app.exec_())
