@@ -46,8 +46,9 @@ class Spectrum(QObject):
         self.workingthread = None
 
     def __del__(self):
-        self.workingthread.stop()
-        self.workingthread = None
+        if not self.workingthread is None:
+            self.workingthread.stop()
+            self.workingthread = None
         self._spectrometer = None
 
 

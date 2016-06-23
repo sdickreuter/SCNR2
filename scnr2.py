@@ -1,24 +1,26 @@
-
-
-from PyQt5.QtCore import pyqtSlot, QTimer, QSocketNotifier, QAbstractTableModel, Qt, QVariant, QModelIndex
-from PyQt5.QtWidgets import QApplication, QMainWindow, QSizePolicy, QVBoxLayout, QFileDialog, QInputDialog
-import pyqtgraph as pg
-
 import os
+
 import numpy as np
+from PyQt5.QtCore import pyqtSlot, QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog
+import pyqtgraph as pg
 
 #from PyQt5 import uic
 #Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 
 from gui.main import Ui_MainWindow
 
+# Device Control imports
 import PIStage
 import AndorSpectrometer
 
+# Helper Classes imports
 import spectrum
 import settings
 import camerathread
 import gamepadthread
+import numpymodel
+import dialogs
 
 # for debugging
 init_pad = False
@@ -41,7 +43,6 @@ class SCNR(QMainWindow):
 
         # init settings
         self.settings = settings.Settings()
-
 
         # init Spectrometer
         if init_spectrometer:
@@ -106,6 +107,9 @@ class SCNR(QMainWindow):
                     self.ui.stage_frame.setEnabled(True)
                 else:
                     self.stage = None
+        # for testing:
+        else:
+            self.ui.scanning_tab.setEnabled(True)
 
         # init Gamepad
         if init_pad:
@@ -157,9 +161,20 @@ class SCNR(QMainWindow):
         self.ui.centre_wavelength_spin.setValue(650)  # TODO: readout correct values from spectrometer
 
         #Temperature  Display
-        self.temperature_timer = QTimer(self)
-        self.temperature_timer.timeout.connect(self.check_temperature)
-        self.temperature_timer.start(500)
+        if init_spectrometer:
+            self.temperature_timer = QTimer(self)
+            self.temperature_timer.timeout.connect(self.check_temperature)
+            self.temperature_timer.start(500)
+
+        #init Position Table
+        self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
+        self.posModel = numpymodel.NumpyModel(self.positions)
+        self.ui.posTable.setModel(self.posModel)
+        self.vh = self.ui.posTable.verticalHeader()
+        self.vh.setVisible(False)
+        self.hh = self.ui.posTable.horizontalHeader()
+        self.hh.setModel(self.posModel)
+        self.hh.setVisible(True)
 
 
 
@@ -420,6 +435,76 @@ class SCNR(QMainWindow):
 
 # ----- END Slots for Buttons
 
+# ----- Scanning Listview Slots
+
+    @pyqtSlot()
+    def on_addpos_clicked(self):
+        self.stage.query_pos()
+        x, y, z = self.stage.last_pos()
+        positions = self.posModel.getMatrix()
+        if positions.shape[1] == 2:
+            positions = np.append(positions, np.matrix([x, y]), axis=0)
+        else:
+            positions = np.matrix([x, y])
+        self.posModel.update(positions)
+
+    @pyqtSlot()
+    def on_spangrid_clicked(self):
+        xl, yl, ok = dialogs.SpanGrid_Dialog.getXY()
+        positions = self.posModel.getMatrix()
+        if (positions.shape[0] >= 3) & ((xl is not 0) | (yl is not 0)):
+            a = np.ravel(positions[0, :])
+            b = np.ravel(positions[1, :])
+            c = np.ravel(positions[2, :])
+            grid = np.zeros((xl * yl, 2))
+            if abs(b[0]) > abs(c[0]):
+                grid_vec_1 = [b[0] - a[0], b[1] - a[1]]
+                grid_vec_2 = [c[0] - a[0], c[1] - a[1]]
+            else:
+                grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
+                grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
+
+            print(grid_vec_1)
+            print(grid_vec_2)
+            i = 0
+            for x in range(xl):
+                for y in range(yl):
+                    vec_x = a[0] + grid_vec_1[0] * x + grid_vec_2[0] * y
+                    vec_y = a[1] + grid_vec_1[1] * x + grid_vec_2[1] * y
+                    grid[i, 0] = vec_x
+                    grid[i, 1] = vec_y
+                    i += 1
+
+            self.posModel.update(grid)
+
+    @pyqtSlot()
+    def on_scan_add(self):
+        positions = self.posModel.getMatrix()
+        if positions.shape[1] == 2:
+            positions = np.append(positions, np.matrix([0.0, 0.0]), axis=0)
+        else:
+            positions = np.matrix([0.0, 0.0])
+        self.posModel.update(positions)
+
+    @pyqtSlot()
+    def on_scan_remove(self):
+        indices = self.ui.posTable.selectionModel().selectedIndexes()
+        rows = np.array([], dtype=int)
+        for index in indices:
+            rows = np.append(rows, index.row())
+        positions = self.posModel.getMatrix()
+        positions = np.delete(positions, rows, axis=0)
+        self.posModel.update(positions)
+
+    @pyqtSlot()
+    def on_scan_clear(self):
+        self.posModel.update(np.matrix([[]]))
+
+    @pyqtSlot(np.ndarray)
+    def update_positions(self, pos):
+        self.posModel.update(pos)
+
+# ----- END Scanning Listview Slots
 
 # ----- Slots for Settings
 
@@ -483,6 +568,9 @@ if __name__ == '__main__':
         main = SCNR()
         main.show()
     except:
+        (type, value, traceback) = sys.exc_info()
+        sys.excepthook(type, value, traceback)
         AndorSpectrometer.andor.Shutdown()
+        sys.exit(app.exec_())
 
     sys.exit(app.exec_())

@@ -411,110 +411,83 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
             </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <widget class="QWidget" name="layoutWidget">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>271</width>
-               <height>34</height>
-              </rect>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QToolButton" name="add_button">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>26</width>
-                  <height>26</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/icons/gui/list-add.png</normaloff>:/icons/gui/list-add.png</iconset>
-                </property>
-                <property name="checkable">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QToolButton" name="remove_button">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>26</width>
-                  <height>26</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>-</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/icons/gui/list-remove.png</normaloff>:/icons/gui/list-remove.png</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QToolButton" name="clear_button">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>26</width>
-                  <height>26</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>clear</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/icons/gui/edit-delete.png</normaloff>:/icons/gui/edit-delete.png</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </widget>
+            <item>
+             <widget class="QToolButton" name="add_button">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>26</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources.qrc">
+                <normaloff>:/icons/gui/list-add.png</normaloff>:/icons/gui/list-add.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="remove_button">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>26</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>-</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources.qrc">
+                <normaloff>:/icons/gui/list-remove.png</normaloff>:/icons/gui/list-remove.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="clear_button">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>26</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>clear</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources.qrc">
+                <normaloff>:/icons/gui/edit-delete.png</normaloff>:/icons/gui/edit-delete.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QTableView" name="posTable">
@@ -538,6 +511,12 @@
             </property>
             <property name="verticalScrollBarPolicy">
              <enum>Qt::ScrollBarAlwaysOn</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
             <property name="alternatingRowColors">
              <bool>true</bool>
@@ -568,9 +547,9 @@
          <zorder>search_checkBox</zorder>
          <zorder>label_5</zorder>
          <zorder>line_7</zorder>
-         <zorder>frame</zorder>
          <zorder>posTable</zorder>
          <zorder>scan_button</zorder>
+         <zorder>layoutWidget</zorder>
         </widget>
         <widget class="QWidget" name="settings_tab">
          <attribute name="title">
@@ -1549,8 +1528,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>741</x>
-     <y>655</y>
+     <x>708</x>
+     <y>575</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1565,11 +1544,11 @@
    <slot>on_stop_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>791</x>
+     <x>758</x>
      <y>31</y>
     </hint>
     <hint type="destinationlabel">
-     <x>975</x>
+     <x>908</x>
      <y>69</y>
     </hint>
    </hints>
@@ -1581,8 +1560,8 @@
    <slot>on_reset_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>743</x>
-     <y>628</y>
+     <x>710</x>
+     <y>552</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
@@ -1629,8 +1608,8 @@
    <slot>on_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>791</x>
-     <y>711</y>
+     <x>758</x>
+     <y>679</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -1645,8 +1624,8 @@
    <slot>on_save_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>746</x>
-     <y>416</y>
+     <x>713</x>
+     <y>368</y>
     </hint>
     <hint type="destinationlabel">
      <x>902</x>
@@ -1661,8 +1640,8 @@
    <slot>on_saveas_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>700</x>
-     <y>454</y>
+     <x>667</x>
+     <y>402</y>
     </hint>
     <hint type="destinationlabel">
      <x>877</x>
@@ -1693,11 +1672,11 @@
    <slot>on_lamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>759</x>
-     <y>271</y>
+     <x>726</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
-     <x>910</x>
+     <x>908</x>
      <y>264</y>
     </hint>
    </hints>
@@ -1709,11 +1688,11 @@
    <slot>on_mean_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>776</x>
-     <y>314</y>
+     <x>743</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
-     <x>936</x>
+     <x>908</x>
      <y>297</y>
     </hint>
    </hints>
@@ -1725,8 +1704,8 @@
    <slot>on_bg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>780</x>
-     <y>248</y>
+     <x>747</x>
+     <y>224</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -1741,11 +1720,11 @@
    <slot>on_series_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>746</x>
-     <y>352</y>
+     <x>713</x>
+     <y>312</y>
     </hint>
     <hint type="destinationlabel">
-     <x>909</x>
+     <x>908</x>
      <y>325</y>
     </hint>
    </hints>
@@ -1757,8 +1736,8 @@
    <slot>on_loaddark_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>756</x>
-     <y>499</y>
+     <x>723</x>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -1773,11 +1752,11 @@
    <slot>on_loadlamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>763</x>
-     <y>544</y>
+     <x>730</x>
+     <y>480</y>
     </hint>
     <hint type="destinationlabel">
-     <x>914</x>
+     <x>908</x>
      <y>449</y>
     </hint>
    </hints>
@@ -1789,8 +1768,8 @@
    <slot>on_loadbg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>698</x>
-     <y>580</y>
+     <x>665</x>
+     <y>512</y>
     </hint>
     <hint type="destinationlabel">
      <x>882</x>
@@ -1821,8 +1800,8 @@
    <slot>on_number_of_samples_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>770</x>
-     <y>156</y>
+     <x>737</x>
+     <y>152</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
@@ -1837,8 +1816,8 @@
    <slot>on_slit_width_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>747</x>
-     <y>185</y>
+     <x>714</x>
+     <y>178</y>
     </hint>
     <hint type="destinationlabel">
      <x>838</x>
@@ -1853,8 +1832,8 @@
    <slot>on_grating_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>681</x>
-     <y>278</y>
+     <x>648</x>
+     <y>264</y>
     </hint>
     <hint type="destinationlabel">
      <x>840</x>
@@ -1869,8 +1848,8 @@
    <slot>on_image_readout_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>742</x>
-     <y>339</y>
+     <x>709</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
      <x>846</x>
@@ -1885,8 +1864,8 @@
    <slot>on_centre_wavelength_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>756</x>
-     <y>218</y>
+     <x>723</x>
+     <y>207</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
@@ -1901,8 +1880,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>769</x>
-     <y>398</y>
+     <x>736</x>
+     <y>380</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -1917,8 +1896,8 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>742</x>
-     <y>473</y>
+     <x>709</x>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1933,8 +1912,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>779</x>
-     <y>514</y>
+     <x>746</x>
+     <y>489</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -1949,8 +1928,8 @@
    <slot>on_rasterwidth_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>766</x>
-     <y>535</y>
+     <x>733</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1965,12 +1944,92 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>779</x>
-     <y>580</y>
+     <x>746</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
      <y>558</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addpos_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_addpos_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>708</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>798</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spangrid_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_spangrid_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>804</x>
+     <y>129</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>add_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_scan_add()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>271</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>813</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>remove_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_scan_remove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>611</x>
+     <y>279</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>811</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clear_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_scan_clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>277</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>812</x>
+     <y>318</y>
     </hint>
    </hints>
   </connection>
@@ -2005,5 +2064,10 @@
   <slot>on_rasterwidth_edited()</slot>
   <slot>on_sigma_edited()</slot>
   <slot>on_savesettings_clicked()</slot>
+  <slot>on_addpos_clicked()</slot>
+  <slot>on_spangrid_clicked()</slot>
+  <slot>on_scan_add()</slot>
+  <slot>on_scan_remove()</slot>
+  <slot>on_scan_clear()</slot>
  </slots>
 </ui>
