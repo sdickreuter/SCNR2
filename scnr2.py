@@ -26,7 +26,7 @@ import dialogs
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = True
+init_spectrometer = False
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -145,11 +145,6 @@ class SCNR(QMainWindow):
         self.spectrum.enableButtons.connect(self.on_enableButtons)
         self.spectrum.specSignal.connect(self.on_update_spectrum)
 
-        # init grating combobox
-        self.ui.grating_combobox.addItem("300 l/mm")
-        self.ui.grating_combobox.addItem("1000 l/mm")
-        self.ui.grating_combobox.addItem("2000 l/mm")
-
         # init image readout combobox
         self.ui.image_combobox.addItem("Only Slit")
         self.ui.image_combobox.addItem("Full Image")
@@ -157,14 +152,22 @@ class SCNR(QMainWindow):
         #init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
         self.ui.number_of_samples_spin.setValue(self.settings.number_of_samples)
-        self.ui.slitwidth_spin.setValue(50) # TODO: readout correct values from spectrometer
-        self.ui.centre_wavelength_spin.setValue(650)  # TODO: readout correct values from spectrometer
+        if init_spectrometer:
+            self.ui.slitwidth_spin.setValue(self.spectrometer.GetSlitWidth())
+            self.ui.centre_wavelength_spin.setValue(650)
+            gratings = self.spectrometer.GetGratingInfo()
+            print(gratings)
+            # init grating combobox
+            self.ui.grating_combobox.addItem("300 l/mm")
+            self.ui.grating_combobox.addItem("1000 l/mm")
+            self.ui.grating_combobox.addItem("2000 l/mm")
 
         #Temperature  Display
         if init_spectrometer:
             self.temperature_timer = QTimer(self)
             self.temperature_timer.timeout.connect(self.check_temperature)
             self.temperature_timer.start(500)
+
 
         #init Position Table
         self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
