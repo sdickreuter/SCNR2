@@ -123,9 +123,9 @@ class SCNR(QMainWindow):
                 self.padthread.yaxisSignal.connect(self.on_yaxis)
                 self.yaxis = 0.0
                 self.padthread.start()
-                self.timer = QTimer(self)
-                self.timer.timeout.connect(self.check_pad_analog)
-                self.timer.start(100)
+                self.gamepad_timer = QTimer(self)
+                self.gamepad_timer.timeout.connect(self.check_pad_analog)
+                self.gamepad_timer.start(100)
                 self.pad_active = False
             else:
                 self.padthread = None
@@ -153,23 +153,35 @@ class SCNR(QMainWindow):
         #init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
         self.ui.number_of_samples_spin.setValue(self.settings.number_of_samples)
-        self.ui.slitwidth_spin.setValue(10) # TODO: readout correct values from spectrometer
+        self.ui.slitwidth_spin.setValue(50) # TODO: readout correct values from spectrometer
         self.ui.centre_wavelength_spin.setValue(650)  # TODO: readout correct values from spectrometer
+
+        #Temperature  Display
+        self.temperature_timer = QTimer(self)
+        self.temperature_timer.timeout.connect(self.check_temperature)
+        self.temperature_timer.start(500)
+
 
 
     def __del__(self):
+        # __del__ spectrum first, so the spectrometer is not blocked by spectrum.workingthread
         self.spectrum = None
         self.spectrometer = None
 
+# ----- Slot for Temperature Display
 
-    # ----- Slots for Camera Stuff
+    @pyqtSlot()
+    def check_temperature(self):
+        self.ui.label_temp.setText('Detector Temperature: '+str(round(self.spectrometer.GetTemperature(),1))+' °C')
+
+# ----- END Slot for Temperature Display
+
+
+# ----- Slots for Camera Stuff
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
         self.img.setImage(img)
-        #print(str(np.min(img)) + ' ' + str(np.max(img)))
-        #print(img.shape)
-        #print(self.cam.get_exposure())
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):

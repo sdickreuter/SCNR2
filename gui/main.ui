@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>976</width>
-    <height>963</height>
+    <width>909</width>
+    <height>931</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,6 +52,7 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <zorder></zorder>
          </widget>
         </item>
        </layout>
@@ -88,6 +89,9 @@
      <widget class="QLabel" name="status">
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -145,7 +149,7 @@
         <property name="maximumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>550</height>
          </size>
         </property>
         <property name="currentIndex">
@@ -523,7 +527,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>150</height>
+              <height>140</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -1101,6 +1105,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_temp">
+        <property name="text">
+         <string>Detector Temp.:</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="searchmax_button">
