@@ -49,8 +49,6 @@ class Spectrum(QObject):
         if not self.workingthread is None:
             self.workingthread.stop()
             self.workingthread = None
-        self._spectrometer = None
-
 
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
@@ -84,7 +82,7 @@ class Spectrum(QObject):
     def stop_process(self):
         self.workingthread.stop()
         time.sleep(0.1)
-        #self.workingthread = None
+        self.workingthread = None
         self.enableButtons.emit()
 
     def take_live(self):

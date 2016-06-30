@@ -54,8 +54,8 @@ class SCNR(QMainWindow):
             #self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
             self.spectrometer.SetSlitWidth(50)
             self.spectrometer.SetSingleTrack()
-            #self.spectrometer.SetExposureTime(self.settings.integration_time/1000)
-            self.spectrometer.SetExposureTime(0.2)
+            self.spectrometer.SetExposureTime(self.settings.integration_time/1000)
+            #self.spectrometer.SetExposureTime(0.2)
             print('Spectrometer initialized')
 
         #self.spectrometer = None
@@ -120,7 +120,7 @@ class SCNR(QMainWindow):
                 print("Error initializing Gamepad")
             if self.padthread.isinitialized:
                 self.padthread.BSignal.connect(self.on_search_clicked)
-                #self.padthread.XSignal.connect(self.on_addpos_clicked)
+                self.padthread.XSignal.connect(self.on_addpos_clicked)
                 #self.padthread.YSignal.connect(self.on_stepup_clicked)
                 #self.padthread.ASignal.connect(self.on_stepdown_clicked)
                 self.padthread.xaxisSignal.connect(self.on_xaxis)
@@ -153,17 +153,17 @@ class SCNR(QMainWindow):
         #init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
         self.ui.number_of_samples_spin.setValue(self.settings.number_of_samples)
-        # if init_spectrometer:
-        #     self.ui.slitwidth_spin.setValue(self.spectrometer.GetSlitWidth())
-        #     self.ui.centre_wavelength_spin.setValue(650)
-        #
-        #     # init grating combobox
-        #     gratings = self.spectrometer.GetGratingInfo()
-        #     for i in range(len(gratings)):
-        #         self.ui.grating_combobox.addItem(str(round(gratings[i+1]))+' lines/mm')
-        #
-        #     active_grating = self.spectrometer.GetGrating()
-        #     self.ui.grating_combobox.setCurrentIndex(active_grating)
+        if init_spectrometer:
+            self.ui.slitwidth_spin.setValue(self.spectrometer.GetSlitWidth())
+            self.ui.centre_wavelength_spin.setValue(650)
+
+            # init grating combobox
+            gratings = self.spectrometer.GetGratingInfo()
+            for i in range(len(gratings)):
+                self.ui.grating_combobox.addItem(str(round(gratings[i+1]))+' lines/mm')
+
+            active_grating = self.spectrometer.GetGrating()
+            self.ui.grating_combobox.setCurrentIndex(active_grating-1)
 
         #Temperature  Display
         if start_cooler:
@@ -187,6 +187,8 @@ class SCNR(QMainWindow):
     def __del__(self):
         # __del__ spectrum first, so the spectrometer is not blocked by spectrum.workingthread
         self.spectrum = None
+        #self.spectrometer.Shutdown()
+        #self.spectrometer.closed = True
         self.spectrometer = None
 
 # ----- Slot for Temperature Display
@@ -517,7 +519,7 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
-        self.spectrometer.SetExosureTime(self.ui.integration_time_spin.value()/1000)
+        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value()/1000)
         print(self.ui.integration_time_spin.value()/1000)
 
     @pyqtSlot()
@@ -531,7 +533,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_centre_wavelength_edited(self):
-        self.spectrometer.SetCentreWavelength(self.ui.slitwidth_spin.value())
+        self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
 
     @pyqtSlot(int)
     def on_grating_changed(self, index):
@@ -575,9 +577,11 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
         main = SCNR()
         main.show()
-    except:
+    except Exception as e:
         (type, value, traceback) = sys.exc_info()
         sys.excepthook(type, value, traceback)
         AndorSpectrometer.andor.Shutdown()
+        AndorSpectrometer.shamrock.Shutdown()
+        sys.exit(0)
     finally:
         sys.exit(app.exec_())
