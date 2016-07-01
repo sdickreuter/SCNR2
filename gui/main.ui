@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>909</width>
+    <width>1021</width>
     <height>931</height>
    </rect>
   </property>
@@ -1992,7 +1992,7 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>527</x>
+     <x>583</x>
      <y>271</y>
     </hint>
     <hint type="destinationlabel">
@@ -2008,7 +2008,7 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>611</x>
+     <x>667</x>
      <y>279</y>
     </hint>
     <hint type="destinationlabel">
@@ -2024,12 +2024,140 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>680</x>
+     <x>736</x>
      <y>277</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
      <y>318</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stepup_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_stepup_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>586</x>
+     <y>747</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>845</x>
+     <y>666</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stepdown_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_stepdown_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>781</x>
+     <y>754</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>842</x>
+     <y>705</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>xup_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_xup_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>534</x>
+     <y>827</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>842</x>
+     <y>750</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>xdown_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_xdown_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>636</x>
+     <y>826</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>844</x>
+     <y>786</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>yup_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_yup_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>577</x>
+     <y>798</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>880</x>
+     <y>809</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ydown_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_ydown_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>584</x>
+     <y>850</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>914</x>
+     <y>836</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zup_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_zup_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>801</x>
+     <y>798</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>864</x>
+     <y>846</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zdown_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_zdown_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>795</x>
+     <y>851</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>968</x>
+     <y>867</y>
     </hint>
    </hints>
   </connection>
@@ -2069,5 +2197,13 @@
   <slot>on_scan_add()</slot>
   <slot>on_scan_remove()</slot>
   <slot>on_scan_clear()</slot>
+  <slot>on_stepup_clicked()</slot>
+  <slot>on_stepdown_clicked()</slot>
+  <slot>on_xup_clicked()</slot>
+  <slot>on_xdown_clicked()</slot>
+  <slot>on_yup_clicked()</slot>
+  <slot>on_ydown_clicked()</slot>
+  <slot>on_zup_clicked()</slot>
+  <slot>on_zdown_clicked()</slot>
  </slots>
 </ui>

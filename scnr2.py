@@ -441,6 +441,52 @@ class SCNR(QMainWindow):
         if not buf is None:
             self.spectrum.bg = buf
 
+    @pyqtSlot()
+    def on_xup_clicked(self):
+        self.stage.moverel(dx=self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_xdown_clicked(self):
+        self.stage.moverel(dx=-self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_yup_clicked(self):
+        self.stage.moverel(dy=self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_ydown_clicked(self):
+        self.stage.moverel(dy=-self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_zup_clicked(self):
+        self.stage.moverel(dz=self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_zdown_clicked(self):
+        self.stage.moverel(dz=-self.settings.stepsize)
+        self.show_pos()
+
+    @pyqtSlot()
+    def on_stepup_clicked(self):
+        self.settings.stepsize *= 10
+        if self.settings.stepsize > 10:
+            self.settings.stepsize = 10.0
+        self.ui.label_stepsize.setText(str(self.settings.stepsize))
+        self.settings.save()
+
+    @pyqtSlot()
+    def on_stepdown_clicked(self):
+        self.settings.stepsize /= 10
+        if self.settings.stepsize < 0.001:
+            self.settings.stepsize = 0.001
+        self.ui.label_stepsize.setText(str(self.settings.stepsize))
+        self.settings.save()
+
 # ----- END Slots for Buttons
 
 # ----- Scanning Listview Slots
@@ -537,7 +583,6 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_grating_changed(self, index):
-        print(index)
         self.spectrometer.SetGrating(index+1)
 
     @pyqtSlot(int)
@@ -567,8 +612,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
-        #self.settings.save()
-        pass
+        self.settings.save()
 
 if __name__ == '__main__':
     import sys

@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(909, 931)
+        MainWindow.resize(1021, 931)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/gui/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -700,6 +700,14 @@ class Ui_MainWindow(object):
         self.add_button.clicked.connect(MainWindow.on_scan_add)
         self.remove_button.clicked.connect(MainWindow.on_scan_remove)
         self.clear_button.clicked.connect(MainWindow.on_scan_clear)
+        self.stepup_button.clicked.connect(MainWindow.on_stepup_clicked)
+        self.stepdown_button.clicked.connect(MainWindow.on_stepdown_clicked)
+        self.xup_button.clicked.connect(MainWindow.on_xup_clicked)
+        self.xdown_button.clicked.connect(MainWindow.on_xdown_clicked)
+        self.yup_button.clicked.connect(MainWindow.on_yup_clicked)
+        self.ydown_button.clicked.connect(MainWindow.on_ydown_clicked)
+        self.zup_button.clicked.connect(MainWindow.on_zup_clicked)
+        self.zdown_button.clicked.connect(MainWindow.on_zdown_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
