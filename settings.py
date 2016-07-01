@@ -27,6 +27,8 @@ class Settings(object):
         self.f = float(self.config['direction']['f'])
 
         self.stepsize = float(self.config['stage']['stepsize'])
+        self.stage_ip = self.config['stage']['ip']
+        self.stage_port = int(self.config['stage']['port'])
 
         self.sigma = float(self.config['searchmax']['sigma'])
         self.rasterdim = int(self.config['searchmax']['rasterdim'])
@@ -35,8 +37,7 @@ class Settings(object):
 
         self.cam_exposure_time = float(self.config['camera']['exposure_time'])
 
-        self.stage_ip = self.config['stage']['ip']
-        self.stage_port = int(self.config['stage']['port'])
+        self.slit_width = int(self.config['spectrometer']['slit_width'])
 
 
     def save(self):
@@ -57,6 +58,8 @@ class Settings(object):
         self.config.set('searchmax', 'integration_time', str(self.search_integration_time))
 
         self.config.set('camera', 'exposure_time', str(self.cam_exposure_time))
+
+        self.config.set('spectrometer', 'slit_width', str(self.slit_width))
 
         try:
             with open(self._filename, 'w') as configfile:

@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1021, 931)
+        MainWindow.resize(1100, 931)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/gui/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -113,9 +113,14 @@ class Ui_MainWindow(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.verticalLayout.addWidget(self.line)
-        self.livedetector_button = QtWidgets.QPushButton(self.spectra_tab)
-        self.livedetector_button.setObjectName("livedetector_button")
-        self.verticalLayout.addWidget(self.livedetector_button)
+        self.mode_combobox = QtWidgets.QComboBox(self.spectra_tab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.mode_combobox.sizePolicy().hasHeightForWidth())
+        self.mode_combobox.setSizePolicy(sizePolicy)
+        self.mode_combobox.setObjectName("mode_combobox")
+        self.verticalLayout.addWidget(self.mode_combobox)
         self.line_8 = QtWidgets.QFrame(self.spectra_tab)
         self.line_8.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -708,6 +713,7 @@ class Ui_MainWindow(object):
         self.ydown_button.clicked.connect(MainWindow.on_ydown_clicked)
         self.zup_button.clicked.connect(MainWindow.on_zup_clicked)
         self.zdown_button.clicked.connect(MainWindow.on_zdown_clicked)
+        self.mode_combobox.currentIndexChanged['int'].connect(MainWindow.on_mode_changed)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -717,7 +723,6 @@ class Ui_MainWindow(object):
         self.left_tab.setTabText(self.left_tab.indexOf(self.cam_tab), _translate("MainWindow", "Camera"))
         self.stop_button.setText(_translate("MainWindow", "Stop"))
         self.live_button.setText(_translate("MainWindow", "Liveview"))
-        self.livedetector_button.setText(_translate("MainWindow", "Liveview Detector"))
         self.dark_button.setText(_translate("MainWindow", "Take Dark Spectrum"))
         self.bg_button.setText(_translate("MainWindow", "Take Background Spectrum"))
         self.ref_button.setText(_translate("MainWindow", "Take Reference Spectrum"))
