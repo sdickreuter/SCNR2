@@ -37,7 +37,7 @@ class SCNR(QMainWindow):
     padthread = None
     spectrometer = None
 
-    def __init__(self, parent=None):
+    def __init__(self,spectrometer, parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -48,13 +48,14 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.ui.centre_wavelength_spin.setValue(650)
 
+        self.spectrometer = spectrometer
         # init Spectrometer
         if init_spectrometer:
-            print('Initializing Spectrometer')
-            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True)
+            #print('Initializing Spectrometer')
+            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True)
             self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
             self.setSpectrumMode()
-            print('Spectrometer initialized')
+            #print('Spectrometer initialized')
 
         self.pw = pg.PlotWidget()
         self.plot = self.pw.plot()
@@ -666,16 +667,21 @@ class SCNR(QMainWindow):
 if __name__ == '__main__':
     import sys
 
+    print('Initializing Spectrometer')
+    spectrometer = AndorSpectrometer.Spectrometer()
+    print('Spectrometer initialized')
+
     try:
         app = QApplication(sys.argv)
-        main = SCNR()
+        main = SCNR(spectrometer)
         main.show()
     except Exception as e:
         print(e)
         (type, value, traceback) = sys.exc_info()
         sys.excepthook(type, value, traceback)
-        AndorSpectrometer.andor.Shutdown()
-        AndorSpectrometer.shamrock.Shutdown()
+        #AndorSpectrometer.andor.Shutdown()
+        #AndorSpectrometer.shamrock.Shutdown()
         sys.exit(0)
     finally:
+        spectrometer = None
         sys.exit(app.exec_())
