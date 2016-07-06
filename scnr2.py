@@ -27,7 +27,7 @@ from custom_pyqtgraph_classes import CustomViewBox
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = True
+init_spectrometer = False
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -665,13 +665,20 @@ class SCNR(QMainWindow):
 if __name__ == '__main__':
     import sys
 
-    print('Initializing Spectrometer')
-    spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=0)
-    print('Spectrometer initialized')
+    if init_spectrometer:
+        print('Initializing Spectrometer')
+        spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=0)
+        print('Spectrometer initialized')
+    else:
+        spectrometer = None
 
-    app = QApplication(sys.argv)
-    main = SCNR(spectrometer)
-    main.show()
+    try:
+        app = QApplication(sys.argv)
+        main = SCNR(spectrometer)
+        main.show()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
 
     try:
         res = app.exec()
