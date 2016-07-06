@@ -27,7 +27,7 @@ from custom_pyqtgraph_classes import CustomViewBox
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -49,18 +49,27 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.ui.centre_wavelength_spin.setValue(650)
 
-
-        #roi = pg.ROI([0, 0], [10, 10])
-        #vb.addItem(roi)
-        #self.pw = pg.PlotWidget()
-        vb = CustomViewBox()
-        self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
+        self.pw = pg.PlotWidget()
+        #vb = CustomViewBox()
+        #self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
         self.plot = self.pw.plot()
-        self.detector_img = pg.ImageItem()
-        self.pw.addItem(self.detector_img)
         l1 = QVBoxLayout(self.ui.specwidget)
         l1.addWidget(self.pw)
+        self.pw.setLabel('left', 'Intensity [a.u.]')
+        self.pw.setLabel('bottom', 'Wavelength [nm]')
 
+        gv = pg.GraphicsView()
+        vb = pg.ViewBox()
+        roi = pg.ROI([0, 0], [50, 50])
+        vb.addItem(roi)
+        self.detector_img = pg.ImageItem()
+        vb.addItem(self.detector_img)
+        gv.setCentralWidget(vb)
+        l = QVBoxLayout(self.ui.detectorwidget)
+        l.setSpacing(0)
+        l.addWidget(gv)
+        #self.pw.setLabel('left', 'y', units='px')
+        #self.pw.setLabel('bottom', 'x', units='px')
 
         self.spectrometer = spectrometer
         # init Spectrometer
@@ -84,7 +93,7 @@ class SCNR(QMainWindow):
             gv2.setCentralWidget(self.vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
-            l2.addWidget(self.gv2)
+            l2.addWidget(gv2)
             try:
                 self.cam = camerathread.CameraThread()
             except:
@@ -93,9 +102,10 @@ class SCNR(QMainWindow):
                 self.cam.set_exposure(self.settings.cam_exposure_time * 1000)
                 self.cam.ImageReadySignal.connect(self.update_camera)
                 self.cam.start()
+                self.ui.cam_tab.setDisabled(False)
             else:
                 self.cam = None
-                self.ui.left_tab.setEnabled(False)
+                #self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
 
         # init stage
@@ -109,6 +119,7 @@ class SCNR(QMainWindow):
                 #print("Could not initialize PIStage, using Dummy instead")
             if not self.stage is None:
                 if self.stage.is_initialized:
+                    self.ui.addpos_button.setEnabled(True)
                     self.ui.scanning_tab.setEnabled(True)
                     self.ui.searchmax_button.setEnabled(True)
                     self.ui.stage_frame.setEnabled(True)
@@ -119,28 +130,29 @@ class SCNR(QMainWindow):
             self.ui.scanning_tab.setEnabled(True)
 
         # init Gamepad
-        if init_pad:
-            try:
-                self.padthread = gamepadthread.GamepadThread()
-            except:
-                print("Error initializing Gamepad")
-            if self.padthread.isinitialized:
-                self.padthread.BSignal.connect(self.on_search_clicked)
-                self.padthread.XSignal.connect(self.on_addpos_clicked)
-                #self.padthread.YSignal.connect(self.on_stepup_clicked)
-                #self.padthread.ASignal.connect(self.on_stepdown_clicked)
-                self.padthread.xaxisSignal.connect(self.on_xaxis)
-                self.xaxis = 0.0
-                self.padthread.yaxisSignal.connect(self.on_yaxis)
-                self.yaxis = 0.0
-                self.padthread.start()
-                self.gamepad_timer = QTimer(self)
-                self.gamepad_timer.timeout.connect(self.check_pad_analog)
-                self.gamepad_timer.start(100)
-                self.pad_active = False
-            else:
-                self.padthread = None
-                print("Could not initialize Gamepad")
+        if not self.stage is None:
+            if init_pad:
+                try:
+                    self.padthread = gamepadthread.GamepadThread()
+                except:
+                    print("Error initializing Gamepad")
+                if self.padthread.isinitialized:
+                    self.padthread.BSignal.connect(self.on_search_clicked)
+                    self.padthread.XSignal.connect(self.on_addpos_clicked)
+                    #self.padthread.YSignal.connect(self.on_stepup_clicked)
+                    #self.padthread.ASignal.connect(self.on_stepdown_clicked)
+                    self.padthread.xaxisSignal.connect(self.on_xaxis)
+                    self.xaxis = 0.0
+                    self.padthread.yaxisSignal.connect(self.on_yaxis)
+                    self.yaxis = 0.0
+                    self.padthread.start()
+                    self.gamepad_timer = QTimer(self)
+                    self.gamepad_timer.timeout.connect(self.check_pad_analog)
+                    self.gamepad_timer.start(100)
+                    self.pad_active = False
+                else:
+                    self.padthread = None
+                    print("Could not initialize Gamepad")
 
 
         # init spectrum stuff
@@ -174,7 +186,6 @@ class SCNR(QMainWindow):
             self.temperature_timer.timeout.connect(self.check_temperature)
             self.temperature_timer.start(500)
 
-
         #init Position Table
         self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
         self.posModel = numpymodel.NumpyModel(self.positions)
@@ -184,7 +195,6 @@ class SCNR(QMainWindow):
         self.hh = self.ui.posTable.horizontalHeader()
         self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
-
 
 # ----- Slot for Temperature Display
 
@@ -199,19 +209,13 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_mode_changed(self, index):
-        if index == 0:
-            self.setSpectrumMode()
-        elif index == 1:
-            self.setImageMode()
+        if init_spectrometer:
+            if index == 0:
+                self.setSpectrumMode()
+            elif index == 1:
+                self.setImageMode()
 
     def setSpectrumMode(self):
-        #self.pw.setLabel('left', 'Intensity', units='a.u.')
-        #self.pw.setLabel('bottom', 'Wavelength', units='nm')
-        self.pw.setLabel('left', 'Intensity [a.u.]')
-        self.pw.setLabel('bottom', 'Wavelength [nm]')
-
-        self.detector_img.clear()
-
         self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetSingleTrack()
@@ -221,7 +225,7 @@ class SCNR(QMainWindow):
         self.ui.ref_button.setEnabled(True)
         self.ui.mean_button.setEnabled(True)
         self.ui.series_button.setEnabled(True)
-
+        self.ui.left_tab.setCurrentIndex(0)
 
     def setImageMode(self):
         self.ui.dark_button.setEnabled(False)
@@ -230,13 +234,9 @@ class SCNR(QMainWindow):
         self.ui.mean_button.setEnabled(False)
         self.ui.series_button.setEnabled(False)
 
-        self.pw.setLabel('left', 'y', units='px')
-        self.pw.setLabel('bottom', 'x', units='px')
-        self.plot.clear()
-        #img_data = pg.np.random.normal(size=(100, 100))
-        #self.detector_img.setImage(img_data)
         self.spectrometer.SetSlitWidth(2500)
         self.spectrometer.SetImageofSlit()
+        self.ui.left_tab.setCurrentIndex(2)
 
 
 # ----- END Slot for Detektor Mode
@@ -297,6 +297,7 @@ class SCNR(QMainWindow):
             self.ui.searchmax_button.setDisabled(False)
             self.ui.stepup_button.setDisabled(False)
             self.ui.stepdown_button.setDisabled(False)
+            self.ui.addpos_button.setDisabled(False)
         self.ui.stop_button.setDisabled(True)
         self.pad_active = True
 
@@ -686,7 +687,8 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     finally:
-        spectrometer.Shutdown()
+        if init_spectrometer:
+            spectrometer.Shutdown()
         spectrometer = None
     sys.exit(0)
 
