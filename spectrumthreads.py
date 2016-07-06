@@ -89,10 +89,20 @@ class MeasurementThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-        #self.spectrometer.AbortAcquisition()
-        #self.specSignal.disconnect()
-        #self.progressSignal.disconnect()
-        #self.finishSignal.disconnect()
+
+
+class ImageThread(MeasurementThread):
+
+    @pyqtSlot()
+    def process(self):
+        while not self.abort:
+            try:
+                self.spec = self.spectrometer.TakeImageofSlit()
+                self.work()
+            except:
+                (type, value, traceback) = sys.exc_info()
+                sys.excepthook(type, value, traceback)
+
 
 class MeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):

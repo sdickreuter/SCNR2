@@ -21,6 +21,7 @@ import camerathread
 import gamepadthread
 import numpymodel
 import dialogs
+from custom_pyqtgraph_classes import CustomViewBox
 
 # for debugging
 init_pad = False
@@ -48,6 +49,19 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.ui.centre_wavelength_spin.setValue(650)
 
+
+        #roi = pg.ROI([0, 0], [10, 10])
+        #vb.addItem(roi)
+        #self.pw = pg.PlotWidget()
+        vb = CustomViewBox()
+        self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
+        self.plot = self.pw.plot()
+        self.detector_img = pg.ImageItem()
+        self.pw.addItem(self.detector_img)
+        l1 = QVBoxLayout(self.ui.specwidget)
+        l1.addWidget(self.pw)
+
+
         self.spectrometer = spectrometer
         # init Spectrometer
         if init_spectrometer:
@@ -57,23 +71,9 @@ class SCNR(QMainWindow):
             self.setSpectrumMode()
             #print('Spectrometer initialized')
 
-        self.pw = pg.PlotWidget()
-        self.plot = self.pw.plot()
-        self.detector_img = pg.ImageItem()
-        self.pw.addItem(self.detector_img)
-        l1 = QVBoxLayout(self.ui.specwidget)
-        l1.addWidget(self.pw)
-        xd = np.linspace(0,1,1000)
-        yd = np.random.rand(1000)
-        self.plot.setData(y=yd, x=xd)
-
-        self.setSpectrumMode()
-
-
         # init detector mode combobox
         self.ui.mode_combobox.addItem("Spectrum")
         self.ui.mode_combobox.addItem("Image")
-
 
         # init camera stuff
         if init_cam:
@@ -186,14 +186,6 @@ class SCNR(QMainWindow):
         self.hh.setVisible(True)
 
 
-
-    def __del__(self):
-        # __del__ spectrum first, so the spectrometer is not blocked by spectrum.workingthread
-        self.spectrum = None
-        #self.spectrometer.Shutdown()
-        #self.spectrometer.closed = True
-        self.spectrometer = None
-
 # ----- Slot for Temperature Display
 
     @pyqtSlot()
@@ -213,8 +205,11 @@ class SCNR(QMainWindow):
             self.setImageMode()
 
     def setSpectrumMode(self):
-        self.pw.setLabel('left', 'Intensity', units='a.u.')
-        self.pw.setLabel('bottom', 'Wavelength', units='nm')
+        #self.pw.setLabel('left', 'Intensity', units='a.u.')
+        #self.pw.setLabel('bottom', 'Wavelength', units='nm')
+        self.pw.setLabel('left', 'Intensity [a.u.]')
+        self.pw.setLabel('bottom', 'Wavelength [nm]')
+
         self.detector_img.clear()
 
         self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
@@ -238,9 +233,9 @@ class SCNR(QMainWindow):
         self.pw.setLabel('left', 'y', units='px')
         self.pw.setLabel('bottom', 'x', units='px')
         self.plot.clear()
-        img_data = pg.np.random.normal(size=(100, 100))
-        self.detector_img.setImage(img_data)
-
+        #img_data = pg.np.random.normal(size=(100, 100))
+        #self.detector_img.setImage(img_data)
+        self.spectrometer.SetSlitWidth(2500)
         self.spectrometer.SetImageofSlit()
 
 
@@ -267,6 +262,7 @@ class SCNR(QMainWindow):
     @pyqtSlot(np.ndarray)
     def on_update_spectrum(self,spec):
         if self.spectrometer.mode == "Image":
+            print(spec.shape)
             self.detector_img.setImage(spec)
         elif self.spectrometer.mode == 'SingleTrack':
             self.plot.setData(self.spectrometer.GetWavelength(),spec)
@@ -349,7 +345,6 @@ class SCNR(QMainWindow):
     def on_start_scan_clicked(self):
         prefix, ok = QInputDialog.getText(self, 'Save Folder',
                                           'Enter Folder to save spectra to:')
-
         if ok:
             try:
                 # os.path.exists(prefix)
@@ -388,7 +383,10 @@ class SCNR(QMainWindow):
     def on_live_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Liveview')
-        self.spectrum.take_live()
+        if self.spectrometer.mode == 'SingleTrack':
+            self.spectrum.take_live()
+        elif self.spectrometer.mode == 'Image':
+            self.spectrum.take_live_image()
 
     @pyqtSlot()
     def on_searchgrid_clicked(self):
@@ -668,20 +666,37 @@ if __name__ == '__main__':
     import sys
 
     print('Initializing Spectrometer')
-    spectrometer = AndorSpectrometer.Spectrometer()
+    spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=0)
     print('Spectrometer initialized')
 
+    app = QApplication(sys.argv)
+    main = SCNR(spectrometer)
+    main.show()
+
     try:
-        app = QApplication(sys.argv)
-        main = SCNR(spectrometer)
-        main.show()
+        res = app.exec()
     except Exception as e:
         print(e)
-        (type, value, traceback) = sys.exc_info()
-        sys.excepthook(type, value, traceback)
-        #AndorSpectrometer.andor.Shutdown()
-        #AndorSpectrometer.shamrock.Shutdown()
-        sys.exit(0)
+        sys.exit(1)
     finally:
+        spectrometer.Shutdown()
         spectrometer = None
-        sys.exit(app.exec_())
+    sys.exit(0)
+
+   # try:
+    #     app = QApplication(sys.argv)
+    #     main = SCNR()
+    #     main.show()
+    # except Exception as e:
+    #     print("Whaaaat ?")
+    #     print(e)
+    #     (type, value, traceback) = sys.exc_info()
+    #     sys.excepthook(type, value, traceback)
+    #     AndorSpectrometer.andor.Shutdown()
+    #     AndorSpectrometer.shamrock.Shutdown()
+    #     sys.exit(app.exec_())
+    # #finally:
+    # #    print("Finally")
+    # #    spectrometer.Shutdown()
+    # #    spectrometer = None
+    #     sys.exit(app.exec_())
