@@ -60,7 +60,7 @@ class SCNR(QMainWindow):
 
         gv = pg.GraphicsView()
         vb = pg.ViewBox()
-        roi = pg.ROI([0, 0], [50, 50])
+        roi = pg.ROI([50, 50], [5, 5])
         vb.addItem(roi)
         self.detector_img = pg.ImageItem()
         vb.addItem(self.detector_img)
@@ -75,9 +75,10 @@ class SCNR(QMainWindow):
         # init Spectrometer
         if init_spectrometer:
             #print('Initializing Spectrometer')
-            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True)
-            self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
+            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
+            #self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
             self.setSpectrumMode()
+            self.spectrometer.SetExposureTime(1.0)
             #print('Spectrometer initialized')
 
         # init detector mode combobox
@@ -236,6 +237,10 @@ class SCNR(QMainWindow):
 
         self.spectrometer.SetSlitWidth(2500)
         self.spectrometer.SetImageofSlit()
+        #if self.ui.image_combobox.currentIndex() == 0:
+        #    self.spectrometer.SetImageofSlit()
+        #elif self.ui.image_combobox.currentIndex() ==1:
+        #    self.spectrometer.SetFullImage()
         self.ui.left_tab.setCurrentIndex(2)
 
 
@@ -250,10 +255,11 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
-        if index == 1:
-            self.cam.enable()
-        if index == 0:
-            self.cam.disable()
+        if init_cam:
+            if index == 1:
+                self.cam.enable()
+            else:
+                self.cam.disable()
 
 # ----- END Slots for Camera Stuff
 
@@ -566,8 +572,8 @@ class SCNR(QMainWindow):
                 grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
                 grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
 
-            print(grid_vec_1)
-            print(grid_vec_2)
+            #print(grid_vec_1)
+            #print(grid_vec_2)
             i = 0
             for x in range(xl):
                 for y in range(yl):
@@ -614,12 +620,10 @@ class SCNR(QMainWindow):
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
         self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value()/1000)
-        print(self.ui.integration_time_spin.value()/1000)
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
         self.settings.number_of_samples = self.ui.number_of_samples_spin.value()
-        print(self.ui.number_of_samples_spin.value())
 
     @pyqtSlot()
     def on_slit_width_edited(self):
@@ -668,7 +672,7 @@ if __name__ == '__main__':
 
     if init_spectrometer:
         print('Initializing Spectrometer')
-        spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=0)
+        spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
         print('Spectrometer initialized')
     else:
         spectrometer = None
@@ -685,6 +689,8 @@ if __name__ == '__main__':
         res = app.exec()
     except Exception as e:
         print(e)
+        AndorSpectrometer.andor.Shutdown()
+        AndorSpectrometer.shamrock.Shutdown()
         sys.exit(1)
     finally:
         if init_spectrometer:
