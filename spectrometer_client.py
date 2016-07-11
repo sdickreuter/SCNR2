@@ -3,25 +3,56 @@ import random
 import sys
 import time
 
-context = zmq.Context()
-socket = context.socket(zmq.PAIR)
-port = "5556"
-socket.connect("tcp://localhost:%s" % port)
-#socket.bind("ipc://spectrometer")
-try:
+import subprocess
+import os
 
-    socket.send(b'?')
-    msg = socket.recv()
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+port = "6667"
+socket.connect("tcp://localhost:%s" % port)
+
+
+poller = zmq.Poller()
+poller.register(socket, zmq.POLLIN) # POLLIN for recv, POLLOUT for send
+#evts = poller.poll(1000) # wait *up to* one second for a message to arrive.
+
+connected = False
+
+try:
+    print("?")
+    socket.send(b'?', flags=zmq.NOBLOCK)
+    print("! ?")
+    msg = None
+    msg = socket.recv(flags=zmq.NOBLOCK)
+    print(msg)
     if msg == b'!':
+        connected = True
         print('Connected to server')
     else:
-        raise RuntimeError("Could not connect to Server")
+        raise zmq.ZMQError()
+except zmq.ZMQError as e:
+    print("No connection to server, starting server")
+    #p = subprocess.run(['python', 'spectrometer_server.py'])
+    p = subprocess.Popen(['python', 'spectrometer_server.py'])
+    #subprocess.call('python spectrometer_server.py', shell=True)
+    #subprocess.call(['python', 'spectrometer_server.py'])
+    time.sleep(1)
 
-    while True:
+
+try:
+    if not connected:
+        socket.send(b'?')
+        msg = socket.recv()
+        if msg == b'!':
+            print('Connected to server')
+        else:
+            raise RuntimeError("Could not connect to Server")
+
+    #while True:
+    for i in range(10):
         msg = socket.recv()
         print(msg)
-        socket.send(b"client message to server1")
-        socket.send(b"client message to server2")
+        socket.send(b"client message to server")
         time.sleep(1)
 except KeyboardInterrupt:
     print("Exiting ...")
