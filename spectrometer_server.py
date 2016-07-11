@@ -1,5 +1,6 @@
 
 import zmq
+import numpy as np
 import random
 import sys
 import time
@@ -12,6 +13,17 @@ socket.bind("tcp://*:%s" % port)
 poller = zmq.Poller()
 poller.register(socket, zmq.POLLOUT) # POLLIN for recv, POLLOUT for send
 
+data = np.ones(10)
+
+
+def send_data(data):
+    if poller.poll(1000):
+        print('Sending: '+str(data))
+        socket.send_pyobj(data)
+    else:
+        print("lost connection to client")
+
+
 running = True
 msg = None
 
@@ -21,19 +33,20 @@ while running:
 
         while True:
 
-            msg = socket.recv()
+            msg = socket.recv_pyobj()
             print(msg)
 
-            if msg == b'?':
-                out = b'!'
+            if msg == '?':
+                send_data('!')
+            elif msg == 'quit':
+                print('Quiting by request of client')
+                running = False
+                break
+            elif msg == 'data':
+                print('Client requested data')
+                send_data(data)
             else:
-                out = b'Server message to client'
-
-            if poller.poll(1000):
-                print('Sending: '+out.decode())
-                socket.send(out)
-            else:
-                print("lost connection to client")
+                send_data('Server message to client')
 
 
     except KeyboardInterrupt:

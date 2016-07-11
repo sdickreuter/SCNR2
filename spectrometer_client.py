@@ -1,4 +1,5 @@
 import zmq
+import numpy as np
 import random
 import sys
 import time
@@ -27,7 +28,7 @@ while not connected:
     sent = False
     if not sent:
         if out_poller.poll(1000): # 10s timeout in milliseconds
-            socket.send(b'?',zmq.NOBLOCK)
+            socket.send_pyobj('?',zmq.NOBLOCK)
             print('sent ?')
             sent = True
         else:
@@ -36,9 +37,9 @@ while not connected:
     received = False
     if sent:
         if in_poller.poll(1000):
-            msg = socket.recv(flags=zmq.NOBLOCK)
+            msg = socket.recv_pyobj(flags=zmq.NOBLOCK)
             print(msg)
-            if msg == b'!':
+            if msg == '!':
                 received = True
         else:
             received = False
@@ -60,6 +61,26 @@ while not connected:
 print('Connected to server')
 
 
+def make_request(req):
+    sent = False
+    received = False
+
+    if out_poller.poll(1000):
+        socket.send_pyobj(req)
+        sent = True
+
+    if in_poller.poll(1000):
+        #msg = socket.recv()
+        data = socket.recv_pyobj()
+        received = True
+
+    if sent and received:
+        return data
+    elif (not sent) and (not received):
+        print("Server not answering, quitting")
+        raise KeyboardInterrupt()
+
+
 try:
     #while True:
     for i in range(10):
@@ -67,11 +88,11 @@ try:
         received = False
 
         if out_poller.poll(1000):
-            socket.send(b"client message to server")
+            socket.send_pyobj("client message to server")
             sent = True
 
         if in_poller.poll(1000):
-            msg = socket.recv()
+            msg = socket.recv_pyobj()
             received = True
 
         if sent and received:
@@ -80,6 +101,13 @@ try:
         elif (not sent) and (not received):
             print("Server not answering, quitting")
             raise KeyboardInterrupt()
+
+
+    data = make_request('data')
+    print(data)
+    socket.send_pyobj('quit')
+
+
 
 except KeyboardInterrupt:
     print("Exiting ...")
