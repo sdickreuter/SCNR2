@@ -5,32 +5,36 @@ import sys
 import time
 
 context = zmq.Context()
-socket = context.socket(zmq.REP)
+socket = context.socket(zmq.PAIR)
 port = "6667"
 socket.bind("tcp://*:%s" % port)
-#socket.bind("ipc://spectrometer")
-connected = False
+
+poller = zmq.Poller()
+poller.register(socket, zmq.POLLOUT) # POLLIN for recv, POLLOUT for send
+
 running = True
+msg = None
+
 while running:
     try:
 
-        while not connected:
-            msg = socket.recv()
-            if msg == b'?':
-                socket.send(b'!')
-                print("Client has connected")
-                connected = True
 
         while True:
-            socket.send(b"Server message to client",zmq.NOBLOCK)
 
-            try:
-                msg = socket.recv(zmq.NOBLOCK)
-                print(msg)
-                #time.sleep(1)
-            except zmq.ZMQError as e:
+            msg = socket.recv()
+            print(msg)
+
+            if msg == b'?':
+                out = b'!'
+            else:
+                out = b'Server message to client'
+
+            if poller.poll(1000):
+                print('Sending: '+out.decode())
+                socket.send(out)
+            else:
                 print("lost connection to client")
-                connected = False
+
 
     except KeyboardInterrupt:
         print("Exiting ...")
