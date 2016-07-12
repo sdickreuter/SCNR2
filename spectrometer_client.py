@@ -50,7 +50,7 @@ class SpectrometerClient:
                 break
             elif waiting:
                 print('Waiting for spectrometer to initialize ...')
-                time.sleep(5)
+                time.sleep(2)
             elif not received :
                 waiting = True
                 print("No connection to server, starting server")
@@ -60,6 +60,9 @@ class SpectrometerClient:
                 # subprocess.call(['python', 'spectrometer_server.py'])
 
 
+        self._width = self.GetWidth()
+        self.mode = None
+        self.wl = self._GetWavelength()
         print('Connected to server')
 
     def __del__(self):
@@ -89,16 +92,18 @@ class SpectrometerClient:
 
     def run(self):
             #while True:
-            for i in range(10):
+            for i in range(30):
                 data = self.make_request('Client to Server',None)
                 print(data)
                 time.sleep(0.5)
 
-            data = self.make_request('singletrack',1)
-            print(data)
+            #data = self.make_request('singletrack',1)
+            #print(data)
             self.socket.send_pyobj(('quit',None))
             time.sleep(2)
 
+    def GetWidth(self):
+        return self.make_request('getwidth', None)
 
     def GetTemperature(self):
         return self.make_request('gettemperature',None)
@@ -114,49 +119,66 @@ class SpectrometerClient:
 
     def SetGrating(self, grating):
         ret = self.make_request('setgrating',grating)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def AbortAcquisition(self):
         ret = self.make_request('abortacquisition',None)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def SetNumberAccumulations(self, number):
         ret = self.make_request('setnumberaccumulations',number)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def SetExposureTime(self, seconds):
         ret = self.make_request('setexposuretime',seconds)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def SetSlitWidth(self, slitwidth):
         ret = self.make_request('setslitwidth',slitwidth)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
-    def GetWavelength(self):
+    def _GetWavelength(self):
         return self.make_request('getwavelength',None)
 
+    def GetWavelength(self):
+        return self.wl
+
     def SetFullImage(self):
+        self.mode = 'Image'
         ret = self.make_request('setfullimage',None)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def TakeFullImage(self):
         return self.make_request('takefullimage',None)
 
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
-        print(ret)
+        self.wl = self._GetWavelength()
+        if not ret == 'ok':
+            print('Communication Error')
 
     def SetImageofSlit(self):
+        self.mode = 'Image'
         ret = self.make_request('setimageofslit',None)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def TakeImageofSlit(self):
         ret = self.make_request('takeimageofslit',None)
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def SetSingleTrack(self, hstart=None, hstop=None):
+        self.mode = 'SingleTrack'
         ret = self.make_request('setsingletrack',(hstart,hstop))
-        print(ret)
+        if not ret == 'ok':
+            print('Communication Error')
 
     def TakeSingleTrack(self):
         return self.make_request('takesingletrack',None)

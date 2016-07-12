@@ -38,7 +38,7 @@ while running:
         while True:
 
             msg, param = socket.recv_pyobj()
-            print(param)
+            print(msg +' '+ str(param))
 
             if msg == '?':
                 send_data('!')
@@ -46,6 +46,9 @@ while running:
                 print('Quiting by request of client')
                 running = False
                 break
+
+            elif msg == 'getwidth':
+                send_data(spectrometer._width)
 
             elif msg == 'gettemperature':
                 send_data(spectrometer.GetTemperature())

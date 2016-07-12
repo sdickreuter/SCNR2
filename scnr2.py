@@ -12,7 +12,8 @@ from gui.main import Ui_MainWindow
 
 # Device Control imports
 import PIStage
-import AndorSpectrometer
+#import AndorSpectrometer
+import spectrometer_client
 
 # Helper Classes imports
 import spectrum
@@ -38,7 +39,7 @@ class SCNR(QMainWindow):
     padthread = None
     spectrometer = None
 
-    def __init__(self,spectrometer, parent=None):
+    def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -71,9 +72,9 @@ class SCNR(QMainWindow):
         #self.pw.setLabel('left', 'y', units='px')
         #self.pw.setLabel('bottom', 'x', units='px')
 
-        self.spectrometer = spectrometer
         # init Spectrometer
         if init_spectrometer:
+            self.spectrometer = spectrometer_client.SpectrometerClient()
             #print('Initializing Spectrometer')
             #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
             #self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
@@ -670,16 +671,10 @@ class SCNR(QMainWindow):
 if __name__ == '__main__':
     import sys
 
-    if init_spectrometer:
-        print('Initializing Spectrometer')
-        spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
-        print('Spectrometer initialized')
-    else:
-        spectrometer = None
 
     try:
         app = QApplication(sys.argv)
-        main = SCNR(spectrometer)
+        main = SCNR()
         main.show()
     except Exception as e:
         print(e)
@@ -689,13 +684,12 @@ if __name__ == '__main__':
         res = app.exec()
     except Exception as e:
         print(e)
-        AndorSpectrometer.andor.Shutdown()
-        AndorSpectrometer.shamrock.Shutdown()
         sys.exit(1)
     finally:
-        if init_spectrometer:
-            spectrometer.Shutdown()
-        spectrometer = None
+        #if init_spectrometer:
+        #    spectrometer.Shutdown()
+        #spectrometer = None
+        pass
     sys.exit(0)
 
    # try:

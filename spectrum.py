@@ -61,7 +61,7 @@ class Spectrum(QObject):
         self.specSignal.emit(spec)
 
     def get_wl(self):
-        return self._spectrometer.Get_wl()
+        return self._spectrometer.GetWavelength()
 
     def get_spec(self, corrected=False):
         if corrected:
