@@ -8,6 +8,10 @@ import time
 import AndorSpectrometer
 
 
+print("Initializing Spectrometer ...")
+spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True,verbosity=1)
+print("Spectrometer initialized !")
+
 context = zmq.Context()
 socket = context.socket(zmq.PAIR)
 port = "6667"
@@ -24,10 +28,6 @@ def send_data(data):
         socket.send_pyobj(data)
     else:
         print("lost connection to client")
-
-
-spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True,verbosity=1)
-#time.sleep(5)
 
 running = True
 msg = None
@@ -79,7 +79,7 @@ while running:
                 spectrometer.SetSlitWidth(param)
                 send_data('ok')
 
-            elif msg == 'setslitwidth':
+            elif msg == 'getwavelength':
                 send_data(spectrometer.GetWavelength())
 
             elif msg == 'setfullimage':

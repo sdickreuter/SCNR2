@@ -24,11 +24,12 @@ class SpectrometerClient:
 
     def __init__(self):
         print("Trying to connect to Server ...")
+        waiting = False
         while not self.connected:
             sent = False
             if not sent:
                 if self.out_poller.poll(1000): # 10s timeout in milliseconds
-                    self.socket.send_pyobj(('?',None),zmq.NOBLOCK)
+                    self.socket.send_pyobj(('?',None))#,zmq.NOBLOCK)
                     print('sent ?')
                     sent = True
                 else:
@@ -37,7 +38,7 @@ class SpectrometerClient:
             received = False
             if sent:
                 if self.in_poller.poll(1000):
-                    msg = self.socket.recv_pyobj(flags=zmq.NOBLOCK)
+                    msg = self.socket.recv_pyobj()#flags=zmq.NOBLOCK)
                     print(msg)
                     if msg == '!':
                         received = True
@@ -47,13 +48,17 @@ class SpectrometerClient:
             if sent and received:
                 connected = True
                 break
+            elif waiting:
+                print('Waiting for spectrometer to initialize ...')
+                time.sleep(5)
             elif not received :
+                waiting = True
                 print("No connection to server, starting server")
                 # p = subprocess.run(['python', 'spectrometer_server.py'])
                 p = subprocess.Popen(['python', 'spectrometer_server.py'])
                 # subprocess.call('python spectrometer_server.py', shell=True)
                 # subprocess.call(['python', 'spectrometer_server.py'])
-                #time.sleep(10)
+
 
         print('Connected to server')
 
@@ -138,7 +143,7 @@ class SpectrometerClient:
         return self.make_request('takefullimage',None)
 
     def SetCentreWavelength(self, wavelength):
-        ret = self.make_request('setcentrewavelength',None)
+        ret = self.make_request('setcentrewavelength',wavelength)
         print(ret)
 
     def SetImageofSlit(self):
