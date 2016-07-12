@@ -170,9 +170,8 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeImageofSlit(self):
-        ret = self.make_request('takeimageofslit',None)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('takeimageofslit',None)
+
 
     def SetSingleTrack(self, hstart=None, hstop=None):
         self.mode = 'SingleTrack'

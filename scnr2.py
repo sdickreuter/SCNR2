@@ -269,7 +269,6 @@ class SCNR(QMainWindow):
     @pyqtSlot(np.ndarray)
     def on_update_spectrum(self,spec):
         if self.spectrometer.mode == "Image":
-            print(spec.shape)
             self.detector_img.setImage(spec)
         elif self.spectrometer.mode == 'SingleTrack':
             self.plot.setData(self.spectrometer.GetWavelength(),spec)
