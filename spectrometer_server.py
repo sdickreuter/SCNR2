@@ -26,7 +26,7 @@ def send_data(data):
         print("lost connection to client")
 
 
-#spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True,verbosity=1)
+spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False,init_shutter=True,verbosity=1)
 #time.sleep(5)
 
 running = True
@@ -35,11 +35,10 @@ msg = None
 while running:
     try:
 
-
         while True:
 
-            msg = socket.recv_pyobj()
-            #print(msg)
+            msg, param = socket.recv_pyobj()
+            print(param)
 
             if msg == '?':
                 send_data('!')
@@ -47,15 +46,70 @@ while running:
                 print('Quiting by request of client')
                 running = False
                 break
-            elif msg == 'singletrack':
-                #data = spectrometer.TakeSingleTrack()
-                send_data(data)
-            elif msg == 'slitimage':
-                #data = spectrometer.TakeImageofSlit()
-                send_data(data)
+
+            elif msg == 'gettemperature':
+                send_data(spectrometer.GetTemperature())
+
+            elif msg == 'getslitwidth':
+                send_data(spectrometer.GetSlitWidth())
+
+            elif msg == 'getgratinginfo':
+                send_data(spectrometer.GetGratingInfo())
+
+            elif msg == 'getgrating':
+                send_data(spectrometer.GetGrating())
+
+            elif msg == 'setgrating':
+                spectrometer.SetGrating(param)
+                send_data('ok')
+
+            elif msg == 'abortacquisition':
+                spectrometer.AbortAcquisition()
+                send_data('ok')
+
+            elif msg == 'setnumberaccumulations':
+                spectrometer.SetNumberAccumulations(param)
+                send_data('ok')
+
+            elif msg == 'setexposuretime':
+                spectrometer.SetExposureTime(param)
+                send_data('ok')
+
+            elif msg == 'setslitwidth':
+                spectrometer.SetSlitWidth(param)
+                send_data('ok')
+
+            elif msg == 'setslitwidth':
+                send_data(spectrometer.GetWavelength())
+
+            elif msg == 'setfullimage':
+                spectrometer.SetFullImage()
+                send_data('ok')
+
+            elif msg == 'takefullimage':
+                send_data(spectrometer.TakeFullImage())
+
+            elif msg == 'setcentrewavelength':
+                spectrometer.SetCentreWavelength(param)
+                send_data('ok')
+
+            elif msg == 'setimageofslit':
+                spectrometer.SetImageofSlit(param)
+                send_data('ok')
+
+            elif msg == 'takeimageofslit':
+                send_data(spectrometer.TakeImageofSlit())
+
+            elif msg == 'setsingletrack':
+                hstart, hstop = param
+                spectrometer.SetSingleTrack(hstart,hstop)
+                send_data('ok')
+
+            elif msg == 'takesingletrack':
+                send_data(spectrometer.TakeSingleTrack())
+
             else:
                 send_data('?')
-
 
     except KeyboardInterrupt:
         print("Exiting ...")

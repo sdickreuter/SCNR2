@@ -28,7 +28,7 @@ class SpectrometerClient:
             sent = False
             if not sent:
                 if self.out_poller.poll(1000): # 10s timeout in milliseconds
-                    self.socket.send_pyobj('?',zmq.NOBLOCK)
+                    self.socket.send_pyobj(('?',None),zmq.NOBLOCK)
                     print('sent ?')
                     sent = True
                 else:
@@ -62,15 +62,15 @@ class SpectrometerClient:
         self.context.term()
 
 
-    def make_request(self, req):
+    def make_request(self, req, param):
         sent = False
         received = False
 
         if self.out_poller.poll(1000):
-            self.socket.send_pyobj(req)
+            self.socket.send_pyobj((req,param))
             sent = True
 
-        if self.in_poller.poll(1000):
+        if self.in_poller.poll(60*1000):
             #msg = socket.recv()
             data = self.socket.recv_pyobj()
             received = True
@@ -85,16 +85,76 @@ class SpectrometerClient:
     def run(self):
             #while True:
             for i in range(10):
-                data = self.make_request('Client to Server')
+                data = self.make_request('Client to Server',None)
                 print(data)
                 time.sleep(0.5)
 
-            data = self.make_request('singletrack')
+            data = self.make_request('singletrack',1)
             print(data)
-            self.socket.send_pyobj('quit')
+            self.socket.send_pyobj(('quit',None))
             time.sleep(2)
 
 
+    def GetTemperature(self):
+        return self.make_request('gettemperature',None)
+
+    def GetSlitWidth(self):
+        return self.make_request('getslitwidth',None)
+
+    def GetGratingInfo(self):
+        return self.make_request('getgratinginfo',None)
+
+    def GetGrating(self):
+        return self.make_request('getgrating',None)
+
+    def SetGrating(self, grating):
+        ret = self.make_request('setgrating',grating)
+        print(ret)
+
+    def AbortAcquisition(self):
+        ret = self.make_request('abortacquisition',None)
+        print(ret)
+
+    def SetNumberAccumulations(self, number):
+        ret = self.make_request('setnumberaccumulations',number)
+        print(ret)
+
+    def SetExposureTime(self, seconds):
+        ret = self.make_request('setexposuretime',seconds)
+        print(ret)
+
+    def SetSlitWidth(self, slitwidth):
+        ret = self.make_request('setslitwidth',slitwidth)
+        print(ret)
+
+    def GetWavelength(self):
+        return self.make_request('getwavelength',None)
+
+    def SetFullImage(self):
+        ret = self.make_request('setfullimage',None)
+        print(ret)
+
+    def TakeFullImage(self):
+        return self.make_request('takefullimage',None)
+
+    def SetCentreWavelength(self, wavelength):
+        ret = self.make_request('setcentrewavelength',None)
+        print(ret)
+
+    def SetImageofSlit(self):
+        ret = self.make_request('setimageofslit',None)
+        print(ret)
+
+    def TakeImageofSlit(self):
+        ret = self.make_request('takeimageofslit',None)
+        print(ret)
+
+    def SetSingleTrack(self, hstart=None, hstop=None):
+        ret = self.make_request('setsingletrack',(hstart,hstop))
+        print(ret)
+
+    def TakeSingleTrack(self):
+        return self.make_request('takesingletrack',None)
 
 if __name__ == '__main__':
     client = SpectrometerClient()
