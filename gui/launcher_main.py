@@ -22,15 +22,18 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QtCore.QSize(270, 120))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.status = QtWidgets.QLabel(self.centralwidget)
-        self.status.setGeometry(QtCore.QRect(10, 10, 241, 21))
-        self.status.setObjectName("status")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.spectrometerButton = QtWidgets.QPushButton(self.centralwidget)
+        self.spectrometerButton.setObjectName("spectrometerButton")
+        self.verticalLayout.addWidget(self.spectrometerButton)
         self.startButton = QtWidgets.QPushButton(self.centralwidget)
-        self.startButton.setGeometry(QtCore.QRect(10, 40, 251, 27))
+        self.startButton.setEnabled(False)
         self.startButton.setObjectName("startButton")
+        self.verticalLayout.addWidget(self.startButton)
         self.quitButton = QtWidgets.QPushButton(self.centralwidget)
-        self.quitButton.setGeometry(QtCore.QRect(10, 80, 251, 27))
         self.quitButton.setObjectName("quitButton")
+        self.verticalLayout.addWidget(self.quitButton)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -39,7 +42,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "SCNR2 Launcher"))
-        self.status.setText(_translate("MainWindow", "Waiting for Spectrometer ..."))
+        self.spectrometerButton.setText(_translate("MainWindow", "Initialize Spectrometer"))
         self.startButton.setText(_translate("MainWindow", "Start Graphical User Interface"))
         self.quitButton.setText(_translate("MainWindow", "Quit"))
 

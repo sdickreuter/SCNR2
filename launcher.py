@@ -10,21 +10,19 @@ import spectrometer_server
 
 
 class Launcher(QMainWindow):
+    server = None
+    p = None
 
     def __init__(self, parent=None):
         super(Launcher, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.server = spectrometer_server.SpectrometerServer()
-
-        self.ui.status.setText("Spectrometer ready")
+        self.ui.spectrometerButton.clicked.connect(self.initialize)
 
         self.ui.quitButton.clicked.connect(self.quit)
 
         self.ui.startButton.clicked.connect(self.start)
-
-        self.p = None
 
 
     @pyqtSlot()
@@ -32,6 +30,11 @@ class Launcher(QMainWindow):
         self.server = None
         self.close()
 
+    @pyqtSlot()
+    def initialize(self):
+        self.ui.spectrometerButton.setDisabled(True)
+        self.server = spectrometer_server.SpectrometerServer()
+        self.ui.startButton.setEnabled(True)
 
     @pyqtSlot()
     def start(self):
