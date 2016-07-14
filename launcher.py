@@ -41,6 +41,8 @@ class ServerThread(QObject):
 
 
 
+
+
 class Launcher(QMainWindow):
     server = None
     p_gui = None

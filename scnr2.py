@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import signal
 from PyQt5.QtCore import pyqtSlot, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, QMessageBox
 import pyqtgraph as pg
@@ -675,15 +676,25 @@ class SCNR(QMainWindow):
         self.settings.save()
 
 
-
-
+def sigint_handler(*args):
+    """Handler for the SIGINT signal."""
+    #sys.stderr.write('\r')
+    #if QMessageBox.question(None, '', "Are you sure you want to quit?",
+    #                        QMessageBox.Yes | QMessageBox.No,
+    #                        QMessageBox.No) == QMessageBox.Yes:
+    #    QApplication.quit()
+    QApplication.quit()
 
 if __name__ == '__main__':
     import sys
 
 
     try:
+        signal.signal(signal.SIGINT, sigint_handler)
         app = QApplication(sys.argv)
+        timer = QTimer()
+        timer.start(500)  # You may change this if you wish.
+        timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
         main = SCNR()
         main.show()
     except Exception as e:
