@@ -22,9 +22,10 @@ class SpectrometerClient:
 
     connected = False
 
+
     def __init__(self):
         print("Trying to connect to Server ...")
-        waiting = False
+        count = 0
         while not self.connected:
             sent = False
             if not sent:
@@ -48,17 +49,13 @@ class SpectrometerClient:
             if sent and received:
                 connected = True
                 break
-            elif waiting:
-                print('Waiting for spectrometer to initialize ...')
-                time.sleep(2)
             elif not received :
-                waiting = True
-                print("No connection to server, starting server")
-                # p = subprocess.run(['python', 'spectrometer_server.py'])
-                p = subprocess.Popen(['python', 'spectrometer_server.py'])
-                # subprocess.call('python spectrometer_server.py', shell=True)
-                # subprocess.call(['python', 'spectrometer_server.py'])
-
+                count += 1
+                if count < 10:
+                    print('Connecting failed trying again')
+                else:
+                    print('Too many tries, exciting ...')
+                    raise KeyboardInterrupt()
 
         self._width = self.GetWidth()
         self.mode = None

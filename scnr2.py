@@ -28,7 +28,7 @@ from custom_pyqtgraph_classes import CustomViewBox
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = True
+init_spectrometer = False
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -61,8 +61,6 @@ class SCNR(QMainWindow):
 
         gv = pg.GraphicsView()
         vb = pg.ViewBox()
-        roi = pg.ROI([50, 50], [5, 5])
-        vb.addItem(roi)
         self.detector_img = pg.ImageItem()
         vb.addItem(self.detector_img)
         gv.setCentralWidget(vb)
@@ -92,6 +90,8 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
+            roi = pg.ROI([50, 50], [10, 10])
+            vb2.addItem(roi)
             gv2.setCentralWidget(self.vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
