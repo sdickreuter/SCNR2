@@ -14,7 +14,7 @@ class SpectrometerServer:
         print("Initializing Spectrometer ...")
         self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
-        
+
         self.spectrometer.SetTemperature(-40)
 
         self.context = zmq.Context()

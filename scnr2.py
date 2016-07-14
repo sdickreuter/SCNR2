@@ -26,9 +26,9 @@ from custom_pyqtgraph_classes import CustomViewBox
 
 # for debugging
 init_pad = False
-init_cam = False
+init_cam = True
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -92,7 +92,7 @@ class SCNR(QMainWindow):
             vb2.addItem(self.img)
             roi = pg.ROI([50, 50], [10, 10])
             vb2.addItem(roi)
-            gv2.setCentralWidget(self.vb2)
+            gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
             l2.addWidget(gv2)
@@ -189,7 +189,7 @@ class SCNR(QMainWindow):
         if start_cooler:
             self.temperature_timer = QTimer(self)
             self.temperature_timer.timeout.connect(self.check_temperature)
-            self.temperature_timer.start(500)
+            self.temperature_timer.start(1000)
 
         #init Position Table
         self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
