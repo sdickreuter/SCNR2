@@ -9,6 +9,7 @@ import AndorSpectrometer
 
 
 class SpectrometerServer:
+    running = True
 
     def __init__(self):
         print("Initializing Spectrometer ...")
@@ -38,7 +39,7 @@ class SpectrometerServer:
             print("lost connection to client")
 
     def run(self):
-        while True:
+        while self.running:
 
             msg, param = self.socket.recv_pyobj()
             print(msg +' '+ str(param))
@@ -47,8 +48,7 @@ class SpectrometerServer:
                 self.send_data('!')
             elif msg == 'quit':
                 print('Quiting by request of client')
-                running = False
-                break
+                self.running = False
 
             elif msg == 'getwidth':
                 self.send_data(self.spectrometer._width)

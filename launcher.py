@@ -9,12 +9,51 @@ from gui.launcher_main import Ui_MainWindow
 import spectrometer_server
 
 
+class ServerThread(QObject):
+    server = None
+
+    def __init__(self, parent = None):
+        if getattr(self.__class__, '_has_instance', False):
+            RuntimeError('Cannot create another instance')
+            #return None
+        self.__class__._has_instance = True
+        try:
+            super(ServerThread, self).__init__(parent)
+            self.thread = QThread(parent)
+            self.moveToThread(self.thread)
+            self.thread.started.connect(self.process)
+        except:
+            (type, value, traceback) = sys.exc_info()
+            sys.excepthook(type, value, traceback)
+
+        self.server = spectrometer_server.SpectrometerServer()
+        self.thread.start()
+
+    @pyqtSlot()
+    def stop(self):
+        self.server.running = False
+        self.thread.wait(5000)
+        self.thread.quit()
+        self.thread.wait(5000)
+
+    def __del__(self):
+        self.__class__.has_instance = False
+        self.server = None
+
+    @pyqtSlot()
+    def process(self):
+        try:
+            self.server.run()
+        except:
+            (type, value, traceback) = sys.exc_info()
+            sys.excepthook(type, value, traceback)
 
 
 class Launcher(QMainWindow):
     server = None
     p_gui = None
     p_server = None
+    serverthread = None
 
     def __init__(self, parent=None):
         super(Launcher, self).__init__(parent)
@@ -28,21 +67,28 @@ class Launcher(QMainWindow):
         self.ui.startButton.clicked.connect(self.start)
 
     def __del__(self):
-        if not self.p_server is None:
-            self.p_server.kill()
+        #if not self.p_server is None:
+        #    self.p_server.kill()
         if not self.p_gui is None:
             self.p_gui.kill()
+        self.serverthread.stop()
+        self.serverthread = None
 
     @pyqtSlot()
     def quit(self):
-        self.server = None
         self.close()
 
     @pyqtSlot()
     def initialize(self):
         self.ui.spectrometerButton.setDisabled(True)
         #self.server = spectrometer_server.SpectrometerServer()
-        self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'])
+        #self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'])
+        try:
+            self.serverthread = ServerThread()
+        except Exception as e:
+            print(e)
+            self.ui.spectrometerButton.setEnabled(True)
+            return
         self.ui.startButton.setEnabled(True)
 
 
