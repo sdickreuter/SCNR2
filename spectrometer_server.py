@@ -13,10 +13,10 @@ class SpectrometerServer:
 
     def __init__(self):
         print("Initializing Spectrometer ...")
-        self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
+        #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
 
-        self.spectrometer.SetTemperature(-40)
+        #self.spectrometer.SetTemperature(-40)
 
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PAIR)
@@ -42,7 +42,7 @@ class SpectrometerServer:
         while self.running:
 
             msg, param = self.socket.recv_pyobj()
-            print(msg +' '+ str(param))
+            #print(msg +' '+ str(param))
 
             if msg == '?':
                 self.send_data('!')

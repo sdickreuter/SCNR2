@@ -21,18 +21,16 @@ class ServerThread(QObject):
             super(ServerThread, self).__init__(parent)
             self.thread = QThread(parent)
             self.moveToThread(self.thread)
-            self.thread.started.connect(self.process)
+            #self.thread.started.connect(self.process)
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
 
-        self.server = spectrometer_server.SpectrometerServer()
+    def start(self):
         self.thread.start()
 
     @pyqtSlot()
     def stop(self):
-        self.server.running = False
-        self.thread.wait(5000)
         self.thread.quit()
         self.thread.wait(5000)
 
@@ -40,20 +38,15 @@ class ServerThread(QObject):
         self.__class__.has_instance = False
         self.server = None
 
-    @pyqtSlot()
-    def process(self):
-        try:
-            self.server.run()
-        except:
-            (type, value, traceback) = sys.exc_info()
-            sys.excepthook(type, value, traceback)
+
 
 
 class Launcher(QMainWindow):
     server = None
     p_gui = None
     p_server = None
-    serverthread = None
+    #serverthread = None
+    #server = None
 
     def __init__(self, parent=None):
         super(Launcher, self).__init__(parent)
@@ -71,8 +64,10 @@ class Launcher(QMainWindow):
         #    self.p_server.kill()
         if not self.p_gui is None:
             self.p_gui.kill()
-        self.serverthread.stop()
-        self.serverthread = None
+        #if not self.serverthread is None:
+        #    self.serverthread.stop()
+        #    self.serverthread = None
+
 
     @pyqtSlot()
     def quit(self):
@@ -82,13 +77,24 @@ class Launcher(QMainWindow):
     def initialize(self):
         self.ui.spectrometerButton.setDisabled(True)
         #self.server = spectrometer_server.SpectrometerServer()
-        #self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'])
+        self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'])
+        proc = subprocess.Popen(...)
         try:
-            self.serverthread = ServerThread()
-        except Exception as e:
-            print(e)
-            self.ui.spectrometerButton.setEnabled(True)
-            return
+            outs, errs = proc.communicate(timeout=320)
+        except subprocess.TimeoutExpired:
+            QMessageBox.critical(self, 'Error', "Could not initialize Spectrometer!", QMessageBox.Ok)
+            raise RuntimeError()
+
+        #self.server = spectrometer_server.SpectrometerServer()
+        #self.serverthread = ServerThread()
+        #self.serverthread.thread.started.connect(self.server.run)
+        #self.serverthread.start()
+        #try:
+        #    self.serverthread = ServerThread()
+        #except Exception as e:
+        #    print(e)
+        #    self.ui.spectrometerButton.setEnabled(True)
+        #    return
         self.ui.startButton.setEnabled(True)
 
 

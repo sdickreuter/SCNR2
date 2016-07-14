@@ -674,6 +674,10 @@ class SCNR(QMainWindow):
     def on_savesettings_clicked(self):
         self.settings.save()
 
+
+
+
+
 if __name__ == '__main__':
     import sys
 
