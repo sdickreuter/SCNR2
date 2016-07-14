@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from PyQt5.QtCore import pyqtSlot, QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, QMessageBox
 import pyqtgraph as pg
 
 #from PyQt5 import uic
@@ -109,6 +109,7 @@ class SCNR(QMainWindow):
                 self.cam = None
                 #self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
+                QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QMessageBox.Ok)
 
         # init stage
         if init_stage:
@@ -127,6 +128,8 @@ class SCNR(QMainWindow):
                     self.ui.stage_frame.setEnabled(True)
                 else:
                     self.stage = None
+                    QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
+
         # for testing:
         else:
             self.ui.scanning_tab.setEnabled(True)
@@ -155,7 +158,7 @@ class SCNR(QMainWindow):
                 else:
                     self.padthread = None
                     print("Could not initialize Gamepad")
-
+                    QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QMessageBox.Ok)
 
         # init spectrum stuff
         self.spectrum = spectrum.Spectrum(self.spectrometer, self.stage, self.settings)
@@ -359,6 +362,8 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
+                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
             self.ui.status.setText("Scanning ...")
@@ -419,6 +424,7 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
+                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
             self.spectrum.save_data(path)
@@ -434,6 +440,8 @@ class SCNR(QMainWindow):
                 self.spectrum.save_spectrum(self.spectrum.mean, save_as[0], None, False, True)
             except:
                 print("Error Saving file " + save_as[0])
+                QMessageBox.warning(self, 'Error', "Error Saving file " + save_as[0], QMessageBox.Ok)
+
 
     @pyqtSlot()
     def on_dark_clicked(self):
@@ -470,6 +478,7 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
+                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
         else:
@@ -572,8 +581,6 @@ class SCNR(QMainWindow):
                 grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
                 grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
 
-            #print(grid_vec_1)
-            #print(grid_vec_2)
             i = 0
             for x in range(xl):
                 for y in range(yl):
