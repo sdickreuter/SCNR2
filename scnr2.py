@@ -1,36 +1,28 @@
 import os
-
-import numpy as np
 import signal
+
+import AndorSpectrometer
+import PIStage
+import numpy as np
 from PyQt5.QtCore import pyqtSlot, QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QMessageBox
 import pyqtgraph as pg
 
-#from PyQt5 import uic
-#Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
-
-from gui.main import Ui_MainWindow
-
-# Device Control imports
-import PIStage
-#import AndorSpectrometer
-import spectrometer_client
-
-# Helper Classes imports
-import spectrum
-import settings
 import camerathread
+import dialogs
 import gamepadthread
 import numpymodel
-import dialogs
-from custom_pyqtgraph_classes import CustomViewBox
+import settings
+import spectrum
+from gui.main import Ui_MainWindow
 
 # for debugging
 init_pad = False
-init_cam = True
+init_cam = False
 init_stage = False
 init_spectrometer = True
-start_cooler = False
+start_cooler = True
+
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -52,8 +44,8 @@ class SCNR(QMainWindow):
         self.ui.centre_wavelength_spin.setValue(650)
 
         self.pw = pg.PlotWidget()
-        #vb = CustomViewBox()
-        #self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
+        # vb = CustomViewBox()
+        # self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
         self.plot = self.pw.plot()
         l1 = QVBoxLayout(self.ui.specwidget)
         l1.addWidget(self.pw)
@@ -68,18 +60,19 @@ class SCNR(QMainWindow):
         l = QVBoxLayout(self.ui.detectorwidget)
         l.setSpacing(0)
         l.addWidget(gv)
-        #self.pw.setLabel('left', 'y', units='px')
-        #self.pw.setLabel('bottom', 'x', units='px')
+        # self.pw.setLabel('left', 'y', units='px')
+        # self.pw.setLabel('bottom', 'x', units='px')
 
         # init Spectrometer
         if init_spectrometer:
-            self.spectrometer = spectrometer_client.SpectrometerClient()
-            #print('Initializing Spectrometer')
-            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
-            #self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
+            # self.spectrometer = spectrometer_client.SpectrometerClient()
+            print('Initializing Spectrometer')
+            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True,
+                                                               verbosity=1)
+            # self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
             self.setSpectrumMode()
             self.spectrometer.SetExposureTime(1.0)
-            #print('Spectrometer initialized')
+            print('Spectrometer initialized')
 
         # init detector mode combobox
         self.ui.mode_combobox.addItem("Spectrum")
@@ -108,20 +101,20 @@ class SCNR(QMainWindow):
                 self.ui.cam_tab.setDisabled(False)
             else:
                 self.cam = None
-                #self.ui.left_tab.setEnabled(False)
+                # self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
                 QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QMessageBox.Ok)
 
         # init stage
         if init_stage:
             try:
-                #self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port)
+                # self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port)
                 self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except:
                 self.stage = None
-                #self.stage = PIStage.Dummy()
-                #print("Could not initialize PIStage, using Dummy instead")
-            if not self.stage is None:
+                # self.stage = PIStage.Dummy()
+                # print("Could not initialize PIStage, using Dummy instead")
+            if self.stage is not None:
                 if self.stage.is_initialized:
                     self.ui.addpos_button.setEnabled(True)
                     self.ui.scanning_tab.setEnabled(True)
@@ -136,7 +129,7 @@ class SCNR(QMainWindow):
             self.ui.scanning_tab.setEnabled(True)
 
         # init Gamepad
-        if not self.stage is None:
+        if self.stage is not None:
             if init_pad:
                 try:
                     self.padthread = gamepadthread.GamepadThread()
@@ -145,8 +138,8 @@ class SCNR(QMainWindow):
                 if self.padthread.isinitialized:
                     self.padthread.BSignal.connect(self.on_search_clicked)
                     self.padthread.XSignal.connect(self.on_addpos_clicked)
-                    #self.padthread.YSignal.connect(self.on_stepup_clicked)
-                    #self.padthread.ASignal.connect(self.on_stepdown_clicked)
+                    # self.padthread.YSignal.connect(self.on_stepup_clicked)
+                    # self.padthread.ASignal.connect(self.on_stepdown_clicked)
                     self.padthread.xaxisSignal.connect(self.on_xaxis)
                     self.xaxis = 0.0
                     self.padthread.yaxisSignal.connect(self.on_yaxis)
@@ -174,26 +167,26 @@ class SCNR(QMainWindow):
         self.ui.image_combobox.addItem("Only Slit")
         self.ui.image_combobox.addItem("Full Image")
 
-        #init setting tab values
+        # init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
         self.ui.number_of_samples_spin.setValue(self.settings.number_of_samples)
         if init_spectrometer:
             # init grating combobox
             gratings = self.spectrometer.GetGratingInfo()
             for i in range(len(gratings)):
-                self.ui.grating_combobox.addItem(str(round(gratings[i+1]))+' lines/mm')
+                self.ui.grating_combobox.addItem(str(round(gratings[i + 1])) + ' lines/mm')
 
             active_grating = self.spectrometer.GetGrating()
-            self.ui.grating_combobox.setCurrentIndex(active_grating-1)
+            self.ui.grating_combobox.setCurrentIndex(active_grating - 1)
 
-        #Temperature  Display
+        # Temperature  Display
         if start_cooler:
             self.temperature_timer = QTimer(self)
             self.temperature_timer.timeout.connect(self.check_temperature)
             self.temperature_timer.start(1000)
 
-        #init Position Table
-        self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
+        # init Position Table
+        self.positions = np.matrix([[0.0, 0.0], [0.0, 10.0], [10.0, 0.0]])
         self.posModel = numpymodel.NumpyModel(self.positions)
         self.ui.posTable.setModel(self.posModel)
         self.vh = self.ui.posTable.verticalHeader()
@@ -202,16 +195,16 @@ class SCNR(QMainWindow):
         self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
 
-# ----- Slot for Temperature Display
+    # ----- Slot for Temperature Display
 
     @pyqtSlot()
     def check_temperature(self):
-        self.ui.label_temp.setText('Detector Temperature: '+str(round(self.spectrometer.GetTemperature(),1))+' °C')
+        self.ui.label_temp.setText('Detector Temperature: ' + str(round(self.spectrometer.GetTemperature(), 1)) + ' °C')
 
-# ----- END Slot for Temperature Display
+    # ----- END Slot for Temperature Display
 
 
-# ----- Slot for Detector Mode
+    # ----- Slot for Detector Mode
 
     @pyqtSlot(int)
     def on_mode_changed(self, index):
@@ -242,17 +235,16 @@ class SCNR(QMainWindow):
 
         self.spectrometer.SetSlitWidth(2500)
         self.spectrometer.SetImageofSlit()
-        #if self.ui.image_combobox.currentIndex() == 0:
+        # if self.ui.image_combobox.currentIndex() == 0:
         #    self.spectrometer.SetImageofSlit()
-        #elif self.ui.image_combobox.currentIndex() ==1:
+        # elif self.ui.image_combobox.currentIndex() ==1:
         #    self.spectrometer.SetFullImage()
         self.ui.left_tab.setCurrentIndex(2)
 
+    # ----- END Slot for Detektor Mode
 
-# ----- END Slot for Detektor Mode
 
-
-# ----- Slots for Camera Stuff
+    # ----- Slots for Camera Stuff
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
@@ -266,16 +258,16 @@ class SCNR(QMainWindow):
             else:
                 self.cam.disable()
 
-# ----- END Slots for Camera Stuff
+                # ----- END Slots for Camera Stuff
 
-# ----- Slots for Spectrum Stuff
+                # ----- Slots for Spectrum Stuff
 
     @pyqtSlot(np.ndarray)
-    def on_update_spectrum(self,spec):
+    def on_update_spectrum(self, spec):
         if self.spectrometer.mode == "Image":
             self.detector_img.setImage(spec)
         elif self.spectrometer.mode == 'SingleTrack':
-            self.plot.setData(self.spectrometer.GetWavelength(),spec)
+            self.plot.setData(self.spectrometer.GetWavelength(), spec)
 
     @pyqtSlot(str)
     def on_updateStatus(self, status):
@@ -284,7 +276,6 @@ class SCNR(QMainWindow):
     @pyqtSlot(float)
     def on_updateProgress(self, progress):
         self.ui.progressBar.setValue(int(progress))
-
 
     @pyqtSlot(np.ndarray)
     def on_updatePositions(self, pos):
@@ -302,7 +293,7 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_enableButtons(self):
         self.ui.right_tab.setDisabled(False)
-        if not self.stage is None:
+        if self.stage is not None:
             self.ui.stage_frame.setDisabled(False)
             self.ui.searchmax_button.setDisabled(False)
             self.ui.stepup_button.setDisabled(False)
@@ -311,16 +302,16 @@ class SCNR(QMainWindow):
         self.ui.stop_button.setDisabled(True)
         self.pad_active = True
 
-# ----- END Slots for Spectrum Stuff
+    # ----- END Slots for Spectrum Stuff
 
-# ----- Slots for Gamepad
+    # ----- Slots for Gamepad
 
     @pyqtSlot(float)
-    def on_xaxis(self,x):
+    def on_xaxis(self, x):
         self.xaxis = x
 
     @pyqtSlot(float)
-    def on_yaxis(self,y):
+    def on_yaxis(self, y):
         self.yaxis = y
 
     @pyqtSlot()
@@ -347,10 +338,10 @@ class SCNR(QMainWindow):
                 self.stage.moverel(dy=y_step)
             self.show_pos()
 
-# ----- END Slots for Gamepad
+            # ----- END Slots for Gamepad
 
 
-# ----- Slots for Buttons
+            # ----- Slots for Buttons
 
     @pyqtSlot()
     def on_start_scan_clicked(self):
@@ -369,8 +360,8 @@ class SCNR(QMainWindow):
             path = self.savedir + prefix + "/"
             self.ui.status.setText("Scanning ...")
             # self.spectrum.make_scan(self.scan_store, path, self.button_searchonoff.get_active(), self.button_lockinonoff.get_active())
-            self.spectrum.make_scan(self.posModel.getMatrix(), path, self.ui.checkBox_lockin.isChecked(),
-                                    self.ui.checkBox_search.isChecked())
+            self.spectrum.make_scan(self.posModel.getMatrix(), path, self.ui.lockin_checkBox.isChecked(),
+                                    self.ui.search_checkBox.isChecked())
             self.disable_buttons()
 
     @pyqtSlot()
@@ -433,16 +424,16 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_saveas_clicked(self):
         self.ui.status.setText("Saving Data ...")
-        save_as = QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/', 'CSV Files (*.csv)')
+        save_as = QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
+                                              'CSV Files (*.csv)')
         print(save_as[0])
         # prefix, ok = QInputDialog.getText(self, 'Save Folder', 'Enter Folder to save spectra to:')
-        if not self.spectrum.mean is None:
+        if self.spectrum.mean is not None:
             try:
                 self.spectrum.save_spectrum(self.spectrum.mean, save_as[0], None, False, True)
             except:
                 print("Error Saving file " + save_as[0])
                 QMessageBox.warning(self, 'Error', "Error Saving file " + save_as[0], QMessageBox.Ok)
-
 
     @pyqtSlot()
     def on_dark_clicked(self):
@@ -485,24 +476,24 @@ class SCNR(QMainWindow):
         else:
             self.ui.status.setText("Error")
         self.spectrum.take_series(path)
-        #self.on_disableButtons()
+        # self.on_disableButtons()
 
     @pyqtSlot()
     def on_loaddark_clicked(self):
         buf = self._load_spectrum_from_file()
-        if not buf is None:
+        if buf is not None:
             self.spectrum.dark = buf
 
     @pyqtSlot()
     def on_loadlamp_clicked(self):
         buf = self._load_spectrum_from_file()
-        if not buf is None:
+        if buf is not None:
             self.spectrum.lamp = buf
 
     @pyqtSlot()
     def on_loadbg_clicked(self):
         buf = self._load_spectrum_from_file()
-        if not buf is None:
+        if buf is not None:
             self.spectrum.bg = buf
 
     @pyqtSlot()
@@ -551,9 +542,9 @@ class SCNR(QMainWindow):
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
         self.settings.save()
 
-# ----- END Slots for Buttons
+    # ----- END Slots for Buttons
 
-# ----- Scanning Listview Slots
+    # ----- Scanning Listview Slots
 
     @pyqtSlot()
     def on_addpos_clicked(self):
@@ -620,14 +611,14 @@ class SCNR(QMainWindow):
     def update_positions(self, pos):
         self.posModel.update(pos)
 
-# ----- END Scanning Listview Slots
+    # ----- END Scanning Listview Slots
 
-# ----- Slots for Settings
+    # ----- Slots for Settings
 
     @pyqtSlot()
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
-        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value()/1000)
+        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value())
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
@@ -644,10 +635,10 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(int)
     def on_grating_changed(self, index):
-        self.spectrometer.SetGrating(index+1)
+        self.spectrometer.SetGrating(index + 1)
 
     @pyqtSlot(int)
-    def on_image_readout_changed(int, index):
+    def on_image_readout_changed(self, index):
         print("readout:" + str(index))
 
     @pyqtSlot()
@@ -678,16 +669,16 @@ class SCNR(QMainWindow):
 
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
-    #sys.stderr.write('\r')
-    #if QMessageBox.question(None, '', "Are you sure you want to quit?",
+    # sys.stderr.write('\r')
+    # if QMessageBox.question(None, '', "Are you sure you want to quit?",
     #                        QMessageBox.Yes | QMessageBox.No,
     #                        QMessageBox.No) == QMessageBox.Yes:
     #    QApplication.quit()
     QApplication.quit()
 
+
 if __name__ == '__main__':
     import sys
-
 
     try:
         signal.signal(signal.SIGINT, sigint_handler)
@@ -707,13 +698,13 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     finally:
-        #if init_spectrometer:
+        # if init_spectrometer:
         #    spectrometer.Shutdown()
-        #spectrometer = None
+        # spectrometer = None
         pass
     sys.exit(0)
 
-   # try:
+    # try:
     #     app = QApplication(sys.argv)
     #     main = SCNR()
     #     main.show()

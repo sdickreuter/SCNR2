@@ -6,42 +6,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from gui.launcher_main import Ui_MainWindow
 
-import spectrometer_server
-
-
-class ServerThread(QObject):
-    server = None
-
-    def __init__(self, parent = None):
-        if getattr(self.__class__, '_has_instance', False):
-            RuntimeError('Cannot create another instance')
-            #return None
-        self.__class__._has_instance = True
-        try:
-            super(ServerThread, self).__init__(parent)
-            self.thread = QThread(parent)
-            self.moveToThread(self.thread)
-            #self.thread.started.connect(self.process)
-        except:
-            (type, value, traceback) = sys.exc_info()
-            sys.excepthook(type, value, traceback)
-
-    def start(self):
-        self.thread.start()
-
-    @pyqtSlot()
-    def stop(self):
-        self.thread.quit()
-        self.thread.wait(5000)
-
-    def __del__(self):
-        self.__class__.has_instance = False
-        self.server = None
-
-
-
-
-
+#import spectrometer_server
+import signal
 
 class Launcher(QMainWindow):
     server = None
@@ -62,10 +28,7 @@ class Launcher(QMainWindow):
         self.ui.startButton.clicked.connect(self.start)
 
     def __del__(self):
-        #if not self.p_server is None:
-        #    self.p_server.kill()
-        if not self.p_gui is None:
-            self.p_gui.kill()
+        pass
         #if not self.serverthread is None:
         #    self.serverthread.stop()
         #    self.serverthread = None
@@ -79,11 +42,13 @@ class Launcher(QMainWindow):
     def initialize(self):
         self.ui.spectrometerButton.setDisabled(True)
         #self.server = spectrometer_server.SpectrometerServer()
-        self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'])
-        proc = subprocess.Popen(...)
-        try:
-            outs, errs = proc.communicate(timeout=320)
-        except subprocess.TimeoutExpired:
+        self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'],stdout=subprocess.PIPE)#,creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        #print('Started Server at:' + str(self.p_server.pid))
+        #Read two lines from stdout, then spectrometer will be initialized
+        print(self.p_server.stdout.readline())
+        out = self.p_server.stdout.readline()
+        print(out)
+        if out != b'Spectrometer initialized !\n':
             QMessageBox.critical(self, 'Error', "Could not initialize Spectrometer!", QMessageBox.Ok)
             raise RuntimeError()
 
@@ -123,7 +88,6 @@ if __name__ == '__main__':
         main.show()
     except Exception as e:
         print(e)
-
         sys.exit(1)
 
     try:
@@ -132,6 +96,11 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     finally:
+        if not main.p_server is None:
+            main.p_server.terminate()
+            #app.p_server.send_signal(signal.SIGTERM)
+        if not main.p_gui is None:
+            main.p_gui.terminate()
         # if init_spectrometer:
         #    spectrometer.Shutdown()
         # spectrometer = None
