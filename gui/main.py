@@ -726,6 +726,7 @@ class Ui_MainWindow(object):
         self.mode_combobox.currentIndexChanged['int'].connect(MainWindow.on_mode_changed)
         self.left_tab.currentChanged['int'].connect(MainWindow.on_lefttab_changed)
         self.integration_time_spin.editingFinished.connect(MainWindow.on_int_time_edited)
+        self.savesettings_button.clicked.connect(MainWindow.on_savesettings_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
