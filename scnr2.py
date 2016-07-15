@@ -1,5 +1,6 @@
 import os
 import signal
+import time
 
 import AndorSpectrometer
 import PIStage
@@ -21,7 +22,7 @@ init_pad = False
 init_cam = False
 init_stage = False
 init_spectrometer = True
-start_cooler = True
+start_cooler = False
 
 
 class SCNR(QMainWindow):
@@ -32,7 +33,7 @@ class SCNR(QMainWindow):
     padthread = None
     spectrometer = None
 
-    def __init__(self, parent=None):
+    def __init__(self,spectrometer, parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -64,12 +65,13 @@ class SCNR(QMainWindow):
         # self.pw.setLabel('bottom', 'x', units='px')
 
         # init Spectrometer
+        self.spectrometer = spectrometer
         if init_spectrometer:
             # self.spectrometer = spectrometer_client.SpectrometerClient()
-            print('Initializing Spectrometer')
-            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True,
-                                                               verbosity=1)
+            #print('Initializing Spectrometer')
+            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True, verbosity=1)
             # self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
+            #time.sleep(1)
             self.setSpectrumMode()
             self.spectrometer.SetExposureTime(1.0)
             print('Spectrometer initialized')
@@ -618,7 +620,10 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
-        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value())
+        seconds = float(round(self.ui.integration_time_spin.value(),2))
+        print(seconds)
+        #self.spectrometer.SetExposureTime(seconds)
+        self.spectrometer.SetExposureTime(0.5)
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
@@ -680,13 +685,23 @@ def sigint_handler(*args):
 if __name__ == '__main__':
     import sys
 
+    print('Initializing Spectrometer')
+    try:
+        spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True,
+                                                       verbosity=1)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+    time.sleep(1)
+    print('Spectrometer initialized')
+
     try:
         signal.signal(signal.SIGINT, sigint_handler)
         app = QApplication(sys.argv)
         timer = QTimer()
         timer.start(500)  # You may change this if you wish.
         timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
-        main = SCNR()
+        main = SCNR(spectrometer)
         main.show()
     except Exception as e:
         print(e)
@@ -698,9 +713,9 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
     finally:
-        # if init_spectrometer:
-        #    spectrometer.Shutdown()
-        # spectrometer = None
+        if init_spectrometer:
+           spectrometer.Shutdown()
+        spectrometer = None
         pass
     sys.exit(0)
 
