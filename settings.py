@@ -17,7 +17,7 @@ class Settings(object):
             RuntimeError("Error loading settings.")
             return
 
-        self.integration_time = int(self.config['spectrum']['integration_time'])
+        self.integration_time = float(self.config['spectrum']['integration_time'])
         self.number_of_samples = int(self.config['spectrum']['number_of_samples'])
 
         self.direction_x = float(self.config['direction']['x'])
