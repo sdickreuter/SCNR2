@@ -531,7 +531,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="doubleSpinBox">
+             <widget class="QDoubleSpinBox" name="integration_time_spin">
               <property name="minimumSize">
                <size>
                 <width>25</width>
@@ -2169,6 +2169,22 @@
     <hint type="destinationlabel">
      <x>214</x>
      <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>integration_time_spin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_int_time_edited()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>806</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>921</x>
+     <y>108</y>
     </hint>
    </hints>
   </connection>
