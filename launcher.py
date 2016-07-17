@@ -1,108 +1,353 @@
 import os
-import subprocess
+import sys
+import time
+import multiprocessing as mp
+import queue
+#import sharedmem as shm
 
-from PyQt5.QtCore import pyqtSlot, QThread, QObject
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtCore import pyqtSlot, QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow
+import pyqtgraph as pg
+import numpy as np
+import ctypes
 
-from gui.launcher_main import Ui_MainWindow
+#import scnr2
 
-#import spectrometer_server
-import signal
+class Example(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
 
-class Launcher(QMainWindow):
-    server = None
-    p_gui = None
-    p_server = None
-    #serverthread = None
-    #server = None
+    def initUI(self):
+        self.statusBar().showMessage('Ready')
 
-    def __init__(self, parent=None):
-        super(Launcher, self).__init__(parent)
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('Statusbar')
+        self.show()
 
-        self.ui.spectrometerButton.clicked.connect(self.initialize)
+class StatusProcess(mp.Process):
 
-        self.ui.quitButton.clicked.connect(self.quit)
+    def __init__(self, status_queue, command_queue):
+        mp.Process.__init__(self)
+        self.status_queue = status_queue
+        self.command_queue = command_queue
 
-        self.ui.startButton.clicked.connect(self.start)
+    def send_status(self, status):
+        self.status_queue.put((self.pid,status))
 
-    def __del__(self):
+    def saferun(self):
+        # Overwrite this method
         pass
-        #if not self.serverthread is None:
-        #    self.serverthread.stop()
-        #    self.serverthread = None
+
+    def run(self):
+        try:
+            self.saferun()
+        except Exception as e:
+            self.send_status(e)
+            self.terminate()
+            raise e
+        return
 
 
-    @pyqtSlot()
-    def quit(self):
-        self.close()
+class SpectrometerProcess(StatusProcess):
+    spectrometer = None
 
-    @pyqtSlot()
-    def initialize(self):
-        self.ui.spectrometerButton.setDisabled(True)
-        #self.server = spectrometer_server.SpectrometerServer()
-        self.p_server = subprocess.Popen(['python', 'spectrometer_server.py'],stdout=subprocess.PIPE)#,creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
-        #print('Started Server at:' + str(self.p_server.pid))
-        #Read two lines from stdout, then spectrometer will be initialized
-        print(self.p_server.stdout.readline())
-        out = self.p_server.stdout.readline()
-        print(out)
-        if out != b'Spectrometer initialized !\n':
-            QMessageBox.critical(self, 'Error', "Could not initialize Spectrometer!", QMessageBox.Ok)
-            raise RuntimeError()
+    def __init__(self, status_queue, command_queue, spec):
+        super(SpectrometerProcess, self).__init__(status_queue,command_queue)
+        self.spec = spec
 
-        #self.server = spectrometer_server.SpectrometerServer()
-        #self.serverthread = ServerThread()
-        #self.serverthread.thread.started.connect(self.server.run)
-        #self.serverthread.start()
-        #try:
-        #    self.serverthread = ServerThread()
-        #except Exception as e:
-        #    print(e)
-        #    self.ui.spectrometerButton.setEnabled(True)
-        #    return
-        self.ui.startButton.setEnabled(True)
+    def saferun(self):
+        while True:
+            msg, param = self.command_queue.get()
+            print(msg + ' ' + str(param))
 
+            if msg == '?':
+                self.send_status('!')
+            elif msg == 'quit':
+                print('Quiting by request of client')
+                # self.running = False
+                raise KeyboardInterrupt()
 
-    @pyqtSlot()
-    def start(self):
+            elif msg == 'test':
+                self.spec[0] = param
+                self.send_status('ok')
 
-        if self.p_gui is None:
-            self.p_gui = subprocess.Popen(['python', 'scnr2.py'])
-            #self.p = subprocess.Popen(['python'],shell=True)
-        else:
-            if not self.p_gui.poll() is  None:
-                self.p_gui = subprocess.Popen(['python', 'scnr2.py'])
-                #self.p = subprocess.Popen(['python'], shell=True)
+            elif msg == 'getwidth':
+                self.send_status(self.spectrometer._width)
+
+            elif msg == 'gettemperature':
+                self.send_status(self.spectrometer.GetTemperature())
+
+            elif msg == 'getslitwidth':
+                self.send_status(self.spectrometer.GetSlitWidth())
+
+            elif msg == 'getgratinginfo':
+                self.send_status(self.spectrometer.GetGratingInfo())
+
+            elif msg == 'getgrating':
+                self.send_status(self.spectrometer.GetGrating())
+
+            elif msg == 'setgrating':
+                self.spectrometer.SetGrating(param)
+                self.send_status('ok')
+
+            elif msg == 'abortacquisition':
+                self.spectrometer.AbortAcquisition()
+                self.send_status('ok')
+
+            elif msg == 'setnumberaccumulations':
+                self.spectrometer.SetNumberAccumulations(param)
+                self.send_status('ok')
+
+            elif msg == 'setexposuretime':
+                self.spectrometer.SetExposureTime(param)
+                self.send_status('ok')
+
+            elif msg == 'setslitwidth':
+                self.spectrometer.SetSlitWidth(param)
+                self.send_status('ok')
+
+            elif msg == 'getwavelength':
+                self.send_status(self.spectrometer.GetWavelength())
+
+            elif msg == 'setfullimage':
+                self.spectrometer.SetFullImage()
+                self.send_status('ok')
+
+            elif msg == 'takefullimage':
+                self.send_status(self.spectrometer.TakeFullImage())
+
+            elif msg == 'setcentrewavelength':
+                self.spectrometer.SetCentreWavelength(param)
+                self.send_status('ok')
+
+            elif msg == 'setimageofslit':
+                self.spectrometer.SetImageofSlit()
+                self.send_status('ok')
+
+            elif msg == 'takeimageofslit':
+                self.send_status(self.spectrometer.TakeImageofSlit())
+
+            elif msg == 'setsingletrack':
+                hstart, hstop = param
+                self.spectrometer.SetSingleTrack(hstart, hstop)
+                self.send_status('ok')
+
+            elif msg == 'takesingletrack':
+                self.send_status(self.spectrometer.TakeSingleTrack())
+
             else:
-                QMessageBox.critical(self, 'Error', "Graphical User Interface seems to be already running.\nIf the Problem persists please restart the computer.", QMessageBox.Ok)
+                self.send_status('?')
 
+
+
+class SpectrometerController:
+    count = 0
+
+    def __init__(self, status_queue, command_queue):
+        self.status = status_queue
+        self.com = command_queue
+
+    def make_request(self, req, param):
+        self.com.put((req,param))
+        pid, status = self.status.get()
+        return status
+
+    def test(self):
+        self.count += 1
+        return self.make_request('test',self.count)
+
+    def GetWidth(self):
+        return self.make_request('getwidth', None)
+
+    def GetTemperature(self):
+        return self.make_request('gettemperature',None)
+
+    def GetSlitWidth(self):
+        return self.make_request('getslitwidth',None)
+
+    def GetGratingInfo(self):
+        return self.make_request('getgratinginfo',None)
+
+    def GetGrating(self):
+        return self.make_request('getgrating',None)
+
+    def SetGrating(self, grating):
+        ret = self.make_request('setgrating',grating)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def AbortAcquisition(self):
+        ret = self.make_request('abortacquisition',None)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def SetNumberAccumulations(self, number):
+        ret = self.make_request('setnumberaccumulations',number)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def SetExposureTime(self, seconds):
+        ret = self.make_request('setexposuretime',seconds)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def SetSlitWidth(self, slitwidth):
+        ret = self.make_request('setslitwidth',slitwidth)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def _GetWavelength(self):
+        return self.make_request('getwavelength',None)
+
+    def GetWavelength(self):
+        return self.wl
+
+    def SetFullImage(self):
+        self.mode = 'Image'
+        ret = self.make_request('setfullimage',None)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def TakeFullImage(self):
+        return self.make_request('takefullimage',None)
+
+    def SetCentreWavelength(self, wavelength):
+        ret = self.make_request('setcentrewavelength',wavelength)
+        self.wl = self._GetWavelength()
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def SetImageofSlit(self):
+        self.mode = 'Image'
+        ret = self.make_request('setimageofslit',None)
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def TakeImageofSlit(self):
+        return self.make_request('takeimageofslit',None)
+
+
+    def SetSingleTrack(self, hstart=None, hstop=None):
+        self.mode = 'SingleTrack'
+        ret = self.make_request('setsingletrack',(hstart,hstop))
+        if not ret == 'ok':
+            print('Communication Error')
+
+    def TakeSingleTrack(self):
+        return self.make_request('takesingletrack',None)
+
+
+
+class GuiProcess(StatusProcess):
+
+    def __init__(self, status_queue, command_queue, spec):
+        super(GuiProcess, self).__init__(status_queue,command_queue)
+        self.spec = spec
+        self.controller = SpectrometerController(status_queue, command_queue)
+
+    @pyqtSlot()
+    def update(self):
+        print("update")
+        self.controller.test()
+        spec = np.ctypeslib.as_array(self.spec.get_obj())
+        print(spec)
+        self.curve.setData(spec)
+
+    def saferun(self):
+        try:
+            # app = QApplication([])
+            # main = Example()
+            # main.show()
+            # main.raise_()
+            # app.exec_()
+            app = QApplication([])
+            self.p = pg.plot()
+            self.p.setWindowTitle('pyqtgraph example: PlotSpeedTest')
+            self.curve = self.p.plot()
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.update)
+            self.timer.start(500)
+            app.exec_()
+        finally:
+            pass
+            # self.send_status('quit')
 
 if __name__ == '__main__':
-    import sys
+    mp.set_start_method('spawn')
 
-    try:
-        app = QApplication(sys.argv)
-        main = Launcher()
-        main.show()
-    except Exception as e:
-        print(e)
-        sys.exit(1)
+    status1 = mp.Queue()
+    status2 = mp.Queue()
 
+    com1 = mp.Queue()
+    com2 = mp.Queue()
+
+    N = 10
+    spec_shared = mp.Array(ctypes.c_double, N)
+    spec = np.ctypeslib.as_array(spec_shared.get_obj())
+    #spec = spec.reshape(10)
+
+    img_shared = mp.Array(ctypes.c_double, N*N)
+    img = np.ctypeslib.as_array(img_shared.get_obj())
+    img = img.reshape(N,N)
+
+    proc1 = SpectrometerProcess(status1,com1,spec_shared)
+    proc1.daemon = True
+    proc1.start()
+
+    #cont = SpectrometerController(status1,com1)
+
+    proc2 = GuiProcess(status1,com1,spec_shared)
+    proc2.daemon = True
+    #proc2.start()
+
+    count = 0
     try:
-        res = app.exec()
-    except Exception as e:
-        print(e)
-        sys.exit(1)
-    finally:
-        if not main.p_server is None:
-            main.p_server.terminate()
-            #app.p_server.send_signal(signal.SIGTERM)
-        if not main.p_gui is None:
-            main.p_gui.terminate()
-        # if init_spectrometer:
-        #    spectrometer.Shutdown()
-        # spectrometer = None
-        pass
-    sys.exit(0)
+        while True:
+
+            #print(cont.make_request("?",None))
+            #time.sleep(1)
+            #print(cont.test())
+            #print(spec)
+            #time.sleep(1)
+
+            if not proc2.is_alive():
+                proc2 = GuiProcess(status1, com1,spec_shared)
+                proc2.start()
+            # else:
+            #     try:
+            #         pid, status = status2.get(block=False)
+            #         print((pid,status))
+            #         if status == "quit":
+            #             proc2.join(1)
+            #             proc2.terminate()
+            #     except queue.Empty:
+            #         pass
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print('Quitting')
+        proc1.terminate()
+        proc2.terminate()
+        sys.exit(0)
+
+
+# if __name__ == '__main__':
+#
+#     try:
+#         app = QApplication(sys.argv)
+#         main = scnr2.Ui_MainWindow()
+#         main.show()
+#     except Exception as e:
+#         print(e)
+#         sys.exit(1)
+#
+#     try:
+#         res = app.exec()
+#     except Exception as e:
+#         print(e)
+#         sys.exit(1)
+#     finally:
+#         pass
+#
+#     sys.exit(0)
