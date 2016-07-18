@@ -21,7 +21,7 @@ from gui.main import Ui_MainWindow
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = True
+init_spectrometer = False
 start_cooler = False
 
 
@@ -32,6 +32,9 @@ class SCNR(QMainWindow):
     cam = None
     padthread = None
     spectrometer = None
+
+    plot = None
+    detector_img = None
 
     def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
