@@ -13,8 +13,9 @@ import time
 
 class GuiProcess(mp.Process):
 
-    def __init__(self):
+    def __init__(self, queue):
         mp.Process.__init__(self)
+        self.queue = queue
 
     def run(self):
         try:
@@ -24,7 +25,7 @@ class GuiProcess(mp.Process):
             # main.raise_()
             # app.exec_()
             app = QApplication([])
-            main = scnr2.SCNR()
+            main = scnr2.SCNR(self.queue)
             main.show()
             app.exec_()
         finally:
@@ -35,18 +36,21 @@ if __name__ == '__main__':
     # Spectrometer will only initialize in spawned process !!!
     mp.set_start_method('spawn')
 
+    queue = mp.Queue()
 
-    server = SpectrometerServerProcess()
+    server = SpectrometerServerProcess(queue)
     server.daemon = True
     server.start()
-    time.sleep(5)
+    time.sleep(30)
 
-    gui = GuiProcess()
-    gui.daemon = True
-    gui.start()
-
-    #client = SpectrometerClient()
     #gui = GuiProcess()
+    #gui.daemon = True
+    #gui.start()
+
+    #client = SpectrometerClient(queue)
+    #print(client.test())
+    #print("Starting GUI")
+    #gui = GuiProcess(queue)
     #gui.daemon = True
     #gui.start()
 
@@ -58,10 +62,10 @@ if __name__ == '__main__':
     #    else:
     #        running = False
 
-    #app = QApplication([])
-    #main = scnr2.SCNR(client)
-    #main.show()
-    #app.exec_()
+    app = QApplication([])
+    main = scnr2.SCNR(queue)
+    main.show()
+    app.exec_()
 
 
     sys.exit(0)

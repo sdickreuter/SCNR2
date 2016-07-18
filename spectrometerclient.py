@@ -18,39 +18,11 @@ class SpectrometerClient:
     connected = False
 
 
-    def __init__(self):
-        print("Trying to connect to Server ...")
-        count = 0
-        while not self.connected:
-            sent = False
-            if not sent:
-                if self.out_poller.poll(1000): # 10s timeout in milliseconds
-                    self.socket.send_pyobj(('?',None))#,zmq.NOBLOCK)
-                    print('sent ?')
-                    sent = True
-                else:
-                    sent = False
+    def __init__(self, queue):
+        self.queue = queue
 
-            received = False
-            if sent:
-                if self.in_poller.poll(1000):
-                    msg = self.socket.recv_pyobj()#flags=zmq.NOBLOCK)
-                    print(msg)
-                    if msg == '!':
-                        received = True
-                else:
-                    received = False
-
-            if sent and received:
-                connected = True
-                break
-            elif not received :
-                count += 1
-                if count < 10:
-                    print('Connecting failed trying again')
-                else:
-                    print('Too many tries, exciting ...')
-                    raise KeyboardInterrupt()
+        self.queue.put(('?',None))
+        print(self.queue.get())
 
         #self._width = self.GetWidth()
         self.mode = None
@@ -62,28 +34,9 @@ class SpectrometerClient:
         self.context.term()
 
 
-    def make_request(self, req, param,recv_array = False):
-        sent = False
-        received = False
-
-        if self.out_poller.poll(1000):
-            self.socket.send_pyobj((req,param))
-            sent = True
-
-        if self.in_poller.poll(120*1000):
-            if not recv_array:
-                data = self.socket.recv_pyobj()
-            else:
-                data = self.socket.recv_array(copy=False)
-                #data = self.socket.recv_zipped_pickle(copy=False)
-            received = True
-
-        if sent and received:
-            return data
-        elif (not sent) and (not received):
-            print("Server not answering, quitting")
-            raise KeyboardInterrupt()
-
+    def make_request(self, req, param):
+        self.queue.put((req,param))
+        return self.queue.get()
 
     def run(self):
             #while True:
@@ -102,6 +55,9 @@ class SpectrometerClient:
             print(data)
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
+
+    def test(self):
+        return self.make_request('?', None)
 
     def Shutdown(self):
         return self.make_request('shutdown', None)
@@ -159,7 +115,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeFullImage(self):
-        return self.make_request('takefullimage',None,recv_array=True)
+        return self.make_request('takefullimage',None)
 
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
@@ -174,7 +130,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeImageofSlit(self):
-        return self.make_request('takeimageofslit',None,recv_array=True)
+        return self.make_request('takeimageofslit',None)
 
 
     def SetSingleTrack(self, hstart=None, hstop=None):
@@ -184,7 +140,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',None,recv_array=False)
+        return self.make_request('takesingletrack',None)
 
 if __name__ == '__main__':
     client = SpectrometerClient()

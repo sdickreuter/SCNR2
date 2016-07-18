@@ -36,7 +36,7 @@ class SCNR(QMainWindow):
     plot = None
     detector_img = None
 
-    def __init__(self, parent=None):
+    def __init__(self, queue, parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -70,7 +70,7 @@ class SCNR(QMainWindow):
         # init Spectrometer
         #self.spectrometer = spectrometer
         if init_spectrometer:
-            self.spectrometer = SpectrometerClient()
+            self.spectrometer = SpectrometerClient(queue)
             #print('Initializing Spectrometer')
             #time.sleep(0.5)
             #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True, verbosity=1)
