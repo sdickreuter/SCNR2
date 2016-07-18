@@ -201,9 +201,18 @@ class SCNR(QMainWindow):
         self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
 
-    def close(self):
+
+    def closeEvent(self, event):
+        time.sleep(0.5)
         if init_spectrometer:
             self.spectrometer.Shutdown()
+        time.sleep(0.5)
+
+    def close(self):
+        time.sleep(0.5)
+        if init_spectrometer:
+            self.spectrometer.Shutdown()
+        time.sleep(0.5)
         super(SCNR, self).close()
 
     # ----- Slot for Temperature Display
@@ -378,6 +387,7 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_stop_clicked(self):
         self.ui.status.setText('Stopped')
+        #self.spectrometer.AbortAcquisition()
         self.spectrum.stop_process()
 
     @pyqtSlot()

@@ -64,7 +64,7 @@ if __name__ == '__main__':
     #img = np.ctypeslib.as_array(img_shared.get_obj())
     #img = img.reshape(N,N)
 
-    proc1 = SpectrometerProcess(status1,com1,spec)
+    proc1 = SpectrometerProcess(status1,com1)
     proc1.daemon = True
     proc1.start()
 
@@ -101,6 +101,18 @@ if __name__ == '__main__':
         proc2.terminate()
         sys.exit(0)
 
+
+from spectrometerprocess import SpectrometerProcess, SpectrometerController
+import multiprocessing as mp
+
+status1 = mp.Queue()
+com1 = mp.Queue()
+proc1 = SpectrometerProcess(status1, com1)
+proc1.daemon = True
+proc1.start()
+
+cont = SpectrometerController(status1, com1)
+cont.SetSingleTrack()
 
 # if __name__ == '__main__':
 #

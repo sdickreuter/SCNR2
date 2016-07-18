@@ -5,7 +5,7 @@ import ctypes
 import AndorSpectrometer
 from statusprocess import StatusProcess
 
-init_spectrometer = False
+init_spectrometer = True
 
 class SpectrometerProcess(StatusProcess):
     spectrometer = None
@@ -15,7 +15,11 @@ class SpectrometerProcess(StatusProcess):
         if init_spectrometer:
             print('Initializing Spectrometer')
             time.sleep(0.5)
-            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False, init_shutter=True, verbosity=1)
+            try:
+                self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False, init_shutter=True, verbosity=1)
+            except Exception as e:
+                print(e)
+                return None
             time.sleep(1)
             print('Spectrometer initialized')
             min_width, max_width = self.spectrometer.CalcImageofSlitDim()
@@ -34,7 +38,7 @@ class SpectrometerProcess(StatusProcess):
     def saferun(self):
         while True:
             msg, param = self.command_queue.get()
-            print(msg + ' ' + str(param))
+            #print(msg + ' ' + str(param))
 
             if msg == '?':
                 self.send_status('!')
@@ -111,7 +115,10 @@ class SpectrometerProcess(StatusProcess):
                 self.send_status('ok')
 
             elif msg == 'takesingletrack':
-                self.spec_shared = self.spectrometer.TakeSingleTrack()
+                print('TakeSingleTrack:')
+                data = self.spectrometer.TakeSingleTrack()
+                print(data)
+                #self.spec_shared = self.spectrometer.TakeSingleTrack()
                 self.send_status('ok')
 
             else:
@@ -134,19 +141,19 @@ class SpectrometerController:
         return self.make_request('test',1)
 
     def GetWidth(self):
-        return self.make_request('getwidth', None)
+        return self.make_request('getwidth', 0)
 
     def GetTemperature(self):
-        return self.make_request('gettemperature',None)
+        return self.make_request('gettemperature',0)
 
     def GetSlitWidth(self):
-        return self.make_request('getslitwidth',None)
+        return self.make_request('getslitwidth',0)
 
     def GetGratingInfo(self):
-        return self.make_request('getgratinginfo',None)
+        return self.make_request('getgratinginfo',0)
 
     def GetGrating(self):
-        return self.make_request('getgrating',None)
+        return self.make_request('getgrating',0)
 
     def SetGrating(self, grating):
         ret = self.make_request('setgrating',grating)
@@ -154,7 +161,7 @@ class SpectrometerController:
             print('Communication Error')
 
     def AbortAcquisition(self):
-        ret = self.make_request('abortacquisition',None)
+        ret = self.make_request('abortacquisition',0)
         if not ret == 'ok':
             print('Communication Error')
 
@@ -174,19 +181,19 @@ class SpectrometerController:
             print('Communication Error')
 
     def _GetWavelength(self):
-        return self.make_request('getwavelength',None)
+        return self.make_request('getwavelength',0)
 
     def GetWavelength(self):
         return self.wl
 
     def SetFullImage(self):
         self.mode = 'Image'
-        ret = self.make_request('setfullimage',None)
+        ret = self.make_request('setfullimage',0)
         if not ret == 'ok':
             print('Communication Error')
 
     def TakeFullImage(self):
-        return self.make_request('takefullimage',None)
+        return self.make_request('takefullimage',0)
 
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
@@ -196,12 +203,12 @@ class SpectrometerController:
 
     def SetImageofSlit(self):
         self.mode = 'Image'
-        ret = self.make_request('setimageofslit',None)
+        ret = self.make_request('setimageofslit',0)
         if not ret == 'ok':
             print('Communication Error')
 
     def TakeImageofSlit(self):
-        return self.make_request('takeimageofslit',None)
+        return self.make_request('takeimageofslit',0)
 
 
     def SetSingleTrack(self, hstart=None, hstop=None):
@@ -211,6 +218,6 @@ class SpectrometerController:
             print('Communication Error')
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',None)
+        return self.make_request('takesingletrack',0)
 
 
