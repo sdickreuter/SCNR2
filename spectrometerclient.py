@@ -1,11 +1,6 @@
 import zmq
-import numpy as np
-import random
-import sys
 import time
 
-import subprocess
-import os
 from serialsocket import SerializingContext
 
 class SpectrometerClient:
@@ -14,7 +9,6 @@ class SpectrometerClient:
     socket = context.socket(zmq.PAIR)
     port = "6667"
     socket.connect("tcp://localhost:%s" % port)
-
 
     in_poller = zmq.Poller()
     in_poller.register(socket, zmq.POLLIN) # POLLIN for recv, POLLOUT for send
@@ -58,9 +52,9 @@ class SpectrometerClient:
                     print('Too many tries, exciting ...')
                     raise KeyboardInterrupt()
 
-        self._width = self.GetWidth()
+        #self._width = self.GetWidth()
         self.mode = None
-        self.wl = self._GetWavelength()
+        #self.wl = self._GetWavelength()
         print('Connected to server')
 
     def __del__(self):
@@ -108,6 +102,9 @@ class SpectrometerClient:
             print(data)
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
+
+    def Shutdown(self):
+        return self.make_request('shutdown', None)
 
     def GetWidth(self):
         return self.make_request('getwidth', None)

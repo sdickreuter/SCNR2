@@ -2,7 +2,7 @@ import os
 import signal
 import time
 
-import AndorSpectrometer
+from spectrometerclient import SpectrometerClient
 import PIStage
 import numpy as np
 from PyQt5.QtCore import pyqtSlot, QTimer
@@ -21,7 +21,7 @@ from gui.main import Ui_MainWindow
 init_pad = False
 init_cam = False
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
 start_cooler = False
 
 
@@ -70,13 +70,13 @@ class SCNR(QMainWindow):
         # init Spectrometer
         #self.spectrometer = spectrometer
         if init_spectrometer:
-            # self.spectrometer = spectrometer_client.SpectrometerClient()
-            print('Initializing Spectrometer')
-            time.sleep(0.5)
-            self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True, verbosity=1)
+            self.spectrometer = SpectrometerClient()
+            #print('Initializing Spectrometer')
+            #time.sleep(0.5)
+            #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler, init_shutter=True, verbosity=1)
             #self.spectrometer.SetExposureTime(self.settings.integration_time)
-            time.sleep(1)
-            print('Spectrometer initialized')
+            #time.sleep(1)
+            #print('Spectrometer initialized')
             self.setSpectrumMode()
             self.spectrometer.SetExposureTime(1.0)
 
