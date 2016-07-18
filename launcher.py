@@ -10,11 +10,13 @@ import pyqtgraph as pg
 import numpy as np
 import ctypes
 
-#import scnr2
-from statusprocess import StatusProcess
+import AndorSpectrometer
+
+import scnr2
+from queueprocess import QueueProcess
 from spectrometerprocess import SpectrometerProcess, SpectrometerController
 
-class GuiProcess(StatusProcess):
+class GuiProcess(QueueProcess):
 
     def __init__(self, status_queue, command_queue, spec):
         super(GuiProcess, self).__init__(status_queue,command_queue)
@@ -104,15 +106,38 @@ if __name__ == '__main__':
 
 from spectrometerprocess import SpectrometerProcess, SpectrometerController
 import multiprocessing as mp
+import numpy as np
+import ctypes
+import time
+#import AndorSpectrometer
 
-status1 = mp.Queue()
-com1 = mp.Queue()
-proc1 = SpectrometerProcess(status1, com1)
+#Spectrometer doesn't like 'fork' !
+mp.set_start_method('spawn')
+
+width = 2000
+height = 256
+spec_shared = mp.Array(ctypes.c_int32, width)
+detector_img_shared = mp.Array(ctypes.c_int32, width * height)
+
+queue = mp.Queue()
+proc1 = SpectrometerProcess(queue, spec_shared, detector_img_shared)
 proc1.daemon = True
 proc1.start()
 
-cont = SpectrometerController(status1, com1)
-cont.SetSingleTrack()
+controller = SpectrometerController(queue, spec_shared, detector_img_shared)
+controller.SetSingleTrack()
+
+controller.SetImageofSlit()
+start = time.time()
+data = controller.TakeImageofSlit()
+print(time.time() - start)
+
+
+start = time.time()
+data = s.TakeImageofSlit()
+print(time.time() - start)
+
+
 
 # if __name__ == '__main__':
 #

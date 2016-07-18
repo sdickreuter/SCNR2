@@ -1,17 +1,33 @@
 import time
+import numpy as np
 import multiprocessing as mp
 import ctypes
 
 import AndorSpectrometer
-from statusprocess import StatusProcess
+from queueprocess import QueueProcess
 
 init_spectrometer = True
 
-class SpectrometerProcess(StatusProcess):
+class SpectrometerProcess(QueueProcess):
     spectrometer = None
+    spec_shared = None
+    detector_img_shared = None
+    running = True
 
-    def __init__(self, status_queue, command_queue):
-        super(SpectrometerProcess, self).__init__(status_queue,command_queue)
+    def __init__(self, queue, spec_shared, detector_img_shared):
+        super(SpectrometerProcess, self).__init__(queue)
+        self.spec_shared = spec_shared
+        self.detector_img_shared = detector_img_shared
+        #self.spectrometer = spectrometer
+        #min_width, max_width = self.spectrometer.CalcImageofSlitDim()
+        #width = max_width - min_width
+        #height = self.spectrometer._height
+        #pixels = self.spectrometer._width
+        #self.spec_shared = mp.Array(ctypes.c_int32, pixels)
+        #self.detector_img_shared = mp.Array(ctypes.c_int32, width * height)
+        #self.init()
+
+    def init(self):
         if init_spectrometer:
             print('Initializing Spectrometer')
             time.sleep(0.5)
@@ -19,33 +35,36 @@ class SpectrometerProcess(StatusProcess):
                 self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=False, init_shutter=True, verbosity=1)
             except Exception as e:
                 print(e)
-                return None
+                raise KeyboardInterrupt()
             time.sleep(1)
             print('Spectrometer initialized')
             min_width, max_width = self.spectrometer.CalcImageofSlitDim()
-            width = max_width-min_width
-            height = self.spectrometer._height
-            pixels = self.spectrometer._width
+            self.width = max_width-min_width
+            self.height = self.spectrometer._height
             self.spectrometer.SetExposureTime(0.33)
+            self.spectrometer.SetSingleTrack()
         else:
             width = 300
             height = 256
             pixels = 2000
 
-        self.spec_shared = mp.Array(ctypes.c_int32, pixels)
-        self.detector_img_shared = mp.Array(ctypes.c_int32, width * height)
+
+    def getspec(self):
+        return self.spec_shared
 
     def saferun(self):
-        while True:
-            msg, param = self.command_queue.get()
+        self.init()
+        while self.running:
+            msg, param = self.queue.get()
             #print(msg + ' ' + str(param))
 
             if msg == '?':
                 self.send_status('!')
-            elif msg == 'quit':
-                print('Quiting by request of client')
-                # self.running = False
-                raise KeyboardInterrupt()
+            elif msg == 'shutdown':
+                self.running = False
+                self.send_status('ok')
+                #raise KeyboardInterrupt()
+                break
 
             elif msg == 'test':
                 self.spec_shared[0] += param
@@ -106,8 +125,9 @@ class SpectrometerProcess(StatusProcess):
                 self.send_status('ok')
 
             elif msg == 'takeimageofslit':
-                self.detector_img_shared = self.spectrometer.TakeImageofSlit()
-                self.send_status('ok')
+                data = self.spectrometer.TakeImageofSlit().ravel()
+                self.detector_img_shared[:len(data)] = data
+                self.send_status((self.width+1,self.height))
 
             elif msg == 'setsingletrack':
                 hstart, hstop = param
@@ -116,9 +136,11 @@ class SpectrometerProcess(StatusProcess):
 
             elif msg == 'takesingletrack':
                 print('TakeSingleTrack:')
+                #data = self.spectrometer.TakeSingleTrack()
+                #print(data)
                 data = self.spectrometer.TakeSingleTrack()
                 print(data)
-                #self.spec_shared = self.spectrometer.TakeSingleTrack()
+                self.spec_shared = data
                 self.send_status('ok')
 
             else:
@@ -128,17 +150,21 @@ class SpectrometerProcess(StatusProcess):
 
 class SpectrometerController:
 
-    def __init__(self, status_queue, command_queue):
-        self.status = status_queue
-        self.com = command_queue
+    def __init__(self, queue, spec_shared, detector_img_shared):
+        self.spec_shared = spec_shared
+        self.detector_img_shared = detector_img_shared
+        self.queue = queue
 
     def make_request(self, req, param):
-        self.com.put((req,param))
-        pid, status = self.status.get()
+        self.queue.put((req,param))
+        pid, status = self.queue.get()
         return status
 
     def test(self):
         return self.make_request('test',1)
+
+    def Shutdown(self):
+        return self.make_request('shutdown',0)
 
     def GetWidth(self):
         return self.make_request('getwidth', 0)
@@ -156,29 +182,19 @@ class SpectrometerController:
         return self.make_request('getgrating',0)
 
     def SetGrating(self, grating):
-        ret = self.make_request('setgrating',grating)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setgrating',grating)
 
     def AbortAcquisition(self):
-        ret = self.make_request('abortacquisition',0)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('abortacquisition',0)
 
     def SetNumberAccumulations(self, number):
-        ret = self.make_request('setnumberaccumulations',number)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setnumberaccumulations',number)
 
     def SetExposureTime(self, seconds):
-        ret = self.make_request('setexposuretime',seconds)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setexposuretime',seconds)
 
     def SetSlitWidth(self, slitwidth):
-        ret = self.make_request('setslitwidth',slitwidth)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setslitwidth',slitwidth)
 
     def _GetWavelength(self):
         return self.make_request('getwavelength',0)
@@ -188,9 +204,7 @@ class SpectrometerController:
 
     def SetFullImage(self):
         self.mode = 'Image'
-        ret = self.make_request('setfullimage',0)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setfullimage',0)
 
     def TakeFullImage(self):
         return self.make_request('takefullimage',0)
@@ -198,26 +212,22 @@ class SpectrometerController:
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
         self.wl = self._GetWavelength()
-        if not ret == 'ok':
-            print('Communication Error')
+        return ret
 
     def SetImageofSlit(self):
         self.mode = 'Image'
-        ret = self.make_request('setimageofslit',0)
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setimageofslit',0)
 
     def TakeImageofSlit(self):
-        return self.make_request('takeimageofslit',0)
-
+        width, height = self.make_request('takeimageofslit',0)
+        data = np.array(self.detector_img_shared[:(width*height)])
+        return data.reshape(width,height)
 
     def SetSingleTrack(self, hstart=None, hstop=None):
         self.mode = 'SingleTrack'
-        ret = self.make_request('setsingletrack',(hstart,hstop))
-        if not ret == 'ok':
-            print('Communication Error')
+        return self.make_request('setsingletrack',(hstart,hstop))
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',0)
-
+        status = self.make_request('takesingletrack',0)
+        return np.array(self.spec_shared)
 

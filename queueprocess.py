@@ -1,14 +1,13 @@
 import multiprocessing as mp
 
-class StatusProcess(mp.Process):
+class QueueProcess(mp.Process):
 
-    def __init__(self, status_queue, command_queue):
+    def __init__(self, queue):
         mp.Process.__init__(self)
-        self.status_queue = status_queue
-        self.command_queue = command_queue
+        self.queue = queue
 
     def send_status(self, status):
-        self.status_queue.put((self.pid,status))
+        self.queue.put((self.pid, status))
 
     def saferun(self):
         # Overwrite this method
