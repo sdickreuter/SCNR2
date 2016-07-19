@@ -2,7 +2,8 @@ import os
 
 import numpy as np
 import signal
-from PyQt5.QtCore import pyqtSlot, QTimer
+import time
+from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, QMessageBox
 import pyqtgraph as pg
 
@@ -22,14 +23,17 @@ import settings
 import camerathread
 import gamepadthread
 import numpymodel
+import settings
+import spectrum
 import dialogs
-from custom_pyqtgraph_classes import CustomViewBox
+import custom_pyqtgraph_classes as cpg
+from gui.main import Ui_MainWindow
 
 # for debugging
 init_pad = False
 init_cam = True
 init_stage = False
-init_spectrometer = True
+init_spectrometer = False
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -39,6 +43,7 @@ class SCNR(QMainWindow):
     cam = None
     padthread = None
     spectrometer = None
+
 
     def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
@@ -91,8 +96,12 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
-            roi = pg.ROI([50, 50], [10, 10])
-            vb2.addItem(roi)
+            #roi = cpg.CustomCrosshairROI(pos=(100, 100), size=10, movable=True)
+            #roi = pg.CrosshairROI(pos=(100, 100), size=10, movable=True)
+            self.roi = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15])
+            #roi.pos()
+            #roi = pg.CircleROI(pos=(100,100),size=10,movable=True)
+            vb2.addItem(self.roi)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
@@ -201,6 +210,24 @@ class SCNR(QMainWindow):
         self.hh = self.ui.posTable.horizontalHeader()
         self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
+
+
+
+    def closeEvent(self, event):
+        self.on_savesettings_clicked()
+        time.sleep(0.5)
+        if init_spectrometer:
+            self.spectrometer.Shutdown()
+        time.sleep(0.5)
+
+    def close(self):
+        self.on_savesettings_clicked()
+        time.sleep(0.5)
+        if init_spectrometer:
+            self.spectrometer.Shutdown()
+        time.sleep(0.5)
+        super(SCNR, self).close()
+
 
 # ----- Slot for Temperature Display
 
@@ -673,6 +700,9 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
+        pos = self.roi.pos()
+        self.settings.marker_x = pos[0]
+        self.settings.marker_y = pos[1]
         self.settings.save()
 
 

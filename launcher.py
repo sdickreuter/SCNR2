@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from gui.launcher_main import Ui_MainWindow
 
-#import spectrometer_server
 import signal
 
 class Launcher(QMainWindow):
@@ -90,19 +89,28 @@ if __name__ == '__main__':
         print(e)
         sys.exit(1)
 
+    res = 0
     try:
         res = app.exec()
     except Exception as e:
         print(e)
-        sys.exit(1)
     finally:
         if not main.p_server is None:
+            main.p_server.send_signal(signal.SIGINT)
+            main.p_server.wait(10)
             main.p_server.terminate()
+            main.p_server.wait(10)
+            main.p_server.kill()
             #app.p_server.send_signal(signal.SIGTERM)
         if not main.p_gui is None:
+            main.p_gui.send_signal(signal.SIGINT)
+            main.p_gui.wait(10)
             main.p_gui.terminate()
+            main.p_gui.kill()
         # if init_spectrometer:
         #    spectrometer.Shutdown()
         # spectrometer = None
-        pass
-    sys.exit(0)
+        #pass
+
+    sys.exit(res)
+

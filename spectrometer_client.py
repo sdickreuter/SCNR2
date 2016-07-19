@@ -8,6 +8,8 @@ import subprocess
 import os
 from serialsocket import SerializingContext
 
+from serialsocket import SerializingContext
+
 class SpectrometerClient:
 
     context = SerializingContext()

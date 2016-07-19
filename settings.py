@@ -17,7 +17,7 @@ class Settings(object):
             RuntimeError("Error loading settings.")
             return
 
-        self.integration_time = int(self.config['spectrum']['integration_time'])
+        self.integration_time = float(self.config['spectrum']['integration_time'])
         self.number_of_samples = int(self.config['spectrum']['number_of_samples'])
 
         self.direction_x = float(self.config['direction']['x'])
@@ -38,6 +38,9 @@ class Settings(object):
         self.cam_exposure_time = float(self.config['camera']['exposure_time'])
 
         self.slit_width = int(self.config['spectrometer']['slit_width'])
+
+        self.marker_x = float(self.config['marker']['x'])
+        self.marker_y = float(self.config['marker']['y'])
 
 
     def save(self):
@@ -60,6 +63,9 @@ class Settings(object):
         self.config.set('camera', 'exposure_time', str(self.cam_exposure_time))
 
         self.config.set('spectrometer', 'slit_width', str(self.slit_width))
+
+        self.config.set('marker', 'x', str(self.marker_x))
+        self.config.set('marker', 'y', str(self.marker_y))
 
         try:
             with open(self._filename, 'w') as configfile:

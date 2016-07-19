@@ -16,3 +16,12 @@ class CustomViewBox(pg.ViewBox):
             ev.ignore()
         else:
             pg.ViewBox.mouseDragEvent(self, ev)
+
+
+class CustomCrosshairROI(pg.CrosshairROI):
+
+     def __init__(self, pos=None, size=None, **kargs):
+         pg.ROI.__init__(self, pos, size, **kargs)
+         self._shape = None
+         self.sigRegionChanged.connect(self.invalidate)
+         self.aspectLocked = True
