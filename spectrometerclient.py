@@ -6,13 +6,12 @@ import time
 
 import subprocess
 import os
-from serialsocket import SerializingContext
 
 from serialsocket import SerializingContext
 
 class SpectrometerClient:
 
-    context = SerializingContext()
+    context = zmq.Context()
     socket = context.socket(zmq.PAIR)
     port = "6667"
     socket.connect("tcp://localhost:%s" % port)
@@ -95,7 +94,7 @@ class SpectrometerClient:
 
     def run(self):
             #while True:
-            for i in range(5):
+            for i in range(30):
                 data = self.make_request('Client to Server',None)
                 print(data)
                 time.sleep(0.5)
@@ -110,6 +109,9 @@ class SpectrometerClient:
             print(data)
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
+
+    def Shutdown(self):
+        return self.make_request('shutdown', None)
 
     def GetWidth(self):
         return self.make_request('getwidth', None)
@@ -189,7 +191,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',None,recv_array=False)
+        return self.make_request('takesingletrack',None,recv_array=True)
 
 if __name__ == '__main__':
     client = SpectrometerClient()

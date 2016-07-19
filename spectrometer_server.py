@@ -46,83 +46,87 @@ class SpectrometerServer:
             print("lost connection to client")
 
     def run(self):
+        while self.running:
+            msg, param = self.socket.recv_pyobj()
+            #print(msg +' '+ str(param))
 
-        msg, param = self.socket.recv_pyobj()
-        #print(msg +' '+ str(param))
+            if msg == '?':
+                self.send_object('!')
+            elif msg == 'quit':
+                print('Quiting by request of client')
+                self.running = False
+                break
+                #raise KeyboardInterrupt()
 
-        if msg == '?':
-            self.send_object('!')
-        elif msg == 'quit':
-            print('Quiting by request of client')
-            #self.running = False
-            raise KeyboardInterrupt()
+            elif msg == 'shutdown':
+                self.send_object(self.spectrometer._width)
 
-        elif msg == 'getwidth':
-            self.send_object(self.spectrometer._width)
+            elif msg == 'getwidth':
+                self.send_object(self.spectrometer._width)
 
-        elif msg == 'gettemperature':
-            self.send_object(self.spectrometer.GetTemperature())
+            elif msg == 'gettemperature':
+                self.send_object(self.spectrometer.GetTemperature())
 
-        elif msg == 'getslitwidth':
-            self.send_object(self.spectrometer.GetSlitWidth())
+            elif msg == 'getslitwidth':
+                self.send_object(self.spectrometer.GetSlitWidth())
 
-        elif msg == 'getgratinginfo':
-            self.send_object(self.spectrometer.GetGratingInfo())
+            elif msg == 'getgratinginfo':
+                self.send_object(self.spectrometer.GetGratingInfo())
 
-        elif msg == 'getgrating':
-            self.send_object(self.spectrometer.GetGrating())
+            elif msg == 'getgrating':
+                self.send_object(self.spectrometer.GetGrating())
 
-        elif msg == 'setgrating':
-            self.spectrometer.SetGrating(param)
-            self.send_object('ok')
+            elif msg == 'setgrating':
+                self.spectrometer.SetGrating(param)
+                self.send_object('ok')
 
-        elif msg == 'abortacquisition':
-            self.spectrometer.AbortAcquisition()
-            self.send_object('ok')
+            elif msg == 'abortacquisition':
+                self.spectrometer.AbortAcquisition()
+                self.send_object('ok')
 
-        elif msg == 'setnumberaccumulations':
-            self.spectrometer.SetNumberAccumulations(param)
-            self.send_object('ok')
+            elif msg == 'setnumberaccumulations':
+                self.spectrometer.SetNumberAccumulations(param)
+                self.send_object('ok')
 
-        elif msg == 'setexposuretime':
-            self.spectrometer.SetExposureTime(param)
-            self.send_object('ok')
+            elif msg == 'setexposuretime':
+                self.spectrometer.SetExposureTime(param)
+                self.send_object('ok')
 
-        elif msg == 'setslitwidth':
-            self.spectrometer.SetSlitWidth(param)
-            self.send_object('ok')
+            elif msg == 'setslitwidth':
+                self.spectrometer.SetSlitWidth(param)
+                self.send_object('ok')
 
-        elif msg == 'getwavelength':
-            self.send_object(self.spectrometer.GetWavelength())
+            elif msg == 'getwavelength':
+                self.send_object(self.spectrometer.GetWavelength())
 
-        elif msg == 'setfullimage':
-            self.spectrometer.SetFullImage()
-            self.send_object('ok')
+            elif msg == 'setfullimage':
+                self.spectrometer.SetFullImage()
+                self.send_object('ok')
 
-        elif msg == 'takefullimage':
-            self.send_array(self.spectrometer.TakeFullImage())
+            elif msg == 'takefullimage':
+                self.send_array(self.spectrometer.TakeFullImage())
 
-        elif msg == 'setcentrewavelength':
-            self.spectrometer.SetCentreWavelength(param)
-            self.send_object('ok')
+            elif msg == 'setcentrewavelength':
+                self.spectrometer.SetCentreWavelength(param)
+                self.send_object('ok')
 
-        elif msg == 'setimageofslit':
-            self.spectrometer.SetImageofSlit()
-            self.send_object('ok')
+            elif msg == 'setimageofslit':
+                self.spectrometer.SetImageofSlit()
+                self.send_object('ok')
 
-        elif msg == 'takeimageofslit':
-            self.send_array(self.spectrometer.TakeImageofSlit())
+            elif msg == 'takeimageofslit':
+                self.send_array(self.spectrometer.TakeImageofSlit())
 
-        elif msg == 'setsingletrack':
-            hstart, hstop = param
-            self.spectrometer.SetSingleTrack(hstart,hstop)
-            self.send_object('ok')
+            elif msg == 'setsingletrack':
+                hstart, hstop = param
+                self.spectrometer.SetSingleTrack(hstart,hstop)
+                self.send_object('ok')
 
-        elif msg == 'takesingletrack':
-            self.send_array(self.spectrometer.TakeSingleTrack())
+            elif msg == 'takesingletrack':
+                self.send_array(self.spectrometer.TakeSingleTrack())
 
-        else:
-            self.send_object('?')
+            else:
+                self.send_object('?')
 
 
 if __name__ == '__main__':
@@ -136,7 +140,6 @@ if __name__ == '__main__':
 
     server = SpectrometerServer()
     try:
-        while running:
-            server.run()
+        server.run()
     except KeyboardInterrupt:
         print("Exiting ...")
