@@ -89,6 +89,7 @@ class SpectrometerClient:
             return data
         elif (not sent) and (not received):
             print("Server not answering, quitting")
+            self.lock.release()
             raise KeyboardInterrupt()
 
 

@@ -83,7 +83,7 @@ class SCNR(QMainWindow):
             #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=start_cooler,init_shutter=True,verbosity=1)
             #self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
             self.setSpectrumMode()
-            self.spectrometer.SetExposureTime(1.0)
+            self.spectrometer.SetExposureTime(self.settings.integration_time)
             #print('Spectrometer initialized')
 
         # init detector mode combobox
