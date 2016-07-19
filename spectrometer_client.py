@@ -59,9 +59,9 @@ class SpectrometerClient:
                     print('Too many tries, exciting ...')
                     raise KeyboardInterrupt()
 
-        self._width = self.GetWidth()
+        #self._width = self.GetWidth()
         self.mode = None
-        self.wl = self._GetWavelength()
+        #self.wl = self._GetWavelength()
         print('Connected to server')
 
     def __del__(self):
@@ -94,19 +94,19 @@ class SpectrometerClient:
 
     def run(self):
             #while True:
-            for i in range(30):
+            for i in range(5):
                 data = self.make_request('Client to Server',None)
                 print(data)
                 time.sleep(0.5)
 
-            self.SetExposureTime(0.1)
-            self.SetCentreWavelength(0)
-            self.SetSlitWidth(2500)
-            self.SetImageofSlit()
-            start = time.time()
-            data = self.TakeImageofSlit()
-            print(time.time()-start)
-            print(data)
+            #self.SetExposureTime(0.1)
+            #self.SetCentreWavelength(0)
+            #self.SetSlitWidth(2500)
+            #self.SetImageofSlit()
+            #start = time.time()
+            #data = self.TakeImageofSlit()
+            #print(time.time()-start)
+            #print(data)
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
 

@@ -14,10 +14,10 @@ class SpectrometerServer:
 
     def __init__(self):
         print("Initializing Spectrometer ...")
-        self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
+        #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
 
-        self.spectrometer.SetTemperature(-15)
+        #self.spectrometer.SetTemperature(-15)
 
         self.context = SerializingContext()
         self.socket = self.context.socket(zmq.PAIR)
@@ -26,6 +26,11 @@ class SpectrometerServer:
 
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLOUT) # POLLIN for recv, POLLOUT for send
+
+        print("You can now start the Graphical User Interface.")
+        print("IMPORTANT:")
+        print("After you have finished please close this program by pressing CTRL+C")
+
 
     def __del__(self):
         #self.spectrometer.Shutdown()
@@ -144,3 +149,5 @@ if __name__ == '__main__':
         server.run()
     except KeyboardInterrupt:
         print("Exiting ...")
+        print("IMPORTANT:")
+        print("Please wait until the Spectrometer warmup is finished!")
