@@ -59,9 +59,9 @@ class SpectrometerClient:
                     print('Too many tries, exciting ...')
                     raise KeyboardInterrupt()
 
-        #self._width = self.GetWidth()
+        self._width = self.GetWidth()
         self.mode = None
-        #self.wl = self._GetWavelength()
+        self.wl = self._GetWavelength()
         print('Connected to server')
 
     def __del__(self):

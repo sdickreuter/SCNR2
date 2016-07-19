@@ -51,8 +51,8 @@ class CameraThread(QObject):
             if not self._cam is None:
                 self._cam.close()
             self.ImageReadySignal.disconnect()
-        except TypeError:
-            pass
+        except TypeError as e:
+            print(e)
 
     def set_exposure(self, us):
         self.exposure_us = us
@@ -77,8 +77,7 @@ class CameraThread(QObject):
 
     def work(self):
         if self.enabled:
-            img = self._cam.get_image()
-            self.ImageReadySignal.emit(img)
+            self.ImageReadySignal.emit(self._cam.get_image())
 
     @pyqtSlot()
     def process(self):

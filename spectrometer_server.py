@@ -14,10 +14,10 @@ class SpectrometerServer:
 
     def __init__(self):
         print("Initializing Spectrometer ...")
-        #self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
+        self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
 
-        #self.spectrometer.SetTemperature(-15)
+        self.spectrometer.SetTemperature(-40)
 
         self.context = SerializingContext()
         self.socket = self.context.socket(zmq.PAIR)
@@ -151,3 +151,5 @@ if __name__ == '__main__':
         print("Exiting ...")
         print("IMPORTANT:")
         print("Please wait until the Spectrometer warmup is finished!")
+
+    server = None
