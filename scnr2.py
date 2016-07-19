@@ -26,7 +26,7 @@ import numpymodel
 import settings
 import spectrum
 import dialogs
-import custom_pyqtgraph_classes as cpg
+from custom_pyqtgraph_classes import Crosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
@@ -98,7 +98,8 @@ class SCNR(QMainWindow):
             vb2.addItem(self.img)
             #roi = cpg.CustomCrosshairROI(pos=(100, 100), size=10, movable=True)
             #roi = pg.CrosshairROI(pos=(100, 100), size=10, movable=True)
-            self.roi = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15])
+            self.roi = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15],pen=pg.mkPen('g'))
+            #self.roi = Crosshair(pos=[self.settings.marker_x, self.settings.marker_y])
             #roi.pos()
             #roi = pg.CircleROI(pos=(100,100),size=10,movable=True)
             vb2.addItem(self.roi)
