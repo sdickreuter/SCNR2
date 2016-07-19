@@ -217,15 +217,15 @@ class SCNR(QMainWindow):
     def closeEvent(self, event):
         self.on_savesettings_clicked()
         time.sleep(0.5)
-        if init_spectrometer:
-            self.spectrometer.Shutdown()
+        #if init_spectrometer:
+        #    self.spectrometer.Shutdown()
         time.sleep(0.5)
 
     def close(self):
         self.on_savesettings_clicked()
         time.sleep(0.5)
-        if init_spectrometer:
-            self.spectrometer.Shutdown()
+        #if init_spectrometer:
+        #    self.spectrometer.Shutdown()
         time.sleep(0.5)
         super(SCNR, self).close()
 
