@@ -108,6 +108,9 @@ class SpectrometerClient:
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
 
+    def Shutdown(self):
+        return self.make_request('shutdown', None)
+
     def GetWidth(self):
         return self.make_request('getwidth', None)
 
