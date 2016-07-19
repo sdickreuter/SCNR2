@@ -97,14 +97,13 @@ if __name__ == '__main__':
     finally:
         if not main.p_server is None:
             main.p_server.send_signal(signal.SIGINT)
-            main.p_server.wait(10)
+            #main.p_server.wait(10)
             main.p_server.terminate()
-            main.p_server.wait(10)
             main.p_server.kill()
             #app.p_server.send_signal(signal.SIGTERM)
         if not main.p_gui is None:
             main.p_gui.send_signal(signal.SIGINT)
-            main.p_gui.wait(10)
+            #main.p_gui.wait(10)
             main.p_gui.terminate()
             main.p_gui.kill()
         # if init_spectrometer:

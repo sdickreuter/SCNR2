@@ -11,7 +11,7 @@ from serialsocket import SerializingContext
 
 class SpectrometerClient:
 
-    context = zmq.Context()
+    context = SerializingContext()
     socket = context.socket(zmq.PAIR)
     port = "6667"
     socket.connect("tcp://localhost:%s" % port)

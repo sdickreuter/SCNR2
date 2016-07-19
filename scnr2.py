@@ -33,7 +33,7 @@ from gui.main import Ui_MainWindow
 init_pad = False
 init_cam = True
 init_stage = False
-init_spectrometer = False
+init_spectrometer = True
 start_cooler = False
 
 class SCNR(QMainWindow):
