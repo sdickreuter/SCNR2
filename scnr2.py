@@ -26,7 +26,7 @@ import numpymodel
 import settings
 import spectrum
 import dialogs
-from custom_pyqtgraph_classes import Crosshair
+from custom_pyqtgraph_classes import movableCrosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
@@ -96,13 +96,9 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
-            #roi = cpg.CustomCrosshairROI(pos=(100, 100), size=10, movable=True)
-            #roi = pg.CrosshairROI(pos=(100, 100), size=10, movable=True)
-            self.roi = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15],pen=pg.mkPen('g'))
-            #self.roi = Crosshair(pos=[self.settings.marker_x, self.settings.marker_y])
-            #roi.pos()
-            #roi = pg.CircleROI(pos=(100,100),size=10,movable=True)
-            vb2.addItem(self.roi)
+            #self.marker = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15], pen=pg.mkPen('g'))
+            self.marker = movableCrosshair(pos=[self.settings.marker_x, self.settings.marker_y], size=15)
+            vb2.addItem(self.marker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
@@ -702,7 +698,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
-        pos = self.roi.pos()
+        pos = self.marker.pos()
         self.settings.marker_x = pos[0]
         self.settings.marker_y = pos[1]
         self.settings.save()
