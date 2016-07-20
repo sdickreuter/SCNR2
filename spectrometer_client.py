@@ -7,11 +7,10 @@ import time
 import subprocess
 import os
 
-from serialsocket import SerializingContext
 
 class SpectrometerClient:
 
-    context = SerializingContext()
+    context = zmq.Context()
     socket = context.socket(zmq.PAIR)
     port = "6667"
     socket.connect("tcp://localhost:%s" % port)
@@ -69,7 +68,7 @@ class SpectrometerClient:
         self.context.term()
 
 
-    def make_request(self, req, param,recv_array = False):
+    def make_request(self, req, param):
         sent = False
         received = False
 
@@ -78,11 +77,7 @@ class SpectrometerClient:
             sent = True
 
         if self.in_poller.poll(120*1000):
-            if not recv_array:
-                data = self.socket.recv_pyobj()
-            else:
-                data = self.socket.recv_array(copy=False)
-                #data = self.socket.recv_zipped_pickle(copy=False)
+            data = self.socket.recv_pyobj()
             received = True
 
         if sent and received:
@@ -167,7 +162,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeFullImage(self):
-        return self.make_request('takefullimage',None,recv_array=True)
+        return self.make_request('takefullimage',None)
 
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
@@ -182,7 +177,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeImageofSlit(self):
-        return self.make_request('takeimageofslit',None,recv_array=True)
+        return self.make_request('takeimageofslit',None)
 
 
     def SetSingleTrack(self, hstart=None, hstop=None):
@@ -192,7 +187,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',None,recv_array=True)
+        return self.make_request('takesingletrack',None)
 
 if __name__ == '__main__':
     client = SpectrometerClient()
