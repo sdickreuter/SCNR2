@@ -72,7 +72,7 @@ class MeasurementThread(QObject):
     def stop(self):
         self.abort = True
         self.thread.quit()
-        self.thread.wait(5000)
+        #self.thread.wait(5000)
 
     def __del__(self):
         self.__class__.has_instance = False
@@ -121,8 +121,8 @@ class MeanThread(MeasurementThread):
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
         self.i += 1
-        self.specSignal.emit(self.mean / (self.i + 1))
-        if self.i >= (self.number_of_samples-1):
+        self.specSignal.emit(self.mean / (self.i))
+        if self.i >= (self.number_of_samples):
             self.progressSignal.emit(100, str(self.progress.eta_td))
             self.finishSignal.emit(self.mean / (self.number_of_samples))
             self.stop()

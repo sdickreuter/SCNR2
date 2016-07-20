@@ -269,7 +269,7 @@ class Spectrum(QObject):
             f.write(str(pos[0]) + eol)
             f.write("y" + eol)
             f.write(str(pos[1]) + eol)
-	else:
+        else:
             f.write(eol)
             f.write(eol)
             f.write(eol)
