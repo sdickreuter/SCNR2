@@ -98,8 +98,8 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
-            self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
-            #self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
+            #self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
+            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
@@ -271,6 +271,7 @@ class SCNR(QMainWindow):
         self.spectrometer.SetSlitWidth(2500)
         self.ui.slitwidth_spin.setValue(2500)
         self.spectrometer.SetImageofSlit()
+        self.ui.centre_wavelength_spin.setValue(0)
         #if self.ui.image_combobox.currentIndex() == 0:
         #    self.spectrometer.SetImageofSlit()
         #elif self.ui.image_combobox.currentIndex() ==1:
