@@ -69,7 +69,7 @@ class SCNR(QMainWindow):
         vb = pg.ViewBox()
         self.detector_img = pg.ImageItem()
         vb.addItem(self.detector_img)
-        self.slitmarker = movableCrosshair(pos=[self.settings.slitmarker_x, self.settings.slitmarker_y], size=15)
+        self.slitmarker = xmovableCrosshair(pos=[self.settings.slitmarker_x, self.settings.slitmarker_y], size=15)
         vb.addItem(self.slitmarker)
         gv.setCentralWidget(vb)
         l = QVBoxLayout(self.ui.detectorwidget)
@@ -99,7 +99,7 @@ class SCNR(QMainWindow):
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
             #self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
-            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
+            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=25)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
@@ -704,10 +704,10 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_savesettings_clicked(self):
         pos = self.cammarker.pos()
-        self.settings.cammarker_x = pos[0]
-        self.settings.cammarker_y = pos[1]
+        self.settings.cammarker_x = pos.x()
+        self.settings.cammarker_y = pos.y()
         pos = self.slitmarker.pos()
-        self.settings.slitmarker_x = pos[0]
+        self.settings.slitmarker_x = pos.x()
         self.settings.save()
 
 
