@@ -26,7 +26,7 @@ import numpymodel
 import settings
 import spectrum
 import dialogs
-from custom_pyqtgraph_classes import movableCrosshair
+from custom_pyqtgraph_classes import movableCrosshair, xmovableCrosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
@@ -69,6 +69,8 @@ class SCNR(QMainWindow):
         vb = pg.ViewBox()
         self.detector_img = pg.ImageItem()
         vb.addItem(self.detector_img)
+        self.slitmarker = movableCrosshair(pos=[self.settings.slitmarker_x, self.settings.slitmarker_y], size=15)
+        vb.addItem(self.slitmarker)
         gv.setCentralWidget(vb)
         l = QVBoxLayout(self.ui.detectorwidget)
         l.setSpacing(0)
@@ -97,8 +99,8 @@ class SCNR(QMainWindow):
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
             #self.marker = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15], pen=pg.mkPen('g'))
-            self.marker = movableCrosshair(pos=[self.settings.marker_x, self.settings.marker_y], size=15)
-            vb2.addItem(self.marker)
+            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
+            vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
             l2.setSpacing(0)
@@ -249,6 +251,7 @@ class SCNR(QMainWindow):
     def setSpectrumMode(self):
         self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.spectrometer.SetSingleTrack()
 
         self.ui.dark_button.setEnabled(True)
@@ -266,6 +269,7 @@ class SCNR(QMainWindow):
         self.ui.series_button.setEnabled(False)
 
         self.spectrometer.SetSlitWidth(2500)
+        self.ui.slitwidth_spin.setValue(2500)
         self.spectrometer.SetImageofSlit()
         #if self.ui.image_combobox.currentIndex() == 0:
         #    self.spectrometer.SetImageofSlit()
@@ -698,9 +702,11 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
-        pos = self.marker.pos()
-        self.settings.marker_x = pos[0]
-        self.settings.marker_y = pos[1]
+        pos = self.cammarker.pos()
+        self.settings.cammarker_x = pos[0]
+        self.settings.cammarker_y = pos[1]
+        pos = self.slitmarker.pos()
+        self.settings.slitmarker_x = pos[0]
         self.settings.save()
 
 

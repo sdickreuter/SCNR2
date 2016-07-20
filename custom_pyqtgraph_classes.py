@@ -18,7 +18,7 @@ class CustomViewBox(pg.ViewBox):
             pg.ViewBox.mouseDragEvent(self, ev)
 
 
-class fixedCrosshair(QtGui.QGraphicsRectItem):
+class xmovableCrosshair(QtGui.QGraphicsRectItem):
     def __init__(self, pos=None, size=None, *args):
         QtGui.QGraphicsRectItem.__init__(self, *args)
         self.setAcceptHoverEvents(True)
@@ -37,6 +37,27 @@ class fixedCrosshair(QtGui.QGraphicsRectItem):
         p.setPen(pg.mkPen('b'))
         p.drawLine(-self.size, -self.size, self.size, self.size)
         p.drawLine(self.size, -self.size, -self.size, self.size)
+
+    def hoverEnterEvent(self, ev):
+        self.savedPen = self.pen()
+        #self.setPen(pg.mkPen(255, 255, 255))
+        ev.ignore()
+
+    def hoverLeaveEvent(self, ev):
+        self.setPen(self.savedPen)
+        ev.ignore()
+
+    def mousePressEvent(self, ev):
+        if ev.button() == QtCore.Qt.LeftButton:
+            ev.accept()
+            self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
+        else:
+            ev.ignore()
+
+    def mouseMoveEvent(self, ev):
+        newpos = self.mapToParent(ev.pos()) - self.pressDelta
+        newpos.setY(self.pos().y())
+        self.setPos(newpos)
 
     def boundingRect(self):
         return QtCore.QRectF(-self.size, -self.size, self.size*2, self.size*2)
@@ -104,7 +125,7 @@ vb = pg.ViewBox()
 p1 = pg.PlotDataItem()
 vb.addItem(p1)
 
-rect = fixedCrosshair(pos=[1.5, 2],size=1)
+rect = xmovableCrosshair(pos=[1.5, 2],size=1)
 rect.setPen(pg.mkPen(100, 200, 100))
 vb.addItem(rect)
 

@@ -39,8 +39,11 @@ class Settings(object):
 
         self.slit_width = int(self.config['spectrometer']['slit_width'])
 
-        self.marker_x = float(self.config['marker']['x'])
-        self.marker_y = float(self.config['marker']['y'])
+        self.cammarker_x = float(self.config['cammarker']['x'])
+        self.cammarker_y = float(self.config['cammarker']['y'])
+
+        self.slitmarker_x = float(self.config['slitmarker']['x'])
+        self.slitmarker_y = float(self.config['slitmarker']['y'])
 
 
     def save(self):
@@ -64,8 +67,11 @@ class Settings(object):
 
         self.config.set('spectrometer', 'slit_width', str(self.slit_width))
 
-        self.config.set('marker', 'x', str(self.marker_x))
-        self.config.set('marker', 'y', str(self.marker_y))
+        self.config.set('cammarker', 'x', str(self.cammarker_x))
+        self.config.set('cammarker', 'y', str(self.cammarker_y))
+
+        self.config.set('slitmarker', 'x', str(self.slitmarker_x))
+        self.config.set('slitmarker', 'y', str(self.slitmarker_y))
 
         try:
             with open(self._filename, 'w') as configfile:
