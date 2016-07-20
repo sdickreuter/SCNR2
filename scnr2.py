@@ -44,6 +44,8 @@ class SCNR(QMainWindow):
     padthread = None
     spectrometer = None
 
+    savedir = "./Spectra/"
+    path = "./"
 
     def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
@@ -99,7 +101,7 @@ class SCNR(QMainWindow):
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
             #self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
-            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=25)
+            self.cammarker = movableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=25)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
@@ -300,12 +302,28 @@ class SCNR(QMainWindow):
 
 # ----- Slots for Spectrum Stuff
 
+    def correct_spec(self,spec):
+        if self.ui.correct_checkBox.isChecked():
+            if not self.spectrum.dark is None:
+                if not self.spectrum.bg is None:
+                    if not self.spectrum.lamp is None:
+                        return (spec - self.spectrum.bg) / (self.spectrum.lamp - self.spectrum.dark)
+                    return self.spectrum._spec - self.spectrum.bg
+                else:
+                    if not self.spectrum.lamp is None:
+                        return (spec - self.spectrum.dark) / (self.spectrum.lamp - self.spectrum.dark)
+                    return spec - self.spectrum.dark
+            else:
+                if not self.spectrum.bg is None:
+                    return spec - self.spectrum.bg
+        return spec
+
     @pyqtSlot(np.ndarray)
     def on_update_spectrum(self,spec):
         if self.spectrometer.mode == "Image":
             self.detector_img.setImage(spec)
         elif self.spectrometer.mode == 'SingleTrack':
-            self.plot.setData(self.spectrometer.GetWavelength(),spec)
+            self.plot.setData(self.spectrometer.GetWavelength(),self.correct_spec(spec))
 
     @pyqtSlot(str)
     def on_updateStatus(self, status):
@@ -657,7 +675,7 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
-        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value()/1000)
+        self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value())
 
     @pyqtSlot()
     def on_number_of_samples_edited(self):
@@ -709,6 +727,20 @@ class SCNR(QMainWindow):
         pos = self.slitmarker.pos()
         self.settings.slitmarker_x = pos.x()
         self.settings.save()
+
+    def _load_spectrum_from_file(self):
+        #save_dir = QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", os.path.expanduser('~'), 'CSV Files (*.csv)')
+        #save_dir = QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", '.'+path.sep+'spectra'+path.sep, 'CSV Files (*.csv)')
+        save_dir = QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
+
+        if len(save_dir[0])>1:
+            save_dir = save_dir[0]
+            #data = pandas.DataFrame(pandas.read_csv(save_dir,skiprows=8))
+            #data = data['counts']
+            data = np.genfromtxt(save_dir, delimiter=',',skip_header=12)
+            data = data[:,1]
+            return np.array(data)
+        return None
 
 
 def sigint_handler(*args):

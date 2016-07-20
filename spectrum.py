@@ -63,22 +63,6 @@ class Spectrum(QObject):
     def get_wl(self):
         return self._spectrometer.GetWavelength()
 
-    def get_spec(self, corrected=False):
-        if corrected:
-            if not self.dark is None:
-                if not self.bg is None:
-                    if not self.lamp is None:
-                        return (self._spec - self.bg) / (self.lamp - self.dark)
-                    return self._spec - self.bg
-                else:
-                    if not self.lamp is None:
-                        return (self._spec - self.dark) / (self.lamp - self.dark)
-                    return self._spec - self.dark
-            else:
-                if not self.ng is None:
-                    return self._spec - self.bg
-        return self._spec
-
     def stop_process(self):
         self.workingthread.stop()
         time.sleep(0.1)
@@ -259,7 +243,7 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
     def save_spectrum(self, spec, filename, pos, lockin, fullPath):
-        wl = self._spectrometer.Get_wl()
+        wl = self._spectrometer.GetWavelength()
         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
         if fullPath:
             f = open(filename, 'w')
@@ -285,6 +269,11 @@ class Spectrum(QObject):
             f.write(str(pos[0]) + eol)
             f.write("y" + eol)
             f.write(str(pos[1]) + eol)
+	else:
+            f.write(eol)
+            f.write(eol)
+            f.write(eol)
+            f.write(eol)
 
         f.write(eol)
         f.write("wavelength,counts" + eol)
