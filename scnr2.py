@@ -98,8 +98,8 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
-            #self.marker = pg.ROI([self.settings.marker_x, self.settings.marker_y], [15, 15], pen=pg.mkPen('g'))
-            self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
+            self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
+            #self.cammarker = xmovableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=15)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
             l2 = QVBoxLayout(self.ui.camwidget)
@@ -285,7 +285,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
-        self.img.setImage(img.transpose())
+        self.img.setImage(img)
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
