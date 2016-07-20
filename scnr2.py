@@ -285,7 +285,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
-        self.img.setImage(img)
+        self.img.setImage(img.transpose())
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
