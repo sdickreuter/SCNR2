@@ -196,12 +196,6 @@ class SCNR(QMainWindow):
             active_grating = self.spectrometer.GetGrating()
             self.ui.grating_combobox.setCurrentIndex(active_grating-1)
 
-        #Temperature  Display
-        if start_cooler:
-            self.temperature_timer = QTimer(self)
-            self.temperature_timer.timeout.connect(self.check_temperature)
-            self.temperature_timer.start(1000)
-
         #init Position Table
         self.positions = np.matrix([ [0.0,0.0], [0.0,10.0], [10.0,0.0]])
         self.posModel = numpymodel.NumpyModel(self.positions)
@@ -230,14 +224,6 @@ class SCNR(QMainWindow):
         #time.sleep(0.5)
         super(SCNR, self).close()
 
-
-# ----- Slot for Temperature Display
-
-    @pyqtSlot()
-    def check_temperature(self):
-        self.ui.label_temp.setText('Detector Temperature: '+str(round(self.spectrometer.GetTemperature(),1))+' °C')
-
-# ----- END Slot for Temperature Display
 
 
 # ----- Slot for Detector Mode
@@ -598,6 +584,10 @@ class SCNR(QMainWindow):
             self.settings.stepsize = 0.001
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
         self.settings.save()
+
+    @pyqtSlot()
+    def on_temp_clicked(self):
+        self.ui.label_temp.setText('Detector Temperature: ' + str(round(self.spectrometer.GetTemperature(), 1)) + ' °C')
 
 # ----- END Slots for Buttons
 

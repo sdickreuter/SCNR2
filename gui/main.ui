@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>931</height>
+    <width>1121</width>
+    <height>937</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1020,6 +1020,19 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="temp_button">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Update Detector Temperature</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_temp">
         <property name="text">
          <string>Detector Temp.:</string>
@@ -1875,7 +1888,7 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>748</x>
+     <x>759</x>
      <y>451</y>
     </hint>
     <hint type="destinationlabel">
@@ -1891,7 +1904,7 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>746</x>
+     <x>757</x>
      <y>489</y>
     </hint>
     <hint type="destinationlabel">
@@ -1923,7 +1936,7 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>746</x>
+     <x>757</x>
      <y>548</y>
     </hint>
     <hint type="destinationlabel">
@@ -2003,7 +2016,7 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>775</x>
+     <x>786</x>
      <y>277</y>
     </hint>
     <hint type="destinationlabel">
@@ -2204,6 +2217,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>temp_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_temp_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>786</x>
+     <y>625</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1001</x>
+     <y>618</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_lefttab_changed(int)</slot>
@@ -2250,5 +2279,6 @@
   <slot>on_zdown_clicked()</slot>
   <slot>on_live_detector_clicked()</slot>
   <slot>on_mode_changed(int)</slot>
+  <slot>on_temp_clicked()</slot>
  </slots>
 </ui>

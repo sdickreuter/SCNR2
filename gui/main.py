@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1100, 931)
+        MainWindow.resize(1121, 937)
         MainWindow.setWindowTitle("SCRN2")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/gui/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -476,6 +476,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.right_tab)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem1)
+        self.temp_button = QtWidgets.QPushButton(self.centralwidget)
+        self.temp_button.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.temp_button.setObjectName("temp_button")
+        self.verticalLayout_2.addWidget(self.temp_button)
         self.label_temp = QtWidgets.QLabel(self.centralwidget)
         self.label_temp.setObjectName("label_temp")
         self.verticalLayout_2.addWidget(self.label_temp)
@@ -727,6 +731,7 @@ class Ui_MainWindow(object):
         self.left_tab.currentChanged['int'].connect(MainWindow.on_lefttab_changed)
         self.integration_time_spin.editingFinished.connect(MainWindow.on_int_time_edited)
         self.savesettings_button.clicked.connect(MainWindow.on_savesettings_clicked)
+        self.temp_button.clicked.connect(MainWindow.on_temp_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -771,6 +776,7 @@ class Ui_MainWindow(object):
         self.label_14.setText(_translate("MainWindow", "Starting Sigma [um]"))
         self.savesettings_button.setText(_translate("MainWindow", "Save Settings"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.settings_tab), _translate("MainWindow", "Settings"))
+        self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temp.:"))
         self.searchmax_button.setText(_translate("MainWindow", "Search Maximum"))
         self.correct_checkBox.setText(_translate("MainWindow", "Correct Spectrum"))
