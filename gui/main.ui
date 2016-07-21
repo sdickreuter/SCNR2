@@ -710,26 +710,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_15">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Choose Image readout:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="image_combobox">
-            <property name="editable">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="Line" name="line_10">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1825,27 +1805,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>648</x>
-     <y>264</y>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>840</x>
      <y>247</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>image_combobox</sender>
-   <signal>activated(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_image_readout_changed(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>709</x>
-     <y>323</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>846</x>
-     <y>305</y>
     </hint>
    </hints>
   </connection>
@@ -1873,7 +1837,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>775</x>
-     <y>380</y>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -1889,7 +1853,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>759</x>
-     <y>451</y>
+     <y>416</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1905,7 +1869,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>757</x>
-     <y>489</y>
+     <y>457</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -1921,7 +1885,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>772</x>
-     <y>506</y>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1937,7 +1901,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>757</x>
-     <y>548</y>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
@@ -2209,7 +2173,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>706</x>
-     <y>562</y>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>

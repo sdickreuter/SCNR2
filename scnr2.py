@@ -331,11 +331,14 @@ class SCNR(QMainWindow):
         self.ui.searchmax_button.setDisabled(True)
         self.ui.stepup_button.setDisabled(True)
         self.ui.stepdown_button.setDisabled(True)
+        self.ui.temp_button.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
+
 
     @pyqtSlot()
     def on_enableButtons(self):
         self.ui.right_tab.setDisabled(False)
+        self.ui.temp_button.setDisabled(False)
         if not self.stage is None:
             self.ui.stage_frame.setDisabled(False)
             self.ui.searchmax_button.setDisabled(False)
@@ -683,10 +686,6 @@ class SCNR(QMainWindow):
     @pyqtSlot(int)
     def on_grating_changed(self, index):
         self.spectrometer.SetGrating(index+1)
-
-    @pyqtSlot(int)
-    def on_image_readout_changed(int, index):
-        print("readout:" + str(index))
 
     @pyqtSlot()
     def on_exposure_time_edited(self):
