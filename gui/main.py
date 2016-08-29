@@ -66,6 +66,9 @@ class Ui_MainWindow(object):
         self.live_button = QtWidgets.QPushButton(self.spectra_tab)
         self.live_button.setObjectName("live_button")
         self.verticalLayout.addWidget(self.live_button)
+        self.lockin_button = QtWidgets.QPushButton(self.spectra_tab)
+        self.lockin_button.setObjectName("lockin_button")
+        self.verticalLayout.addWidget(self.lockin_button)
         self.line = QtWidgets.QFrame(self.spectra_tab)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -724,12 +727,14 @@ class Ui_MainWindow(object):
         self.integration_time_spin.editingFinished.connect(MainWindow.on_int_time_edited)
         self.savesettings_button.clicked.connect(MainWindow.on_savesettings_clicked)
         self.temp_button.clicked.connect(MainWindow.on_temp_clicked)
+        self.lockin_button.clicked.connect(MainWindow.on_lockin_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         self.stop_button.setText(_translate("MainWindow", "Stop"))
         self.live_button.setText(_translate("MainWindow", "Liveview"))
+        self.lockin_button.setText(_translate("MainWindow", "Take Lockin Spectrum"))
         self.dark_button.setText(_translate("MainWindow", "Take Dark Spectrum"))
         self.bg_button.setText(_translate("MainWindow", "Take Background Spectrum"))
         self.ref_button.setText(_translate("MainWindow", "Take Reference Spectrum"))

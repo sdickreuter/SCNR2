@@ -123,6 +123,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="lockin_button">
+            <property name="text">
+             <string>Take Lockin Spectrum</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="Line" name="line">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1552,8 +1559,8 @@
    <slot>on_reset_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>710</x>
-     <y>552</y>
+     <x>853</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
@@ -1584,8 +1591,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>702</x>
-     <y>162</y>
+     <x>853</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -1664,8 +1671,8 @@
    <slot>on_lamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>726</x>
-     <y>243</y>
+     <x>853</x>
+     <y>268</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -1680,8 +1687,8 @@
    <slot>on_mean_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>743</x>
-     <y>278</y>
+     <x>853</x>
+     <y>308</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -1712,8 +1719,8 @@
    <slot>on_series_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>713</x>
-     <y>312</y>
+     <x>853</x>
+     <y>338</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -1744,8 +1751,8 @@
    <slot>on_loadlamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>730</x>
-     <y>480</y>
+     <x>853</x>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -1760,8 +1767,8 @@
    <slot>on_loadbg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>665</x>
-     <y>512</y>
+     <x>853</x>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
      <x>882</x>
@@ -1856,8 +1863,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>757</x>
-     <y>457</y>
+     <x>852</x>
+     <y>450</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -1888,8 +1895,8 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>757</x>
-     <y>523</y>
+     <x>852</x>
+     <y>516</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
@@ -1920,8 +1927,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>735</x>
-     <y>127</y>
+     <x>853</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -1936,8 +1943,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>622</x>
-     <y>271</y>
+     <x>648</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -1952,8 +1959,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>706</x>
-     <y>279</y>
+     <x>726</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -1968,8 +1975,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>277</y>
+     <x>804</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2112,8 +2119,8 @@
    <slot>on_mode_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>131</y>
+     <x>853</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>982</x>
@@ -2185,6 +2192,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lockin_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_lockin_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>766</x>
+     <y>125</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1037</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_lefttab_changed(int)</slot>
@@ -2232,5 +2255,6 @@
   <slot>on_live_detector_clicked()</slot>
   <slot>on_mode_changed(int)</slot>
   <slot>on_temp_clicked()</slot>
+  <slot>on_lockin_clicked()</slot>
  </slots>
 </ui>

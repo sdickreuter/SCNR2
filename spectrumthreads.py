@@ -172,7 +172,7 @@ class LockinThread(MeasurementThread):
         self.i += 1
         if self.i >= self.number_of_samples:
             self.progressSignal.emit(100, str(self.progress.eta_td))
-            self.finishSignal.emit(self.mean / (self.number_of_samples))
+            self.finishSignal.emit(self.calc_lockin())
             self.stop()
 
 class SearchThread(MeasurementThread):

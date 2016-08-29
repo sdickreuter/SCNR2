@@ -435,12 +435,12 @@ class SCNR(QMainWindow):
     def on_reset_clicked(self):
         self.spectrum.reset()
 
-    # @pyqtSlot()
-    # def on_acquirelockin_clicked(self):
-    #     self.ui.status.setText('Acquiring ...')
-    #     self.spectrum.take_lockin()
-    #     self.disable_buttons()
-    #
+    @pyqtSlot()
+    def on_lockin_clicked(self):
+        self.on_disableButtons()
+        self.ui.status.setText('Acquiring ...')
+        self.spectrum.take_lockin()
+
     # @pyqtSlot()
     # def on_direction_clicked(self):
     #     self.direction_dialog.rundialog()
