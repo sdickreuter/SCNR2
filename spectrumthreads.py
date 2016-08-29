@@ -154,7 +154,7 @@ class LockinThread(MeasurementThread):
         self.number_of_samples = settings.number_of_samples
         self.stage = stage
         self.settings = settings
-        super(MeanThread, self).__init__(spectrometer)
+        super(LockinThread, self).__init__(spectrometer)
         self.init()
 
     def init(self):
@@ -176,7 +176,7 @@ class LockinThread(MeasurementThread):
         res = np.zeros(self.spectrometer._width)
         for i in range(self.spectrometer._width):
             ref = np.cos(2 * np.pi * np.arange(0, self.number_of_samples) * self.settings.f)
-            buf = ref * self.lockin[:, 1]
+            buf = ref * self.lockin[i, :]
             buf = np.sum(buf)
             res[i] = buf
         return res

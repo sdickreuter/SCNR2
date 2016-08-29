@@ -43,10 +43,11 @@ class Test(QMainWindow):
 
 
     def startThread(self):
-        positions = np.array([[10, 10], [15, 15]])
-        self.workingthread = ScanMeanThread(self.spectrometer, self.settings, positions, self.stage)
+        #positions = np.array([[10, 10], [15, 15]])
+        #self.workingthread = ScanMeanThread(self.spectrometer, self.settings, positions, self.stage)
+        self.workingthread = LockinThread(self.spectrometer, self.settings, self.stage)
         self.workingthread.finishSignal.connect(self.finishedCallback)
-        self.workingthread.saveSignal.connect(self.saveCallback)
+        #self.workingthread.saveSignal.connect(self.saveCallback)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)
         self.workingthread.start()
