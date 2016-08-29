@@ -155,8 +155,8 @@ class SCNR(QMainWindow):
                 if self.padthread.isinitialized:
                     self.padthread.BSignal.connect(self.on_search_clicked)
                     self.padthread.XSignal.connect(self.on_addpos_clicked)
-                    #self.padthread.YSignal.connect(self.on_stepup_clicked)
-                    #self.padthread.ASignal.connect(self.on_stepdown_clicked)
+                    self.padthread.YSignal.connect(self.on_stepup_clicked)
+                    self.padthread.ASignal.connect(self.on_stepdown_clicked)
                     self.padthread.xaxisSignal.connect(self.on_xaxis)
                     self.xaxis = 0.0
                     self.padthread.yaxisSignal.connect(self.on_yaxis)
@@ -224,6 +224,12 @@ class SCNR(QMainWindow):
         #time.sleep(0.5)
         super(SCNR, self).close()
 
+def show_pos(self):
+    pos = self.stage.last_pos()
+    # print(pos)
+    self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
+    self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
+    self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
 
 
 # ----- Slot for Detector Mode
