@@ -30,9 +30,9 @@ from custom_pyqtgraph_classes import movableCrosshair, xmovableCrosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
-init_pad = False
+init_pad = True
 init_cam = True
-init_stage = False
+init_stage = True
 init_spectrometer = True
 start_cooler = False
 
@@ -90,6 +90,7 @@ class SCNR(QMainWindow):
             self.spectrometer.SetExposureTime(self.settings.integration_time)
             #print('Spectrometer initialized')
 
+
         # init detector mode combobox
         self.ui.mode_combobox.addItem("Spectrum")
         self.ui.mode_combobox.addItem("Image")
@@ -125,8 +126,8 @@ class SCNR(QMainWindow):
         # init stage
         if init_stage:
             try:
-                #self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port)
-                self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port)
+                #self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except:
                 self.stage = None
                 #self.stage = PIStage.Dummy()
@@ -165,8 +166,9 @@ class SCNR(QMainWindow):
                     self.gamepad_timer = QTimer(self)
                     self.gamepad_timer.timeout.connect(self.check_pad_analog)
                     self.gamepad_timer.start(100)
-                    self.pad_active = False
+                    self.pad_active = True
                 else:
+                    self.pad_active = False
                     self.padthread = None
                     print("Could not initialize Gamepad")
                     QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QMessageBox.Ok)
@@ -179,10 +181,6 @@ class SCNR(QMainWindow):
         self.spectrum.disableButtons.connect(self.on_disableButtons)
         self.spectrum.enableButtons.connect(self.on_enableButtons)
         self.spectrum.specSignal.connect(self.on_update_spectrum)
-
-        # init image readout combobox
-        self.ui.image_combobox.addItem("Only Slit")
-        self.ui.image_combobox.addItem("Full Image")
 
         #init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
@@ -206,6 +204,7 @@ class SCNR(QMainWindow):
         self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
 
+        self.show_pos()
 
 
     def closeEvent(self, event):
@@ -224,12 +223,12 @@ class SCNR(QMainWindow):
         #time.sleep(0.5)
         super(SCNR, self).close()
 
-def show_pos(self):
-    pos = self.stage.last_pos()
-    # print(pos)
-    self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
-    self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
-    self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
+    def show_pos(self):
+        pos = self.stage.last_pos()
+        # print(pos)
+        self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
+        self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
+        self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
 
 
 # ----- Slot for Detector Mode

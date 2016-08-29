@@ -211,14 +211,12 @@ class SearchThread(MeasurementThread):
         self.spectrometer.SetExposureTime(self.settings.search_integration_time / 1000)
         # self.mutex.unlock()
         spec = self.spectrometer.TakeSingleTrack()
-        spec = np.mean(spec,1)
+        #spec = np.mean(spec,1)
         spec = smooth(self.wl, spec)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
 
-        minval = np.min(spec)
-        maxval = np.max(spec)
 
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
 
@@ -228,8 +226,8 @@ class SearchThread(MeasurementThread):
             self.stage.query_pos()
             origin = self.stage.last_pos()
             measured = np.zeros(self.settings.rasterdim)
-            if j is 4:
-                d /= 2
+            #if j is 4:
+            #    d /= 2
             if j % 2:
                 pos = d + origin[0]
             else:
@@ -250,7 +248,8 @@ class SearchThread(MeasurementThread):
                 measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
-
+            minval = np.min(measured)
+            maxval = np.max(measured)
             initial_guess = (maxval - minval, pos[maxind], self.settings.sigma, minval)
             dx = origin[0]
             dy = origin[1]
@@ -291,7 +290,7 @@ class SearchThread(MeasurementThread):
             plt.close()
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        self.spectrometer.SetExposureTime(self.settings.integration_time / 1000)
+        self.spectrometer.SetExposureTime(self.settings.integration_time)
         # self.stage.query_pos()
         # spec = self.getspec()
         # self.specSignal.emit(spec)
