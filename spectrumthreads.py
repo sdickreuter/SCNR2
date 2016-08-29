@@ -358,7 +358,7 @@ class ScanSearchThread(ScanThread):
         super(ScanSearchThread, self).stop()
 
     def __del__(self):
-        self.searchthread.specSignal.disconnect(self.specslot)
+        #self.searchthread.specSignal.disconnect(self.specslot)
         super(ScanSearchThread, self).__del__()
 
     def intermediatework(self):
@@ -430,8 +430,11 @@ class ScanMeanThread(ScanThread):
         self.meanthread.init()
 
     def intermediatework(self):
+        print("BLA 0")
         self.meanthread.init()
+        print("BLA 1")
         self.meanthread.process()
+        print("BLA 2")
         # self.initMeanThread()
         # self.meanthread.start()
         #self.meanthread.thread.wait()
@@ -469,7 +472,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         super(ScanMeanThread, self).stop()
 
     def __del__(self):
-        self.searchthread.specSignal.disconnect()
+        #self.searchthread.specSignal.disconnect()
         super(ScanMeanThread, self).__del__()
 
     def intermediatework(self):
