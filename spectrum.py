@@ -52,11 +52,13 @@ class Spectrum(QObject):
 
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
+        print("Progress Callback")
         self.updateProgress.emit(progress)
         self.updateStatus.emit('ETA: ' + eta)
 
     @pyqtSlot(np.ndarray)
     def specCallback(self, spec):
+        print('BLUBB specCallback')
         self._spec = spec
         self.specSignal.emit(spec)
 
@@ -64,14 +66,17 @@ class Spectrum(QObject):
         return self._spectrometer.GetWavelength()
 
     def stop_process(self):
-        self.workingthread.stop()
-        time.sleep(0.1)
-        self.workingthread = None
+        try:
+            self.workingthread.stop()
+            self.workingthread.wait(500)
+            self.workingthread = None
+        except Exception as e:
+            print(e)
         self.enableButtons.emit()
 
     def take_live(self):
         # self.workingthread = LiveThread(self.getspecthread)
-        self.workingthread = MeasurementThread(self._spectrometer)
+        self.workingthread = LiveThread(self._spectrometer)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.start()
 
@@ -84,37 +89,37 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
-        #self.stop_process()
+        self.stop_process()
         self.lockin = spec
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Lockin Spectrum acquired')
 
     @pyqtSlot(np.ndarray)
     def finishedDarkCallback(self, spec):
-        #self.stop_process()
+        self.stop_process()
         self.dark = spec
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Dark Spectrum acquired')
 
     @pyqtSlot(np.ndarray)
     def finishedLampCallback(self, spec):
-        #self.stop_process()
+        self.stop_process()
         self.lamp = spec
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Lamp Spectrum acquired')
 
     @pyqtSlot(np.ndarray)
     def finishedMeanCallback(self, spec):
-        #self.stop_process()
+        self.stop_process()
         self.mean = spec
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Mean Spectrum acquired')
 
     @pyqtSlot(np.ndarray)
     def finishedBGCallback(self, spec):
-        #self.stop_process()
+        self.stop_process()
         self.bg = spec
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Background Spectrum acquired')
 
     def startMeanThread(self):
@@ -170,50 +175,56 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedSearch(self, pos):
-        #self.stop_process()
-        self.enableButtons.emit()
+        self.stop_process()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Search finished')
 
     @pyqtSlot(np.ndarray)
     def finishedScanSearch(self, pos):
-        #self.stop_process()
+        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
         plt.close()
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Scan Search finished')
         self.updatePositions.emit(pos)
 
-    def make_scan(self, positions, savedir, with_lockin, with_search):
+    def take_scan(self, positions, savedir, with_lockin, with_search):
         self.save_path = savedir
         self.save_data(savedir)
         self.positions = positions
+        print(positions)
         if with_lockin:
             return True
         elif with_search:
             self.workingthread = ScanSearchMeanThread(self._spectrometer, self.settings, positions, self.stage)
         else:
             self.workingthread = ScanMeanThread(self._spectrometer, self.settings, positions, self.stage)
+            #self.workingthread = ScanThread(self._spectrometer, self.settings, positions, self.stage)
 
         self.workingthread.finishSignal.connect(self.finishedScanMean)
         self.workingthread.saveSignal.connect(self.save_spectrum)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.start()
+        print("Startinge Scan")
+        try:
+            self.workingthread.start()
+        except Exception as e:
+            print(e)
 
     @pyqtSlot(np.ndarray)
     def finishedScanMean(self, pos):
-        #self.stop_process()
+        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
         plt.close()
-        self.enableButtons.emit()
+        #self.enableButtons.emit()
         self.updateStatus.emit('Scan Mean finished')
 
     def take_series(self, path):
@@ -242,10 +253,10 @@ class Spectrum(QObject):
             self.save_spectrum(self.lockin, 'lockin.csv', None, True, False)
 
     @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
-    def save_spectrum(self, spec, filename, pos, lockin, fullPath):
+    def save_spectrum(self, spec, filename, pos, islockin, isfullPath):
         wl = self._spectrometer.GetWavelength()
         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
-        if fullPath:
+        if isfullPath:
             f = open(filename, 'w')
         else:
             f = open(self.save_path + filename, 'w')
@@ -258,7 +269,7 @@ class Spectrum(QObject):
         f.write(str(self.settings.integration_time) + eol)
         f.write("number of samples" + eol)
         f.write(str(self.settings.number_of_samples) + eol)
-        if lockin:
+        if islockin:
             f.write("amplitude" + eol)
             f.write(str(self.settings.amplitude) + eol)
             f.write("frequency" + eol)

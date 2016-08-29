@@ -6,7 +6,7 @@ import progress
 import scipy.optimize as opt
 from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject
 from scipy.signal import savgol_filter
-
+import time
 
 #  modified from: http://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m#comment33999040_21566831
 def gauss2D(pos, amplitude, xo, yo, fwhm, offset):
@@ -35,8 +35,8 @@ def smooth(x, y):
     slope = (np.mean(buf[ind2]) - np.mean(buf[ind1])) / (np.mean(x[ind2]) - np.mean(x[ind1]))
     intercept = np.mean(buf[ind1]) - slope * np.mean(x[ind1])
     l = slope * x + intercept
-    buf = np.subtract(buf, l)
-    buf = buf * gauss(x, 1, 600, 500, 0)
+    #buf = np.subtract(buf, l)
+    #buf = buf * gauss(x, 1, 600, 500, 0)
 
     return buf
 
@@ -64,6 +64,7 @@ class MeasurementThread(QObject):
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
         self.spec = np.zeros(self.spectrometer._width)
+        print("New "+ self.__class__.__name__ +" created: "+str(id(self)))
 
     def start(self):
         self.thread.start()
@@ -78,7 +79,22 @@ class MeasurementThread(QObject):
         self.__class__.has_instance = False
 
     def work(self):
+        pass
+
+    @pyqtSlot()
+    def process(self):
+        while not self.abort:
+            try:
+                self.work()
+            except:
+                (type, value, traceback) = sys.exc_info()
+                sys.excepthook(type, value, traceback)
+
+class LiveThread(MeasurementThread):
+
+    def work(self):
         self.specSignal.emit(self.spec)
+        print('spec emitted')
 
     @pyqtSlot()
     def process(self):
@@ -92,6 +108,10 @@ class MeasurementThread(QObject):
 
 
 class ImageThread(MeasurementThread):
+
+    def work(self):
+        self.specSignal.emit(self.spec)
+        print('spec emitted')
 
     @pyqtSlot()
     def process(self):
@@ -117,9 +137,11 @@ class MeanThread(MeasurementThread):
         self.abort = False
 
     def work(self):
+        self.spec = self.spectrometer.TakeSingleTrack()
         self.mean = (self.mean + self.spec)  # / 2
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+        print('progress emitted')
         self.i += 1
         self.specSignal.emit(self.mean / (self.i))
         if self.i >= (self.number_of_samples):
@@ -186,17 +208,6 @@ class SearchThread(MeasurementThread):
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
 
-    @pyqtSlot()
-    def process(self):
-        while True:
-            if self.abort:
-                return
-            try:
-                self.work()
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
-
     def work(self):
         self.search()
         x, y, z = self.stage.last_pos()
@@ -242,10 +253,10 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
                     return False
                 spec = self.spectrometer.TakeSingleTrack()
-                # spec = smooth(self.wl, spec)
+                spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
-                # measured[k] = np.max(spec[400:800])
-                measured[k] = np.sum(spec)
+                measured[k] = np.max(spec[400:800])
+                #measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
             minval = np.min(measured)
@@ -373,9 +384,9 @@ class ScanLockinThread(ScanThread):
         super(ScanMeanThread, self).stop()
 
     def __del__(self):
-        self.meanthread.finishSignal.disconnect(self.lockinfinished)
-        self.meanthread.specSignal.disconnect(self.specslot)
-        self.saveSignal.disconnect()
+        #self.meanthread.finishSignal.disconnect(self.lockinfinished)
+        #self.meanthread.specSignal.disconnect(self.specslot)
+        #self.saveSignal.disconnect()
         super(ScanMeanThread, self).__del__()
 
     def intermediatework(self):
@@ -396,32 +407,56 @@ class ScanMeanThread(ScanThread):
 
     def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
         super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, stage)
-        self.meanthread = MeanThread(spectrometer, settings.number_of_samples, self)
-        self.meanthread.finishSignal.connect(self.meanfinished)
-        self.meanthread.specSignal.connect(self.specslot)
+        self.initMeanThread()
 
     def stop(self):
-        self.meanthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
         super(ScanMeanThread, self).stop()
+        #self.meanthread.finishSignal.disconnect()
+        #self.meanthread.specSignal.disconnect()
+        #self.saveSignal.disconnect()
 
     def __del__(self):
-        self.meanthread.finishSignal.disconnect(self.meanfinished)
-        self.meanthread.specSignal.disconnect(self.specslot)
-        self.saveSignal.disconnect()
+        #self.meanthread.finishSignal.disconnect()
+        #self.meanthread.specSignal.disconnect()
+        #self.saveSignal.disconnect()
         super(ScanMeanThread, self).__del__()
+
+    def initMeanThread(self):
+        self.meanthread = MeanThread(self.spectrometer, self.settings.number_of_samples, self)
+        self.meanthread.finishSignal.connect(self.meanfinished)
+        self.meanthread.specSignal.connect(self.specslot)
+        self.meanthread.init()
 
     def intermediatework(self):
         self.meanthread.init()
         self.meanthread.process()
+        # self.initMeanThread()
+        # self.meanthread.start()
+        #self.meanthread.thread.wait()
+        # while not self.meanthread.thread.isFinished():
+        #     time.sleep(0.1)
+        # try:
+        #     self.meanthread.stop()
+        #     self.meanthread = None
+        # except Exception as e:
+        #     print(e)
+        #while not self.proceed:
+        #    time.sleep(0.1)
+        #self.meanthread.process()
 
     @pyqtSlot(np.ndarray)
     def specslot(self, spec):
+        print('BLUBB spec ready')
         self.specSignal.emit(spec)
 
     @pyqtSlot(np.ndarray)
     def meanfinished(self, spec):
+        print('mean finished')
         self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
-
+        #self.specSignal.emit(spec)
+        #self.proceed = True
 
 class ScanSearchMeanThread(ScanMeanThread):
     def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):

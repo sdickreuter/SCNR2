@@ -30,11 +30,10 @@ from custom_pyqtgraph_classes import movableCrosshair, xmovableCrosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
-init_pad = False
+init_pad = True
 init_cam = False
-init_stage = False
-init_spectrometer = False
-start_cooler = False
+init_stage = True
+init_spectrometer = True
 
 class SCNR(QMainWindow):
     _window_title = "SCNR2"
@@ -216,18 +215,10 @@ class SCNR(QMainWindow):
 
     def closeEvent(self, event):
         self.on_savesettings_clicked()
-        #time.sleep(0.5)
-        #if init_spectrometer:
-        #    self.spectrometer.Shutdown()
-        #time.sleep(0.5)
         super(SCNR, self).closeEvent(event)
 
     def close(self):
         self.on_savesettings_clicked()
-        #time.sleep(0.5)
-        #if init_spectrometer:
-        #    self.spectrometer.Shutdown()
-        #time.sleep(0.5)
         super(SCNR, self).close()
 
     def show_pos(self):
@@ -422,8 +413,8 @@ class SCNR(QMainWindow):
             path = self.savedir + prefix + "/"
             self.ui.status.setText("Scanning ...")
             # self.spectrum.make_scan(self.scan_store, path, self.button_searchonoff.get_active(), self.button_lockinonoff.get_active())
-            self.spectrum.make_scan(self.posModel.getMatrix(), path, self.ui.checkBox_lockin.isChecked(),
-                                    self.ui.checkBox_search.isChecked())
+            self.spectrum.take_scan(self.posModel.getMatrix(), path, self.ui.lockin_checkBox.isChecked(),
+                                    self.ui.search_checkBox.isChecked())
             self.disable_buttons()
 
     @pyqtSlot()
