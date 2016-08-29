@@ -163,7 +163,7 @@ class LockinThread(MeasurementThread):
 
         ref = np.cos(2 * np.pi * self.i * self.settings.f)
         self.move_stage(ref / 2)
-        spec = self._spectrometer.intensities(correct_nonlinearity=True)
+        spec = self.spectrometer.TakeSingleTrack()
         self.lockin[:, self.i] = spec
 
         self.specSignal.emit(self.lockin[:, self.i])
@@ -208,7 +208,7 @@ class SearchThread(MeasurementThread):
 
     def search(self):
         # self.mutex.lock()
-        self.spectrometer.SetExposureTime(self.settings.search_integration_time / 1000)
+        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
         # self.mutex.unlock()
         spec = self.spectrometer.TakeSingleTrack()
         #spec = np.mean(spec,1)

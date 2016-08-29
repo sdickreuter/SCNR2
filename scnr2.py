@@ -30,10 +30,10 @@ from custom_pyqtgraph_classes import movableCrosshair, xmovableCrosshair
 from gui.main import Ui_MainWindow
 
 # for debugging
-init_pad = True
-init_cam = True
-init_stage = True
-init_spectrometer = True
+init_pad = False
+init_cam = False
+init_stage = False
+init_spectrometer = False
 start_cooler = False
 
 class SCNR(QMainWindow):
@@ -57,6 +57,11 @@ class SCNR(QMainWindow):
 
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.ui.centre_wavelength_spin.setValue(650)
+
+        self.ui.rasterdim_spin.setValue(self.settings.rasterdim)
+        self.ui.rasterwidth_spin.setValue(self.settings.rasterwidth)
+        self.ui.search_int_time_spin.setValue(self.settings.search_integration_time)
+        self.ui.sigma_spin.setValue(self.settings.sigma)
 
         self.pw = pg.PlotWidget()
         #vb = CustomViewBox()
@@ -138,6 +143,8 @@ class SCNR(QMainWindow):
                     self.ui.scanning_tab.setEnabled(True)
                     self.ui.searchmax_button.setEnabled(True)
                     self.ui.stage_frame.setEnabled(True)
+                    self.ui.search_checkBox.setEnabled(True)
+                    #self.ui.lockin_checkBox.setEnabled(True)
                 else:
                     self.stage = None
                     QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
@@ -224,11 +231,12 @@ class SCNR(QMainWindow):
         super(SCNR, self).close()
 
     def show_pos(self):
-        pos = self.stage.last_pos()
-        # print(pos)
-        self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
-        self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
-        self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
+        if not self.stage is None:
+            pos = self.stage.last_pos()
+            # print(pos)
+            self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
+            self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
+            self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
 
 
 # ----- Slot for Detector Mode
@@ -252,6 +260,8 @@ class SCNR(QMainWindow):
         self.ui.ref_button.setEnabled(True)
         self.ui.mean_button.setEnabled(True)
         self.ui.series_button.setEnabled(True)
+        self.ui.searchmax_button.setEnabled(True)
+
         self.ui.left_tab.setCurrentIndex(0)
 
     def setImageMode(self):
@@ -260,6 +270,7 @@ class SCNR(QMainWindow):
         self.ui.ref_button.setEnabled(False)
         self.ui.mean_button.setEnabled(False)
         self.ui.series_button.setEnabled(False)
+        self.ui.searchmax_button.setEnabled(False)
 
         self.spectrometer.SetSlitWidth(2500)
         self.ui.slitwidth_spin.setValue(2500)
@@ -715,11 +726,13 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_savesettings_clicked(self):
-        pos = self.cammarker.pos()
-        self.settings.cammarker_x = pos.x()
-        self.settings.cammarker_y = pos.y()
-        pos = self.slitmarker.pos()
-        self.settings.slitmarker_x = pos.x()
+        if self.cam is not None:
+            pos = self.cammarker.pos()
+            self.settings.cammarker_x = pos.x()
+            self.settings.cammarker_y = pos.y()
+        if self.spectrometer is not None:
+            pos = self.slitmarker.pos()
+            self.settings.slitmarker_x = pos.x()
         self.settings.save()
 
     def _load_spectrum_from_file(self):
@@ -769,7 +782,7 @@ if __name__ == '__main__':
         #if init_spectrometer:
         #    spectrometer.Shutdown()
         #spectrometer = None
-        pass
+        print(res)
     sys.exit(0)
 
    # try:

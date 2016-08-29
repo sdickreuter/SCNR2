@@ -492,7 +492,6 @@
          <zorder>line_7</zorder>
          <zorder>posTable</zorder>
          <zorder>scan_button</zorder>
-         <zorder>layoutWidget</zorder>
         </widget>
         <widget class="QWidget" name="settings_tab">
          <attribute name="title">
@@ -813,7 +812,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="search_int_time_spin">
+             <widget class="QDoubleSpinBox" name="search_int_time_spin">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -830,13 +829,16 @@
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
               <property name="minimum">
-               <number>10</number>
+               <double>0.050000000000000</double>
               </property>
               <property name="maximum">
-               <number>10000</number>
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
               </property>
               <property name="value">
-               <number>300</number>
+               <double>0.100000000000000</double>
               </property>
              </widget>
             </item>
@@ -912,6 +914,9 @@
               </property>
               <property name="maximum">
                <double>20.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
               </property>
               <property name="value">
                <double>1.200000000000000</double>
@@ -1452,7 +1457,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <zorder></zorder>
          </widget>
         </item>
        </layout>
@@ -1842,22 +1846,6 @@
     <hint type="destinationlabel">
      <x>847</x>
      <y>368</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>search_int_time_spin</sender>
-   <signal>editingFinished()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_search_int_time_edited()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>759</x>
-     <y>416</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>442</y>
     </hint>
    </hints>
   </connection>

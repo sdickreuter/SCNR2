@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -403,13 +403,14 @@ class Ui_MainWindow(object):
         self.label_11 = QtWidgets.QLabel(self.settings_tab)
         self.label_11.setObjectName("label_11")
         self.horizontalLayout_9.addWidget(self.label_11)
-        self.search_int_time_spin = QtWidgets.QSpinBox(self.settings_tab)
+        self.search_int_time_spin = QtWidgets.QDoubleSpinBox(self.settings_tab)
         self.search_int_time_spin.setMinimumSize(QtCore.QSize(0, 25))
         self.search_int_time_spin.setMaximumSize(QtCore.QSize(100, 16777215))
         self.search_int_time_spin.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.search_int_time_spin.setMinimum(10)
-        self.search_int_time_spin.setMaximum(10000)
-        self.search_int_time_spin.setProperty("value", 300)
+        self.search_int_time_spin.setMinimum(0.05)
+        self.search_int_time_spin.setMaximum(1.0)
+        self.search_int_time_spin.setSingleStep(0.1)
+        self.search_int_time_spin.setProperty("value", 0.1)
         self.search_int_time_spin.setObjectName("search_int_time_spin")
         self.horizontalLayout_9.addWidget(self.search_int_time_spin)
         self.verticalLayout_4.addLayout(self.horizontalLayout_9)
@@ -439,6 +440,7 @@ class Ui_MainWindow(object):
         self.rasterwidth_spin.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.rasterwidth_spin.setMinimum(0.5)
         self.rasterwidth_spin.setMaximum(20.0)
+        self.rasterwidth_spin.setSingleStep(0.1)
         self.rasterwidth_spin.setProperty("value", 1.2)
         self.rasterwidth_spin.setObjectName("rasterwidth_spin")
         self.horizontalLayout_11.addWidget(self.rasterwidth_spin)
@@ -701,7 +703,6 @@ class Ui_MainWindow(object):
         self.grating_combobox.activated['int'].connect(MainWindow.on_grating_changed)
         self.centre_wavelength_spin.editingFinished.connect(MainWindow.on_centre_wavelength_edited)
         self.exposure_time_spin.editingFinished.connect(MainWindow.on_exposure_time_edited)
-        self.search_int_time_spin.editingFinished.connect(MainWindow.on_search_int_time_edited)
         self.rasterdim_spin.editingFinished.connect(MainWindow.on_rasterdim_edited)
         self.rasterwidth_spin.editingFinished.connect(MainWindow.on_rasterwidth_edited)
         self.sigma_spin.editingFinished.connect(MainWindow.on_sigma_edited)
