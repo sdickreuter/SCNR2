@@ -52,13 +52,11 @@ class Spectrum(QObject):
 
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
-        print("Progress Callback")
         self.updateProgress.emit(progress)
         self.updateStatus.emit('ETA: ' + eta)
 
     @pyqtSlot(np.ndarray)
     def specCallback(self, spec):
-        print('Spec Callback')
         self._spec = spec
         self.specSignal.emit(spec)
 
@@ -68,7 +66,7 @@ class Spectrum(QObject):
     def stop_process(self):
         try:
             self.workingthread.stop()
-            self.workingthread.wait(500)
+            self.workingthread.thread.wait(500)
             self.workingthread = None
         except Exception as e:
             print(e)
@@ -110,7 +108,6 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedMeanCallback(self, spec):
-        print('finished Mean Callback')
         self.stop_process()
         self.mean = spec
         #self.enableButtons.emit()
@@ -215,7 +212,6 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedScanMean(self, pos):
-        print('finished Scan Mean Callback')
         self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
@@ -253,7 +249,6 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
     def save_spectrum(self, spec, filename, pos, islockin, isfullPath):
-        print('save spectrum called')
         wl = self._spectrometer.GetWavelength()
         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
         if isfullPath:

@@ -32,7 +32,7 @@ from gui.main import Ui_MainWindow
 
 # for debugging
 init_pad = True
-init_cam = False
+init_cam = True
 init_stage = True
 init_spectrometer = True
 

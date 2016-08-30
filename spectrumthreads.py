@@ -173,18 +173,40 @@ class LockinThread(MeasurementThread):
         self.stage.moveabs(x=x, y=y, z=z)
 
     def calc_lockin(self):
+        def cos_fit(x, freq, amplitude, offset):
+            return (np.cos(2 * np.pi * x * freq + 0))**2 * amplitude + offset
+
         res = np.zeros(self.spectrometer._width)
         for i in range(self.spectrometer._width):
-            ref = np.cos(2 * np.pi * np.arange(0, self.number_of_samples) * self.settings.f)
+            x= np.arange(0, self.number_of_samples)
+            ref = np.cos(2 * np.pi * x * self.settings.f)
             buf = ref * self.lockin[i, :]
-            buf = np.sum(buf)
+            # buf = np.sum(buf)
+            p0 = [self.settings.f, np.max(buf)-np.min(buf),np.mean(buf)]
+            popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
+            res[i] = -popt[2]
             res[i] = buf
+
+        # i = 1000
+        # x = np.arange(0, self.number_of_samples)
+        # ref = np.cos(2 * np.pi * x * self.settings.f)
+        # buf = ref * self.lockin[i, :]
+        # p0 = [self.settings.f, (np.max(buf) - np.min(buf))/2, np.mean(buf)]
+        # popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
+        # print(popt)
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
+        # ax.plot(x, buf, 'bo')
+        # ax.plot(x, cos_fit(x, *popt), 'g-')
+        # plt.savefig("search_max/lockin.png")
+        # plt.close()
+
         return res
 
     def work(self):
 
-        ref = np.cos(2 * np.pi * self.i * self.settings.f)
-        self.move_stage(ref / 2)
+        ref = np.cos(2 * np.pi * self.i * self.settings.f)+1
+        self.move_stage(ref)
         spec = self.spectrometer.TakeSingleTrack()
         self.lockin[:, self.i] = spec
 
@@ -194,7 +216,10 @@ class LockinThread(MeasurementThread):
         self.i += 1
         if self.i >= self.number_of_samples:
             self.progressSignal.emit(100, str(self.progress.eta_td))
-            self.finishSignal.emit(self.calc_lockin())
+            self.spec = self.calc_lockin()
+            self.specSignal.emit(self.spec)
+            self.finishSignal.emit(self.spec)
+            self.stage.moveabs(x=self.startpos[0], y=self.startpos[1])
             self.stop()
 
 class SearchThread(MeasurementThread):
@@ -430,11 +455,8 @@ class ScanMeanThread(ScanThread):
         self.meanthread.init()
 
     def intermediatework(self):
-        print("BLA 0")
         self.meanthread.init()
-        print("BLA 1")
         self.meanthread.process()
-        print("BLA 2")
         # self.initMeanThread()
         # self.meanthread.start()
         #self.meanthread.thread.wait()
@@ -451,12 +473,10 @@ class ScanMeanThread(ScanThread):
 
     @pyqtSlot(np.ndarray)
     def specslot(self, spec):
-        print('BLUBB spec ready')
         self.specSignal.emit(spec)
 
     @pyqtSlot(np.ndarray)
     def meanfinished(self, spec):
-        print('mean finished')
         self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
         #self.specSignal.emit(spec)
         #self.proceed = True
