@@ -218,7 +218,7 @@ class LockinThread(MeasurementThread):
             self.progressSignal.emit(100, str(self.progress.eta_td))
             self.spec = self.calc_lockin()
             self.specSignal.emit(self.spec)
-            self.finishSignal.emit(self.spec)
+            self.finishSignal.emit(self.lockin)
             self.stage.moveabs(x=self.startpos[0], y=self.startpos[1])
             self.stop()
 

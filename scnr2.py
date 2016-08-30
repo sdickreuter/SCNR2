@@ -730,7 +730,8 @@ class SCNR(QMainWindow):
             save_dir = save_dir[0]
             # data = pandas.DataFrame(pandas.read_csv(save_dir,skiprows=8))
             # data = data['counts']
-            data = np.genfromtxt(save_dir, delimiter=',', skip_header=12)
+            #data = np.genfromtxt(save_dir, delimiter=',', skip_header=12)
+            data = np.genfromtxt(save_dir, delimiter=',', skip_header=16)
             data = data[:, 1]
             return np.array(data)
         return None

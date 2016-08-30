@@ -84,7 +84,6 @@ class Spectrum(QObject):
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.start()
 
-
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
         self.stop_process()
@@ -245,7 +244,8 @@ class Spectrum(QObject):
         if not self.bg is None:
             self.save_spectrum(self.bg, 'background.csv', None, False, False)
         if not self.lockin is None:
-            self.save_spectrum(self.lockin, 'lockin.csv', None, True, False)
+            #self.save_spectrum(self.lockin, 'lockin.csv', None, True, False)
+            self.save_lockin_data(self.lockin, 'lockin.csv')
 
     @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
     def save_spectrum(self, spec, filename, pos, islockin, isfullPath):
@@ -269,6 +269,11 @@ class Spectrum(QObject):
             f.write(str(self.settings.amplitude) + eol)
             f.write("frequency" + eol)
             f.write(str(self.settings.f) + eol)
+        else:
+            f.write(eol)
+            f.write(eol)
+            f.write(eol)
+            f.write(eol)
 
         if pos is not None:
             f.write("x" + eol)
@@ -287,6 +292,12 @@ class Spectrum(QObject):
             f.write(str(data[i][0]) + "," + str(data[i][1]) + eol)
 
         f.close()
+
+    @pyqtSlot(np.ndarray, str)
+    def save_lockin_data(self, spec, filename):
+        wl = self._spectrometer.GetWavelength()
+        data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
+        np.savetxt(filename, data, delimiter="\t")
 
     def reset(self):
         self.dark = None
