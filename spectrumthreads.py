@@ -277,7 +277,7 @@ class SearchThread(MeasurementThread):
                 spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
-                measured[k] = np.max(spec[400:800])
+                measured[k] = np.max(spec[100:1900])
                 #measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
