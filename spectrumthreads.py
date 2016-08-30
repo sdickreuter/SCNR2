@@ -94,7 +94,6 @@ class LiveThread(MeasurementThread):
 
     def work(self):
         self.specSignal.emit(self.spec)
-        print('spec emitted')
 
     @pyqtSlot()
     def process(self):
@@ -111,7 +110,6 @@ class ImageThread(MeasurementThread):
 
     def work(self):
         self.specSignal.emit(self.spec)
-        print('spec emitted')
 
     @pyqtSlot()
     def process(self):
@@ -141,7 +139,6 @@ class MeanThread(MeasurementThread):
         self.mean = (self.mean + self.spec)  # / 2
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        print('progress emitted')
         self.i += 1
         self.specSignal.emit(self.mean / (self.i))
         if self.i >= (self.number_of_samples):
@@ -181,10 +178,10 @@ class LockinThread(MeasurementThread):
             x= np.arange(0, self.number_of_samples)
             ref = np.cos(2 * np.pi * x * self.settings.f)
             buf = ref * self.lockin[i, :]
-            # buf = np.sum(buf)
-            p0 = [self.settings.f, np.max(buf)-np.min(buf),np.mean(buf)]
-            popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
-            res[i] = -popt[2]
+            buf = np.sum(buf)
+            #p0 = [self.settings.f, np.max(buf)-np.min(buf),np.mean(buf)]
+            #popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
+            #res[i] = -popt[2]
             res[i] = buf
 
         # i = 1000

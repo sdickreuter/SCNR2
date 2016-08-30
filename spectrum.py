@@ -206,7 +206,6 @@ class Spectrum(QObject):
         self.workingthread.saveSignal.connect(self.save_spectrum)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)
-        print("Starting Scan")
         self.workingthread.start()
 
     @pyqtSlot(np.ndarray)
@@ -297,7 +296,7 @@ class Spectrum(QObject):
     def save_lockin_data(self, spec, filename):
         wl = self._spectrometer.GetWavelength()
         data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
-        np.savetxt(filename, data, delimiter="\t")
+        np.savetxt(self.save_path + filename, data, delimiter="\t")
 
     def reset(self):
         self.dark = None
