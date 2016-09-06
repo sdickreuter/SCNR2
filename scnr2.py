@@ -144,7 +144,8 @@ class SCNR(QMainWindow):
                     self.ui.searchmax_button.setEnabled(True)
                     self.ui.stage_frame.setEnabled(True)
                     self.ui.search_checkBox.setEnabled(True)
-                    # self.ui.lockin_checkBox.setEnabled(True)
+                    self.ui.lockin_button.setDisabled(True)
+                    self.ui.lockin_checkBox.setDisabled(True)
                 else:
                     self.stage = None
                     QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
@@ -337,6 +338,8 @@ class SCNR(QMainWindow):
         self.ui.stepup_button.setDisabled(True)
         self.ui.stepdown_button.setDisabled(True)
         self.ui.temp_button.setDisabled(True)
+        self.ui.lockin_button.setDisabled(True)
+        self.ui.lockin_checkBox.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
 
     @pyqtSlot()
@@ -349,6 +352,8 @@ class SCNR(QMainWindow):
             self.ui.stepup_button.setDisabled(False)
             self.ui.stepdown_button.setDisabled(False)
             self.ui.addpos_button.setDisabled(False)
+            self.ui.lockin_button.setDisabled(False)
+            self.ui.lockin_checkBox.setDisabled(False)
         self.ui.stop_button.setDisabled(True)
         self.pad_active = True
 
