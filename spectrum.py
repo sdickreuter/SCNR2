@@ -193,7 +193,6 @@ class Spectrum(QObject):
         self.save_path = savedir
         self.save_data(savedir)
         self.positions = positions
-        print(positions)
         if with_lockin:
             return True
         elif with_search:

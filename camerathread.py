@@ -30,7 +30,7 @@ class CameraThread(QObject):
                 self._cam = xi.Xi_Camera(DevID=0)
                 self._cam.set_debug_level("Warning")
                 self._cam.set_param('exposure', self.exposure_us)
-                self._cam.set_param('aeag', 1)
+                self._cam.set_param('aeag', 0)
                 self._cam.set_param('exp_priority', 0)
                 #self._cam.set_binning(2, skipping=False)
                 self._cam.set_param('imgdataformat',2)

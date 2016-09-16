@@ -202,7 +202,7 @@ class LockinThread(MeasurementThread):
 
     def work(self):
 
-        ref = np.cos(2 * np.pi * self.i * self.settings.f)+1
+        ref = np.cos(2 * np.pi * self.i * self.settings.f)*2#+1
         self.move_stage(ref)
         spec = self.spectrometer.TakeSingleTrack()
         self.lockin[:, self.i] = spec
@@ -374,6 +374,7 @@ class ScanSearchThread(ScanThread):
         super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, stage)
         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
         self.searchthread.specSignal.connect(self.specslot)
+        self.searchthread.finishSignal.connect(self.searchfinishslot)
 
     def stop(self):
         self.searchthread.stop()
@@ -389,6 +390,10 @@ class ScanSearchThread(ScanThread):
     @pyqtSlot(np.ndarray)
     def specslot(self, spec):
         self.specSignal.emit(spec)
+
+    @pyqtSlot(np.ndarray)
+    def searchfinishslot(self, pos):
+        print(pos)
 
 
 class ScanLockinThread(ScanThread):

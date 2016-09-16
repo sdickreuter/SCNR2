@@ -626,11 +626,11 @@ class SCNR(QMainWindow):
             c = np.ravel(positions[2, :])
             grid = np.zeros((xl * yl, 2))
             if abs(b[0]) > abs(c[0]):
-                grid_vec_1 = [b[0] - a[0], b[1] - a[1]]
-                grid_vec_2 = [c[0] - a[0], c[1] - a[1]]
-            else:
                 grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
                 grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
+            else:
+                grid_vec_1 = [b[0] - a[0], b[1] - a[1]]
+                grid_vec_2 = [c[0] - a[0], c[1] - a[1]]
 
             i = 0
             for x in range(xl):
@@ -696,6 +696,7 @@ class SCNR(QMainWindow):
     def on_grating_changed(self, index):
         self.spectrometer.SetGrating(index + 1)
 
+    @pyqtSlot()
     @pyqtSlot()
     def on_exposure_time_edited(self):
         self.settings.cam_exposure_time = self.ui.exposure_time_spin.value()
