@@ -57,12 +57,13 @@ class SCNR(QMainWindow):
         self.settings = settings.Settings()
 
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
-        self.ui.centre_wavelength_spin.setValue(650)
+        self.ui.centre_wavelength_spin.setValue(700)
 
         self.ui.rasterdim_spin.setValue(self.settings.rasterdim)
         self.ui.rasterwidth_spin.setValue(self.settings.rasterwidth)
         self.ui.search_int_time_spin.setValue(self.settings.search_integration_time)
         self.ui.sigma_spin.setValue(self.settings.sigma)
+        self.ui.exposure_time_spin.setValue(self.settings.cam_exposure_time)
 
         self.pw = pg.PlotWidget()
         # vb = CustomViewBox()
@@ -626,11 +627,11 @@ class SCNR(QMainWindow):
             c = np.ravel(positions[2, :])
             grid = np.zeros((xl * yl, 2))
             if abs(b[0]) > abs(c[0]):
-                grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
-                grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
-            else:
                 grid_vec_1 = [b[0] - a[0], b[1] - a[1]]
                 grid_vec_2 = [c[0] - a[0], c[1] - a[1]]
+            else:
+                grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
+                grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
 
             i = 0
             for x in range(xl):

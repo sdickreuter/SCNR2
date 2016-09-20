@@ -8,7 +8,7 @@ from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject#, QMutex
 
 class CameraThread(QObject):
     ImageReadySignal = pyqtSignal(np.ndarray)
-    exposure_us = 100
+    exposure_us = 150000
     #mutex = QMutex()
     enabled = False
 
