@@ -64,6 +64,7 @@ class SCNR(QMainWindow):
         self.ui.search_int_time_spin.setValue(self.settings.search_integration_time)
         self.ui.sigma_spin.setValue(self.settings.sigma)
         self.ui.exposure_time_spin.setValue(self.settings.cam_exposure_time)
+        self.ui.label_stepsize.setText(str(self.settings.stepsize))
 
         self.pw = pg.PlotWidget()
         # vb = CustomViewBox()
