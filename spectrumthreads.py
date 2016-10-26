@@ -170,39 +170,31 @@ class LockinThread(MeasurementThread):
         self.stage.moveabs(x=x, y=y, z=z)
 
     def calc_lockin(self):
-        def cos_fit(x, freq, amplitude, offset):
-            return (np.cos(2 * np.pi * x * freq + 0))**2 * amplitude + offset
 
         res = np.zeros(self.spectrometer._width)
         for i in range(self.spectrometer._width):
-            x= np.arange(0, self.number_of_samples)
-            ref = np.cos(2 * np.pi * x * self.settings.f)
-            buf = ref * self.lockin[i, :]
-            buf = np.sum(buf)
-            #p0 = [self.settings.f, np.max(buf)-np.min(buf),np.mean(buf)]
-            #popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
-            #res[i] = -popt[2]
-            res[i] = buf
+            d = np.abs(np.fft.rfft(self.lockin[i, :]))
+            f = np.fft.rfftfreq(d.shape[0])
+            res[i] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
 
-        # i = 1000
-        # x = np.arange(0, self.number_of_samples)
-        # ref = np.cos(2 * np.pi * x * self.settings.f)
-        # buf = ref * self.lockin[i, :]
-        # p0 = [self.settings.f, (np.max(buf) - np.min(buf))/2, np.mean(buf)]
-        # popt, pcov = opt.curve_fit(cos_fit, x, buf, p0=p0)
-        # print(popt)
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111)
-        # ax.plot(x, buf, 'bo')
-        # ax.plot(x, cos_fit(x, *popt), 'g-')
-        # plt.savefig("search_max/lockin.png")
-        # plt.close()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        indices= [300,800,1200,1600]
+        for i in indices:
+            x = np.arange(0, self.number_of_samples)
+            ref = np.cos(2 * np.pi * x * self.settings.f*2+np.pi)
+            buf = self.lockin[i, :]
+            buf = buf - np.min(buf)
+            ax.plot(x, buf/np.max(buf))
+        #ax.plot(x, ref/np.max(ref), 'g-')
+        plt.savefig("search_max/lockin.png")
+        plt.close()
 
         return res
 
     def work(self):
 
-        ref = np.cos(2 * np.pi * self.i * self.settings.f)*2#+1
+        ref = np.cos(2 * np.pi * self.i * self.settings.f)#+1
         self.move_stage(ref)
         spec = self.spectrometer.TakeSingleTrack()
         self.lockin[:, self.i] = spec
@@ -216,7 +208,7 @@ class LockinThread(MeasurementThread):
             self.spec = self.calc_lockin()
             self.specSignal.emit(self.spec)
             self.finishSignal.emit(self.lockin)
-            self.stage.moveabs(x=self.startpos[0], y=self.startpos[1])
+            self.stage.moveabs(x=self.startpos[0], y=self.startpos[1], z=self.startpos[2])
             self.stop()
 
 class SearchThread(MeasurementThread):
