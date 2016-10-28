@@ -287,10 +287,12 @@ class SearchThread(MeasurementThread):
                 # print(perr)
                 if perr[0] > 10000 or perr[1] > 1 or perr[2] > 1:
                     print("Could not determine particle position: Variance too big")
-                elif popt[0] < 1e-1:
+                elif popt[0] < 1:
                     print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
                     print("Could not determine particle position: Peak outside bounds")
+                elif popt[2] < self.settings.sigma/2:
+                    print("Could not determine particle position: Peak to narrow")
                 else:
                     fitted = True
             except RuntimeError as e:

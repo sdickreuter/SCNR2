@@ -627,8 +627,8 @@ class SCNR(QMainWindow):
             b = np.ravel(positions[1, :])
             c = np.ravel(positions[2, :])
             grid = np.zeros((xl * yl, 2))
-            grid_vec_1 = [b[0] - a[0], b[1] - a[1]]
-            grid_vec_2 = [c[0] - a[0], c[1] - a[1]]
+            grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
+            grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
 
             i = 0
             for x in range(xl):
