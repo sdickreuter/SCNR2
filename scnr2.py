@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import signal
 import time
 from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
@@ -753,9 +752,11 @@ def sigint_handler(*args):
 
 if __name__ == '__main__':
     import sys
+    import signal
+
+    signal.signal(signal.SIGINT, sigint_handler)
 
     try:
-        signal.signal(signal.SIGINT, sigint_handler)
         app = QApplication(sys.argv)
         timer = QTimer()
         timer.start(500)  # You may change this if you wish.
@@ -764,18 +765,12 @@ if __name__ == '__main__':
         main.show()
     except Exception as e:
         print(e)
-        sys.exit(1)
 
     try:
         res = app.exec()
     except Exception as e:
         print(e)
-        sys.exit(1)
-    finally:
-        # if init_spectrometer:
-        #    spectrometer.Shutdown()
-        # spectrometer = None
-        print(1)
+
     sys.exit(0)
 
     # try:
