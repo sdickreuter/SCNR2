@@ -27,7 +27,7 @@ class SpectrometerServer:
 
         print("You can now start the Graphical User Interface.")
         print("IMPORTANT:")
-        print("After you have finished please close this program by pressing CTRL+C")
+        print("After you have finished please close this program by pressing CTRL+C\nand wait for detector warmup")
 
 
     def __del__(self):

@@ -76,7 +76,7 @@ class SpectrometerClient:
             self.socket.send_pyobj((req,param))
             sent = True
 
-        if self.in_poller.poll(120*1000):
+        if self.in_poller.poll(320*1000):
             data = self.socket.recv_pyobj()
             received = True
 

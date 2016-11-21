@@ -4,7 +4,7 @@ import numpy as np
 import time
 from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
-    QMessageBox
+    QMessageBox, QGridLayout
 import pyqtgraph as pg
 
 # from PyQt5 import uic
@@ -111,9 +111,14 @@ class SCNR(QMainWindow):
             self.cammarker = movableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=25)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
-            l2 = QVBoxLayout(self.ui.camwidget)
+
+            l2 = QGridLayout()
             l2.setSpacing(0)
             l2.addWidget(gv2)
+
+            w = pg.HistogramLUTWidget()
+            l2.addWidget(w, 0, 1)
+
             try:
                 self.cam = camerathread.CameraThread()
             except:
@@ -758,9 +763,9 @@ if __name__ == '__main__':
 
     try:
         app = QApplication(sys.argv)
-        timer = QTimer()
-        timer.start(500)  # You may change this if you wish.
-        timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
+        #timer = QTimer()
+        #timer.start(500)  # You may change this if you wish.
+        #timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
         main = SCNR()
         main.show()
     except Exception as e:
