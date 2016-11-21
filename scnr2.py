@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
     QMessageBox, QGridLayout
 import pyqtgraph as pg
+from skimage import exposure
 
 # from PyQt5 import uic
 # Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
@@ -107,17 +108,17 @@ class SCNR(QMainWindow):
             vb2 = pg.ViewBox()
             self.img = pg.ImageItem()
             vb2.addItem(self.img)
-            # self.cammarker = pg.ROI([self.settings.cammarker_x, self.settings.cammarker_y], [15, 15], pen=pg.mkPen('g'))
             self.cammarker = movableCrosshair(pos=[self.settings.cammarker_x, self.settings.cammarker_y], size=25)
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
 
-            l2 = QGridLayout()
+            l2 = QGridLayout(self.ui.camwidget)
             l2.setSpacing(0)
-            l2.addWidget(gv2)
+            l2.addWidget(gv2, 0, 0)
 
-            w = pg.HistogramLUTWidget()
-            l2.addWidget(w, 0, 1)
+            #w = pg.HistogramLUTWidget()
+            #l2.addWidget(w, 0, 1)
+            #w.setImageItem(self.img)
 
             try:
                 self.cam = camerathread.CameraThread()
@@ -287,7 +288,10 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
-        self.img.setImage(img)
+        plow, phigh = np.percentile(img, (1, 99))
+        img = exposure.rescale_intensity(img, in_range=(plow, phigh))
+
+        self.img.setImage(img,autoLevels=True,autoDownsample = True)
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
