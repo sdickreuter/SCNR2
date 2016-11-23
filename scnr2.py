@@ -116,9 +116,9 @@ class SCNR(QMainWindow):
             l2.setSpacing(0)
             l2.addWidget(gv2, 0, 0)
 
-            #w = pg.HistogramLUTWidget()
-            #l2.addWidget(w, 0, 1)
-            #w.setImageItem(self.img)
+            w = pg.HistogramLUTWidget()
+            l2.addWidget(w, 0, 1)
+            w.setImageItem(self.img)
 
             try:
                 self.cam = camerathread.CameraThread()
@@ -288,8 +288,8 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
-        plow, phigh = np.percentile(img, (1, 99))
-        img = exposure.rescale_intensity(img, in_range=(plow, phigh))
+        #plow, phigh = np.percentile(img, (2, 98))
+        #img = exposure.rescale_intensity(img, in_range=(plow, phigh))
 
         self.img.setImage(img,autoLevels=True,autoDownsample = True)
 
@@ -324,6 +324,8 @@ class SCNR(QMainWindow):
     @pyqtSlot(np.ndarray)
     def on_update_spectrum(self, spec):
         if self.spectrometer.mode == "Image":
+            #plow, phigh = np.percentile(spec, (2, 98))
+            #spec = exposure.rescale_intensity(spec, in_range=(plow, phigh))
             self.detector_img.setImage(spec)
         elif self.spectrometer.mode == 'SingleTrack':
             self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
