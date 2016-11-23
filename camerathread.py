@@ -34,6 +34,7 @@ class CameraThread(QObject):
                 self._cam.set_param('exp_priority', 0)
                 #self._cam.set_binning(2, skipping=False)
                 self._cam.set_param('imgdataformat',2)
+                self._cam.set_param('buffers_queue_size',1)
                 self._cam.get_image()
 
                 self.thread.started.connect(self.process)
