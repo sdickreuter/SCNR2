@@ -9,7 +9,7 @@ from PyQt5.QtCore import pyqtSignal
 Ui_SettingsDialog = uic.loadUiType("gui/settingsdialog.ui")[0]
 Ui_SpanGridDialog = uic.loadUiType("gui/griddialog.ui")[0]
 Ui_SlitWidthDialog = uic.loadUiType("gui/slitwidthdialog.ui")[0]
-
+Ui_StartUpDialog = uic.loadUiType("gui/startup.ui")[0]
 
 class Settings_Dialog(QDialog):
     updateSignal = pyqtSignal()
@@ -62,8 +62,6 @@ class SlitWidth_Dialog(QDialog):
         self.hide()
 
 
-
-
 class SpanGrid_Dialog(QDialog):
     def __init__(self,settings, parent = None):
         super(SpanGrid_Dialog, self).__init__(parent)
@@ -79,7 +77,22 @@ class SpanGrid_Dialog(QDialog):
         return (dialog.ui.x_spin.value(), dialog.ui.y_spin.value(), result == QDialog.Accepted)
 
 
-#
+class StartUp_Dialog(QDialog):
+    def __init__(self, settings, parent=None):
+        super(StartUp_Dialog, self).__init__(parent)
+        self.ui = Ui_StartUpDialog()
+        self.ui.setupUi(self)
+
+    # static method to create the dialog and return (x steps, y steps, accepted)
+    @staticmethod
+    def getOptions(parent=None):
+        dialog = StartUp_Dialog(parent)
+        result = dialog.exec_()
+        return (dialog.ui.setup_combobox.currentIndex, dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), result == QDialog.Accepted)
+
+
+
+                #
 # class DirectionDialog(Gtk.Dialog):
 #     def __init__(self, parent, settings):
 #         self.settings = settings

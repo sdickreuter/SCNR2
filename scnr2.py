@@ -51,6 +51,21 @@ class SCNR(QMainWindow):
     def __init__(self, parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
+
+        setup, stage, cam, ok = dialogs.StartUp_Dialog.getOptions()
+
+        if ok:
+            init_cam = cam
+            init_stage = stage
+            if setup == 0: # Microscope Setup
+                coord_mapping = {"x":"x","y":"y","z":"z"}
+            elif setup == 1: #Freespace Setup
+                coord_mapping = {"x":"z","y":"y","z":"x"}
+            else:
+                raise RuntimeError("Setup not specified!")
+        else:
+            super(SCNR, self).close()
+
         self.ui.setupUi(self)
 
         # init settings
@@ -138,7 +153,7 @@ class SCNR(QMainWindow):
         # init stage
         if init_stage:
             try:
-                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coord_mapping)
                 # self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except:
                 self.stage = None
