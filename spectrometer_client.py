@@ -187,7 +187,7 @@ class SpectrometerClient:
             print('Communication Error')
 
     def TakeSingleTrack(self):
-        return self.make_request('takesingletrack',None)
+        return np.mean(self.make_request('takesingletrack',None),axis=1)
 
 if __name__ == '__main__':
     client = SpectrometerClient()
