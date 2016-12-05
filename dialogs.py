@@ -88,7 +88,7 @@ class StartUp_Dialog(QDialog):
     def getOptions(parent=None):
         dialog = StartUp_Dialog(parent)
         result = dialog.exec_()
-        return (dialog.ui.setup_combobox.currentIndex, dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), result == QDialog.Accepted)
+        return dialog.ui.setup_combobox.currentIndex(), dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), QDialog.Accepted
 
 
 

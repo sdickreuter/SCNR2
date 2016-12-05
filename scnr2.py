@@ -53,6 +53,7 @@ class SCNR(QMainWindow):
         self.ui = Ui_MainWindow()
 
         setup, stage, cam, ok = dialogs.StartUp_Dialog.getOptions()
+        print(setup)
 
         if ok:
             init_cam = cam
@@ -62,7 +63,9 @@ class SCNR(QMainWindow):
             elif setup == 1: #Freespace Setup
                 coord_mapping = {"x":"z","y":"y","z":"x"}
             else:
-                raise RuntimeError("Setup not specified!")
+                #raise RuntimeError("Setup not specified!")
+                print("Setup not specified, quitting.")
+                super(SCNR, self).close()
         else:
             super(SCNR, self).close()
 
@@ -97,9 +100,15 @@ class SCNR(QMainWindow):
         self.slitmarker = xmovableCrosshair(pos=[self.settings.slitmarker_x, self.settings.slitmarker_y], size=15)
         vb.addItem(self.slitmarker)
         gv.setCentralWidget(vb)
-        l = QVBoxLayout(self.ui.detectorwidget)
+        l = QGridLayout(self.ui.detectorwidget)
         l.setSpacing(0)
-        l.addWidget(gv)
+        l.addWidget(gv, 0, 0)
+
+        w = pg.HistogramLUTWidget()
+        l.addWidget(w, 0, 1)
+        w.setImageItem(self.detector_img)
+
+
         # self.pw.setLabel('left', 'y', units='px')
         # self.pw.setLabel('bottom', 'x', units='px')
 
@@ -319,7 +328,7 @@ class SCNR(QMainWindow):
         #plow, phigh = np.percentile(img, (2, 98))
         #img = exposure.rescale_intensity(img, in_range=(plow, phigh))
 
-        self.img.setImage(img,autoLevels=True,autoDownsample = True)
+        self.img.setImage(img,autoLevels=False,autoDownsample = True)
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
@@ -354,7 +363,7 @@ class SCNR(QMainWindow):
         if self.spectrometer.mode == "Image":
             #plow, phigh = np.percentile(spec, (2, 98))
             #spec = exposure.rescale_intensity(spec, in_range=(plow, phigh))
-            self.detector_img.setImage(spec)
+            self.detector_img.setImage(spec,autoLevels=False)
         elif self.spectrometer.mode == 'SingleTrack':
             self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
 
