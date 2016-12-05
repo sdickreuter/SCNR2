@@ -159,16 +159,24 @@ class SCNR(QMainWindow):
                 self.stage = None
                 # self.stage = PIStage.Dummy()
                 # print("Could not initialize PIStage, using Dummy instead")
-            if not self.stage is None:
+            if self.stage is not None:
                 if self.stage.is_initialized:
                     self.ui.addpos_button.setEnabled(True)
                     self.ui.scanning_tab.setEnabled(True)
                     self.ui.searchmax_button.setEnabled(True)
                     self.ui.stage_frame.setEnabled(True)
                     self.ui.search_checkBox.setEnabled(True)
+                    self.ui.lockin_button.setEnabled(True)
+                    self.ui.lockin_checkBox.setEnabled(True)
+                else:
+                    self.ui.addpos_button.setDisabled(True)
+                    self.ui.scanning_tab.setDisabled(True)
+                    self.ui.searchmax_button.setDisabled(True)
+                    self.ui.stage_frame.setDisabled(True)
+                    self.ui.search_checkBox.setDisabled(True)
                     self.ui.lockin_button.setDisabled(True)
                     self.ui.lockin_checkBox.setDisabled(True)
-                else:
+
                     self.stage = None
                     QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
 
@@ -275,6 +283,8 @@ class SCNR(QMainWindow):
         self.ui.mean_button.setEnabled(True)
         self.ui.series_button.setEnabled(True)
         self.ui.searchmax_button.setEnabled(True)
+        self.ui.lockin_button.setEnabled(True)
+
 
         self.ui.left_tab.setCurrentIndex(0)
 
@@ -285,6 +295,7 @@ class SCNR(QMainWindow):
         self.ui.mean_button.setEnabled(False)
         self.ui.series_button.setEnabled(False)
         self.ui.searchmax_button.setEnabled(False)
+        self.ui.lockin_button.setEnabled(False)
 
         self.spectrometer.SetSlitWidth(2500)
         self.ui.slitwidth_spin.setValue(2500)
