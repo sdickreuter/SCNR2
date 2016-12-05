@@ -267,8 +267,10 @@ class SCNR(QMainWindow):
     def on_mode_changed(self, index):
         if init_spectrometer:
             if index == 0:
+                self.spectrometer.AbortAcquisition()
                 self.setSpectrumMode()
             elif index == 1:
+                self.spectrometer.AbortAcquisition()
                 self.setImageMode()
 
     def setSpectrumMode(self):
