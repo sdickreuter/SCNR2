@@ -190,13 +190,13 @@ class SpectrometerClient:
     def TakeSingleTrack(self):
         #return np.mean(self.make_request('takesingletrack',None),axis=1)
         spec = self.make_request('takesingletrack',None)
-        #print(spec.shape)
-        f = plt.figure()
-        for i in range(spec.shape[1]):
-            plt.plot(spec[:,i])
-
-        plt.savefig('singletrack.png')
-        plt.close()
+        # for debuggin purposes
+        # f = plt.figure()
+        # for i in range(spec.shape[1]):
+        #     plt.plot(spec[:,i])
+        #
+        # plt.savefig('singletrack.png')
+        # plt.close()
         return np.mean(spec, axis=1)
         #return np.mean(spec[:, 1:(spec.shape[1] - 1)], axis=1)
         #return spec[:,1]

@@ -34,7 +34,8 @@ class CameraThread(QObject):
                 self._cam.set_param('exp_priority', 0)
                 #self._cam.set_binning(2, skipping=False)
                 #self._cam.set_param('imgdataformat',2) # RGB24
-                self._cam.set_param('imgdataformat', 6) # RAW16 (monochrome)
+                #self._cam.set_param('imgdataformat', 6) # RAW16 (monochrome)
+                self._cam.set_param('imgdataformat', 1) # MONO16
 
                 self._cam.set_param('buffers_queue_size',1)
                 self._cam.get_image()
