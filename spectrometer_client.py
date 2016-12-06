@@ -7,6 +7,7 @@ import time
 import subprocess
 import os
 
+from matplotlib import pyplot as plt
 
 class SpectrometerClient:
 
@@ -190,8 +191,15 @@ class SpectrometerClient:
         #return np.mean(self.make_request('takesingletrack',None),axis=1)
         spec = self.make_request('takesingletrack',None)
         #print(spec.shape)
-        #return np.mean(spec[:,1:(spec.shape[1]-1)], axis=1)
-        return spec[:,1]
+        f = plt.figure()
+        for i in range(spec.shape[1]):
+            plt.plot(spec[:,i])
+
+        plt.savefig('singletrack.png')
+        plt.close()
+        return np.mean(spec, axis=1)
+        #return np.mean(spec[:, 1:(spec.shape[1] - 1)], axis=1)
+        #return spec[:,1]
 
 if __name__ == '__main__':
     client = SpectrometerClient()
