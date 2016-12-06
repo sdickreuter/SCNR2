@@ -52,12 +52,12 @@ class SCNR(QMainWindow):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
 
-        setup, stage, cam, ok = dialogs.StartUp_Dialog.getOptions()
+        setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
         print(setup)
 
         if ok:
-            init_cam = cam
-            init_stage = stage
+            init_cam = cam_ok
+            init_stage = stage_ok
             if setup == 0: # Microscope Setup
                 coord_mapping = {"x":"x","y":"y","z":"z"}
             elif setup == 1: #Freespace Setup
@@ -162,9 +162,10 @@ class SCNR(QMainWindow):
         # init stage
         if init_stage:
             try:
-                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coord_mapping)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping)
                 # self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
-            except:
+            except Exception as e:
+                print(e)
                 self.stage = None
                 # self.stage = PIStage.Dummy()
                 # print("Could not initialize PIStage, using Dummy instead")
