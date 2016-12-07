@@ -276,8 +276,8 @@ class SearchThread(MeasurementThread):
             minval = np.min(measured)
             maxval = np.max(measured)
             initial_guess = (maxval - minval, pos[maxind], self.settings.sigma, minval)
-            dx = origin[0]
-            dy = origin[1]
+            #dx = origin[0]
+            #dy = origin[1]
             popt = None
             fitted = False
             try:
@@ -302,10 +302,11 @@ class SearchThread(MeasurementThread):
             if fitted:
                 if j % 2:
                     dx = float(popt[1])
+                    self.stage.moveabs(x=dx)
                 else:
                     dy = float(popt[1])
+                    self.stage.moveabs(y=dy)
 
-            self.stage.moveabs(x=dx, y=dy)
             fig = plt.figure()
             ax = fig.add_subplot(111)
             ax.plot(pos, measured, 'bo')

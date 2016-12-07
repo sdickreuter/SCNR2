@@ -197,6 +197,7 @@ class SpectrometerClient:
         #
         # plt.savefig('singletrack.png')
         # plt.close()
+        spec = np.flipud(spec) # After changing Calibration with Andor Solis, data is now flipped, has to be flipped back
         return np.mean(spec, axis=1)
         #return np.mean(spec[:, 1:(spec.shape[1] - 1)], axis=1)
         #return spec[:,1]

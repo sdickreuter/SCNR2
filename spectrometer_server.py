@@ -125,8 +125,8 @@ class SpectrometerServer:
 
             elif msg == 'takesingletrack':
                 #self.send_array(self.spectrometer.TakeSingleTrack())
+                #self.send_object(self.spectrometer.TakeSingleTrack())
                 self.send_object(self.spectrometer.TakeSingleTrack())
-
             else:
                 self.send_object('?')
 
