@@ -68,6 +68,7 @@ class Spectrum(QObject):
             self.workingthread.stop()
             self.workingthread.thread.wait(500)
             self.workingthread = None
+            #self._spectrometer.AbortAcquisition()
         except Exception as e:
             print(e)
         self.enableButtons.emit()

@@ -279,16 +279,13 @@ class SCNR(QMainWindow):
             if index == 0:
                 self.spectrometer.AbortAcquisition()
                 self.setSpectrumMode()
+                time.sleep(0.5)
             elif index == 1:
                 self.spectrometer.AbortAcquisition()
                 self.setImageMode()
+                time.sleep(0.5)
 
     def setSpectrumMode(self):
-        self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
-        self.spectrometer.SetSlitWidth(self.settings.slit_width)
-        self.ui.slitwidth_spin.setValue(self.settings.slit_width)
-        self.spectrometer.SetSingleTrack()
-
         self.ui.dark_button.setEnabled(True)
         self.ui.bg_button.setEnabled(True)
         self.ui.ref_button.setEnabled(True)
@@ -297,6 +294,10 @@ class SCNR(QMainWindow):
         self.ui.searchmax_button.setEnabled(True)
         self.ui.lockin_button.setEnabled(True)
 
+        self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
+        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        self.ui.slitwidth_spin.setValue(self.settings.slit_width)
+        self.spectrometer.SetSingleTrack()
 
         self.ui.left_tab.setCurrentIndex(0)
 
@@ -733,6 +734,7 @@ class SCNR(QMainWindow):
     def on_slit_width_edited(self):
         self.settings.slit_width = self.ui.slitwidth_spin.value()
         self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
+        time.sleep(0.5)
 
     @pyqtSlot()
     def on_centre_wavelength_edited(self):
