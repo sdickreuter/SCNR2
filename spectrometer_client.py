@@ -88,6 +88,21 @@ class SpectrometerClient:
             self.lock.release()
             raise KeyboardInterrupt()
 
+    def _return_value_is_ok(self, ret):
+        if type(ret) is str:
+            if not ret == 'ok':
+                print('Communication Error')
+                return False
+        else:
+            print('Communiction out of sync, please retry')
+            return False
+        return True
+
+    def _return_value_is_data(self, ret):
+        if type(ret) is not np.ndarray:
+            print('Communiction out of sync, please retry')
+            return False
+        return True
 
     def run(self):
             #while True:
@@ -127,31 +142,30 @@ class SpectrometerClient:
 
     def SetGrating(self, grating):
         ret = self.make_request('setgrating',grating)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def AbortAcquisition(self):
         ret = self.make_request('abortacquisition',None)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def SetNumberAccumulations(self, number):
         ret = self.make_request('setnumberaccumulations',number)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def SetExposureTime(self, seconds):
         ret = self.make_request('setexposuretime',seconds)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def SetSlitWidth(self, slitwidth):
         ret = self.make_request('setslitwidth',slitwidth)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def _GetWavelength(self):
-        return self.make_request('getwavelength',None)
+        ret = self.make_request('getwavelength',None)
+        if self._return_value_is_data(ret):
+            return ret
+        else:
+            return None
 
     def GetWavelength(self):
         return self.wl
@@ -159,33 +173,40 @@ class SpectrometerClient:
     def SetFullImage(self):
         self.mode = 'Image'
         ret = self.make_request('setfullimage',None)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def TakeFullImage(self):
-        return self.make_request('takefullimage',None)
+        ret = self.make_request('takefullimage',None)
+        if self._return_value_is_data(ret):
+            return ret
+        else:
+            return None
 
     def SetCentreWavelength(self, wavelength):
         ret = self.make_request('setcentrewavelength',wavelength)
-        self.wl = self._GetWavelength()
-        if not ret == 'ok':
-            print('Communication Error')
+        wl = self._GetWavelength()
+        if wl is not None:
+            self.wl = wl
+        else:
+            raise RuntimeError("Communication out of Sync, cannot get wavelength. Quitting ...")
+        self._return_value_is_ok(ret)
 
     def SetImageofSlit(self):
         self.mode = 'Image'
         ret = self.make_request('setimageofslit',None)
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def TakeImageofSlit(self):
-        return self.make_request('takeimageofslit',None)
-
+        ret = self.make_request('takeimageofslit',None)
+        if self._return_value_is_data(ret):
+            return ret
+        else:
+            return None
 
     def SetSingleTrack(self, hstart=None, hstop=None):
         self.mode = 'SingleTrack'
         ret = self.make_request('setsingletrack',(hstart,hstop))
-        if not ret == 'ok':
-            print('Communication Error')
+        self._return_value_is_ok(ret)
 
     def TakeSingleTrack(self):
         #return np.mean(self.make_request('takesingletrack',None),axis=1)
@@ -197,8 +218,11 @@ class SpectrometerClient:
         #
         # plt.savefig('singletrack.png')
         # plt.close()
-        spec = np.flipud(spec) # After changing Calibration with Andor Solis, data is now flipped, has to be flipped back
-        return np.mean(spec, axis=1)
+        if self._return_value_is_data(spec):
+            spec = np.flipud(spec)  # After changing Calibration with Andor Solis, data is now flipped, has to be flipped back
+            return np.mean(spec, axis=1)
+        else:
+            return None
         #return np.mean(spec[:, 1:(spec.shape[1] - 1)], axis=1)
         #return spec[:,1]
 
