@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1121, 937)
+        MainWindow.resize(1121, 970)
         MainWindow.setWindowTitle("SCRN2")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/gui/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -683,7 +683,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.right_tab.setCurrentIndex(0)
+        self.right_tab.setCurrentIndex(2)
         self.left_tab.setCurrentIndex(0)
         self.scan_button.clicked.connect(MainWindow.on_start_scan_clicked)
         self.stop_button.clicked.connect(MainWindow.on_stop_clicked)
@@ -728,6 +728,7 @@ class Ui_MainWindow(object):
         self.savesettings_button.clicked.connect(MainWindow.on_savesettings_clicked)
         self.temp_button.clicked.connect(MainWindow.on_temp_clicked)
         self.lockin_button.clicked.connect(MainWindow.on_lockin_clicked)
+        self.search_int_time_spin.editingFinished.connect(MainWindow.on_search_int_time_edited)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

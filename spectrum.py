@@ -153,6 +153,7 @@ class Spectrum(QObject):
         self.workingthread.start()
 
     def search_max(self):
+        print(self.settings.search_integration_time)
         self.workingthread = SearchThread(self._spectrometer, self.settings, self.stage)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)

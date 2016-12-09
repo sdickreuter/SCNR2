@@ -299,7 +299,7 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.spectrometer.SetSingleTrack()
 
-        self.ui.left_tab.setCurrentIndex(0)
+        #self.ui.left_tab.setCurrentIndex(0)
 
     def setImageMode(self):
         self.ui.dark_button.setDisabled(True)
@@ -318,7 +318,7 @@ class SCNR(QMainWindow):
         #    self.spectrometer.SetImageofSlit()
         # elif self.ui.image_combobox.currentIndex() ==1:
         #    self.spectrometer.SetFullImage()
-        self.ui.left_tab.setCurrentIndex(2)
+        #self.ui.left_tab.setCurrentIndex(2)
 
     # ----- END Slot for Detektor Mode
 
