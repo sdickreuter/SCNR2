@@ -72,9 +72,11 @@ class MeasurementThread(QObject):
     @pyqtSlot()
     def stop(self):
         self.abort = True
-        self.thread.quit()
-        self.thread.wait(1000)
-        self.spectrometer.AbortAcquisition()
+        #self.spectrometer.AbortAcquisition()
+
+        self.thread.wait(self.spectrometer.exposure_time*1000+500)
+        #self.thread.quit()
+        #print("Done with thread")
 
     def __del__(self):
         self.__class__.has_instance = False
@@ -94,7 +96,11 @@ class MeasurementThread(QObject):
 class LiveThread(MeasurementThread):
 
     def work(self):
-        self.specSignal.emit(self.spec)
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
 
     @pyqtSlot()
     def process(self):
@@ -110,7 +116,11 @@ class LiveThread(MeasurementThread):
 class ImageThread(MeasurementThread):
 
     def work(self):
-        self.specSignal.emit(self.spec)
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
 
     @pyqtSlot()
     def process(self):
@@ -137,12 +147,16 @@ class MeanThread(MeasurementThread):
 
     def work(self):
         self.spec = self.spectrometer.TakeSingleTrack()
-        print('Spectrum aquired' +str(self.spec.shape))
-        self.mean = (self.mean + self.spec)  # / 2
-        self.progress.next()
-        self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        self.i += 1
-        self.specSignal.emit(self.mean / (self.i))
+        if self.spec is not None:
+            print('Spectrum aquired' +str(self.spec.shape))
+            self.mean = (self.mean + self.spec)  # / 2
+            self.progress.next()
+            self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+            self.i += 1
+            self.specSignal.emit(self.mean / (self.i))
+        else :
+            self.stop()
+            print("Communication out of sync, try again")
         if self.i >= (self.number_of_samples):
             self.progressSignal.emit(100, str(self.progress.eta_td))
             self.finishSignal.emit(self.mean / (self.number_of_samples))

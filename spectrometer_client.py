@@ -62,6 +62,7 @@ class SpectrometerClient:
         self._width = self.GetWidth()
         self.mode = None
         self.wl = self._GetWavelength()
+        self.exposure_time = 0.1
         print('Connected to server')
 
     def __del__(self):
@@ -153,6 +154,7 @@ class SpectrometerClient:
         self._return_value_is_ok(ret)
 
     def SetExposureTime(self, seconds):
+        self.exposure_time = seconds
         ret = self.make_request('setexposuretime',seconds)
         self._return_value_is_ok(ret)
 

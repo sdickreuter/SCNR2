@@ -302,13 +302,13 @@ class SCNR(QMainWindow):
         self.ui.left_tab.setCurrentIndex(0)
 
     def setImageMode(self):
-        self.ui.dark_button.setEnabled(False)
-        self.ui.bg_button.setEnabled(False)
-        self.ui.ref_button.setEnabled(False)
-        self.ui.mean_button.setEnabled(False)
-        self.ui.series_button.setEnabled(False)
-        self.ui.searchmax_button.setEnabled(False)
-        self.ui.lockin_button.setEnabled(False)
+        self.ui.dark_button.setDisabled(True)
+        self.ui.bg_button.setDisabled(True)
+        self.ui.ref_button.setDisabled(True)
+        self.ui.mean_button.setDisabled(True)
+        self.ui.series_button.setDisabled(True)
+        self.ui.searchmax_button.setDisabled(True)
+        self.ui.lockin_button.setDisabled(True)
 
         self.spectrometer.SetSlitWidth(2500)
         self.ui.slitwidth_spin.setValue(2500)
