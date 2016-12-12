@@ -93,7 +93,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="usesScrollButtons">
          <bool>true</bool>
@@ -124,6 +124,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="lockin_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Take Lockin Spectrum</string>
             </property>

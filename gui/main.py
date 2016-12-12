@@ -67,6 +67,7 @@ class Ui_MainWindow(object):
         self.live_button.setObjectName("live_button")
         self.verticalLayout.addWidget(self.live_button)
         self.lockin_button = QtWidgets.QPushButton(self.spectra_tab)
+        self.lockin_button.setEnabled(False)
         self.lockin_button.setObjectName("lockin_button")
         self.verticalLayout.addWidget(self.lockin_button)
         self.line = QtWidgets.QFrame(self.spectra_tab)
@@ -683,7 +684,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.right_tab.setCurrentIndex(2)
+        self.right_tab.setCurrentIndex(0)
         self.left_tab.setCurrentIndex(0)
         self.scan_button.clicked.connect(MainWindow.on_start_scan_clicked)
         self.stop_button.clicked.connect(MainWindow.on_stop_clicked)

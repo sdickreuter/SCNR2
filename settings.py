@@ -38,6 +38,8 @@ class Settings(object):
         self.cam_exposure_time = float(self.config['camera']['exposure_time'])
 
         self.slit_width = int(self.config['spectrometer']['slit_width'])
+        self.centre_wavelength = int(self.config['spectrometer']['centre_wavelength'])
+
 
         self.cammarker_x = float(self.config['cammarker']['x'])
         self.cammarker_y = float(self.config['cammarker']['y'])
@@ -66,6 +68,8 @@ class Settings(object):
         self.config.set('camera', 'exposure_time', str(self.cam_exposure_time))
 
         self.config.set('spectrometer', 'slit_width', str(self.slit_width))
+        self.config.set('spectrometer', 'centre_wavelength', str(self.centre_wavelength))
+
 
         self.config.set('cammarker', 'x', str(self.cammarker_x))
         self.config.set('cammarker', 'y', str(self.cammarker_y))

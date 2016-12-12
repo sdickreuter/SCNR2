@@ -75,7 +75,7 @@ class SCNR(QMainWindow):
         self.settings = settings.Settings()
 
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
-        self.ui.centre_wavelength_spin.setValue(700)
+        self.ui.centre_wavelength_spin.setValue(self.settings.centre_wavelength)
 
         self.ui.rasterdim_spin.setValue(self.settings.rasterdim)
         self.ui.rasterwidth_spin.setValue(self.settings.rasterwidth)
@@ -158,6 +158,9 @@ class SCNR(QMainWindow):
                 # self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
                 QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QMessageBox.Ok)
+                self.ui.left_tab.removeTab(1)
+        else:
+            self.ui.left_tab.removeTab(1)
 
         # init stage
         if init_stage:
@@ -179,14 +182,6 @@ class SCNR(QMainWindow):
                     self.ui.lockin_button.setEnabled(True)
                     self.ui.lockin_checkBox.setEnabled(True)
                 else:
-                    self.ui.addpos_button.setDisabled(True)
-                    self.ui.scanning_tab.setDisabled(True)
-                    self.ui.searchmax_button.setDisabled(True)
-                    self.ui.stage_frame.setDisabled(True)
-                    self.ui.search_checkBox.setDisabled(True)
-                    self.ui.lockin_button.setDisabled(True)
-                    self.ui.lockin_checkBox.setDisabled(True)
-
                     self.stage = None
                     QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
 
@@ -276,14 +271,12 @@ class SCNR(QMainWindow):
     @pyqtSlot(int)
     def on_mode_changed(self, index):
         if init_spectrometer:
+            self.spectrometer.AbortAcquisition()
+            time.sleep(0.5)
             if index == 0:
-                self.spectrometer.AbortAcquisition()
                 self.setSpectrumMode()
-                time.sleep(0.5)
             elif index == 1:
-                self.spectrometer.AbortAcquisition()
                 self.setImageMode()
-                time.sleep(0.5)
 
     def setSpectrumMode(self):
         self.ui.dark_button.setEnabled(True)
@@ -294,7 +287,8 @@ class SCNR(QMainWindow):
         self.ui.searchmax_button.setEnabled(True)
         self.ui.lockin_button.setEnabled(True)
 
-        self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
+        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self.ui.centre_wavelength_spin.setValue(self.settings.centre_wavelength)
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.spectrometer.SetSingleTrack()
@@ -741,6 +735,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_centre_wavelength_edited(self):
+        self.settings.centre_wavelength = self.ui.centre_wavelength_spin.value()
         self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
 
     @pyqtSlot(int)
