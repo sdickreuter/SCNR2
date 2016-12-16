@@ -248,31 +248,26 @@ class SearchThread(MeasurementThread):
         super(SearchThread, self).stop()
 
     def search(self):
-        # self.mutex.lock()
-        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-        # self.mutex.unlock()
-        spec = self.spectrometer.TakeSingleTrack()
-        #spec = np.mean(spec,1)
-        spec = smooth(self.wl, spec)
 
-        self.stage.query_pos()
-        startpos = self.stage.last_pos()
+        def plot(title, popt, perr, pos):
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(pos, measured, 'bo')
+            x = np.linspace(min(pos), max(pos))
+            if not popt is None:
+                ax.text(0.1, 0.9, str(round(popt[1],3)) + ' +- ' + str(round(perr[1],3)), ha='left', va='center', transform=ax.transAxes)
+                ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+                ax.set_title(title)
+            plt.savefig("search_max/search" + str(j) + ".png")
+            plt.close()
 
 
-        d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
+        def search_direction(direction, pos):
 
-        repetitions = 4
-        self.progress = progress.Progress(max=repetitions)
-        for j in range(repetitions):
-            self.stage.query_pos()
-            origin = self.stage.last_pos()
-            measured = np.zeros(self.settings.rasterdim)
-            #if j is 4:
-            #    d /= 2
-            if j % 2:
-                pos = d + origin[0]
-            else:
-                pos = d + origin[1]
+            if direction == "x":
+                pass
+            elif direction == "y":
+                pass
 
             for k in range(len(pos)):
                 if j % 2:
@@ -281,7 +276,7 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(y=pos[k])
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
-                    return False
+                    return None, None
                 spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
@@ -292,16 +287,10 @@ class SearchThread(MeasurementThread):
             minval = np.min(measured)
             maxval = np.max(measured)
             initial_guess = (maxval - minval, pos[maxind], self.settings.sigma, minval)
-            #dx = origin[0]
-            #dy = origin[1]
-            popt = None
-            fitted = False
             try:
                 popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
-                # popt, pcov = opt.curve_fit(gauss, pos, measured, p0=initial_guess)
                 perr = np.diag(pcov)
-                # print(perr)
-                if perr[0] > 10000 or perr[1] > 1 or perr[2] > 1:
+                if perr[0] > 1000 or perr[1] > 0.01 or perr[2] > 1:
                     print("Could not determine particle position: Variance too big")
                 elif popt[0] < 1:
                     print("Could not determine particle position: Peak too small")
@@ -310,12 +299,42 @@ class SearchThread(MeasurementThread):
                 elif popt[2] < self.settings.sigma/2:
                     print("Could not determine particle position: Peak to narrow")
                 else:
-                    fitted = True
+                    return popt, perr
             except RuntimeError as e:
                 print(e)
                 print("Could not determine particle position: Fit error")
+            return None, None
 
-            if fitted:
+
+        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+        spec = self.spectrometer.TakeSingleTrack()
+
+        spec = smooth(self.wl, spec)
+
+        self.stage.query_pos()
+        startpos = self.stage.last_pos()
+
+
+        d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
+
+        repetitions = 4
+        self.progress = progress.Progress(max=repetitions)
+        last_perr = np.ones(4)
+        for j in range(repetitions):
+            self.stage.query_pos()
+            origin = self.stage.last_pos()
+            measured = np.zeros(self.settings.rasterdim)
+
+            if j % 2:
+                pos = d + origin[0]
+                dir = "x"
+            else:
+                pos = d + origin[1]
+                dir = "y"
+
+            popt, perr = search_direction(dir, pos)
+
+            if popt is not None:
                 if j % 2:
                     dx = float(popt[1])
                     self.stage.moveabs(x=dx)
@@ -323,21 +342,21 @@ class SearchThread(MeasurementThread):
                     dy = float(popt[1])
                     self.stage.moveabs(y=dy)
 
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-            ax.plot(pos, measured, 'bo')
-            x = np.linspace(min(pos), max(pos))
-            if not popt is None:
-                ax.text(0.1, 0.9, str(popt[1]) + ' +- ' + str(perr[1]), ha='left', va='center', transform=ax.transAxes)
-                ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
-            plt.savefig("search_max/search" + str(j) + ".png")
-            plt.close()
+                plot(dir,popt, perr, pos)
+                if perr[1] < 0.01 and last_perr[1] < 0.01:
+                    print("Particle localized, terminating early")
+                    break
+                last_perr = perr
+
+            if self.abort:
+                self.stage.moveabs(x=startpos[0], y=startpos[1])
+                return False
+
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+
         self.spectrometer.SetExposureTime(self.settings.integration_time)
-        # self.stage.query_pos()
-        # spec = self.getspec()
-        # self.specSignal.emit(spec)
+
 
 
 class ScanThread(MeasurementThread):
