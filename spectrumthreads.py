@@ -337,10 +337,18 @@ class SearchThread(MeasurementThread):
             if popt is not None:
                 if j % 2:
                     dx = float(popt[1])
-                    self.stage.moveabs(x=dx)
+                    if dx-startpos[0] > 1.5:
+                        print("Position to far from start, skipping")
+                        self.stage.moveabs(x=startpos[0])
+                    else:
+                        self.stage.moveabs(x=dx)
                 else:
                     dy = float(popt[1])
-                    self.stage.moveabs(y=dy)
+                    if dy-startpos[1] > 1.5:
+                        print("Position to far from start, skipping result")
+                        self.stage.moveabs(y=startpos[1])
+                    else:
+                        self.stage.moveabs(y=dy)
 
                 plot(dir,popt, perr, pos)
                 if perr[1] < 0.01 and last_perr[1] < 0.01:
