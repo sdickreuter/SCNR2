@@ -92,6 +92,7 @@ class MeasurementThread(QObject):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
+                self.stop()
 
 class LiveThread(MeasurementThread):
 
@@ -245,11 +246,13 @@ class SearchThread(MeasurementThread):
         self.stop()
 
     def stop(self):
-        super(SearchThread, self).stop()
+        #super(SearchThread, self).stop()
+        self.abort = True
+        self.thread.wait(self.settings.search_integration_time*1000+500)
 
     def search(self):
 
-        def plot(title, popt, perr, pos):
+        def plot(title, popt, perr, pos, measured):
             fig = plt.figure()
             ax = fig.add_subplot(111)
             ax.plot(pos, measured, 'bo')
@@ -263,6 +266,7 @@ class SearchThread(MeasurementThread):
 
 
         def search_direction(direction, pos):
+            measured = np.zeros(self.settings.rasterdim)
 
             if direction == "x":
                 pass
@@ -276,7 +280,7 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(y=pos[k])
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
-                    return None, None
+                    return None, None, None
                 spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
@@ -290,20 +294,21 @@ class SearchThread(MeasurementThread):
             try:
                 popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
                 perr = np.diag(pcov)
-                if perr[0] > 1000 or perr[1] > 0.01 or perr[2] > 1:
+                if perr[0] > 1000 or perr[1] > 1 or perr[2] > 50:
                     print("Could not determine particle position: Variance too big")
-                elif popt[0] < 1:
+                    print(perr)
+                elif popt[0] < 0.5:
                     print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
                     print("Could not determine particle position: Peak outside bounds")
                 elif popt[2] < self.settings.sigma/2:
                     print("Could not determine particle position: Peak to narrow")
                 else:
-                    return popt, perr
+                    return popt, perr, measured
             except RuntimeError as e:
                 print(e)
                 print("Could not determine particle position: Fit error")
-            return None, None
+            return None, None, measured
 
 
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
@@ -323,7 +328,6 @@ class SearchThread(MeasurementThread):
         for j in range(repetitions):
             self.stage.query_pos()
             origin = self.stage.last_pos()
-            measured = np.zeros(self.settings.rasterdim)
 
             if j % 2:
                 pos = d + origin[0]
@@ -332,29 +336,35 @@ class SearchThread(MeasurementThread):
                 pos = d + origin[1]
                 dir = "y"
 
-            popt, perr = search_direction(dir, pos)
+            popt, perr, measured = search_direction(dir, pos)
 
             if popt is not None:
                 if j % 2:
                     dx = float(popt[1])
-                    if dx-startpos[0] > 1.5:
+                    if dx-startpos[0] > 1.0:
                         print("Position to far from start, skipping")
                         self.stage.moveabs(x=startpos[0])
                     else:
                         self.stage.moveabs(x=dx)
                 else:
                     dy = float(popt[1])
-                    if dy-startpos[1] > 1.5:
+                    if dy-startpos[1] > 1.0:
                         print("Position to far from start, skipping result")
                         self.stage.moveabs(y=startpos[1])
                     else:
                         self.stage.moveabs(y=dy)
 
-                plot(dir,popt, perr, pos)
+                plot(dir,popt, perr, pos, measured)
                 if perr[1] < 0.01 and last_perr[1] < 0.01:
                     print("Particle localized, terminating early")
                     break
                 last_perr = perr
+            else:
+                if j % 2:
+                    self.stage.moveabs(x=startpos[0])
+                else:
+                    self.stage.moveabs(y=startpos[1])
+                plot(dir, None, None, pos, measured)
 
             if self.abort:
                 self.stage.moveabs(x=startpos[0], y=startpos[1])
@@ -445,7 +455,10 @@ class ScanLockinThread(ScanThread):
         self.meanthread.specSignal.connect(self.specslot)
 
     def stop(self):
-        self.meanthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
+            self.meanthread.thread.wait(self.settings.integration_time*1000+500)
+            self.meanthread = None
         super(ScanMeanThread, self).stop()
 
     def __del__(self):
@@ -475,18 +488,20 @@ class ScanMeanThread(ScanThread):
         self.initMeanThread()
 
     def stop(self):
-        if self.meanthread is not None:
-            self.meanthread.stop()
+        # if self.meanthread is not None:
+        #     self.meanthread.stop()
+        #     self.meanthread.wait(self.settings.integration_time*1000+500)
+        #     self.meanthread = None
         super(ScanMeanThread, self).stop()
         #self.meanthread.finishSignal.disconnect()
         #self.meanthread.specSignal.disconnect()
         #self.saveSignal.disconnect()
 
-    def __del__(self):
-        #self.meanthread.finishSignal.disconnect()
-        #self.meanthread.specSignal.disconnect()
-        #self.saveSignal.disconnect()
-        super(ScanMeanThread, self).__del__()
+    # def __del__(self):
+    #     #self.meanthread.finishSignal.disconnect()
+    #     #self.meanthread.specSignal.disconnect()
+    #     #self.saveSignal.disconnect()
+    #     super(ScanMeanThread, self).__del__()
 
     def initMeanThread(self):
         self.meanthread = MeanThread(self.spectrometer, self.settings.number_of_samples, self)
@@ -528,12 +543,18 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.searchthread.specSignal.connect(self.specslot)
 
     def stop(self):
+        self.meanthread.stop()
+        self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
+        self.meanthread = None
         self.searchthread.stop()
+        self.searchthread.thread.wait(self.settings.integration_time*1000+500)
+        self.searchthread = None
         super(ScanMeanThread, self).stop()
 
-    def __del__(self):
-        #self.searchthread.specSignal.disconnect()
-        super(ScanMeanThread, self).__del__()
+    # def __del__(self):
+    #     self.stop()
+    #     #self.searchthread.specSignal.disconnect()
+    #     super(ScanMeanThread, self).__del__()
 
     def intermediatework(self):
         self.searchthread.search()
