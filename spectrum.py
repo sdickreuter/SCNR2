@@ -160,13 +160,13 @@ class Spectrum(QObject):
         self.workingthread.finishSignal.connect(self.finishedSearch)
         self.workingthread.start()
 
-    def scan_search_max(self, pos):
+    def scan_search_max(self, pos, labels):
         # self.stage.query_pos()
         # x, y, z = self.stage.last_pos()
         # pos = np.matrix([[x, y]])
         self.positions = pos
         self.save_path = "search_max/"
-        self.workingthread = ScanSearchThread(self._spectrometer, self.settings, pos, self.stage)
+        self.workingthread = ScanSearchThread(self._spectrometer, self.settings, pos, labels,self.stage)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)
         self.workingthread.finishSignal.connect(self.finishedScanSearch)

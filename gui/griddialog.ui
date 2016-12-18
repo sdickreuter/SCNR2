@@ -2,24 +2,33 @@
 <ui version="4.0">
  <class>SpanGridDialog</class>
  <widget class="QDialog" name="SpanGridDialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
-    <height>115</height>
+    <width>500</width>
+    <height>534</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>280</width>
-    <height>115</height>
+    <width>500</width>
+    <height>534</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>280</width>
-    <height>115</height>
+    <width>500</width>
+    <height>534</height>
    </size>
   </property>
   <property name="baseSize">
@@ -35,10 +44,13 @@
    <bool>false</bool>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>-70</x>
-     <y>80</y>
+     <x>150</x>
+     <y>500</y>
      <width>340</width>
      <height>32</height>
     </rect>
@@ -61,18 +73,11 @@
     <rect>
      <x>10</x>
      <y>0</y>
-     <width>261</width>
-     <height>81</height>
+     <width>221</width>
+     <height>91</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Y Steps</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
@@ -92,10 +97,17 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>100000</number>
+       <number>9</number>
       </property>
       <property name="value">
        <number>5</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Y Steps</string>
       </property>
      </widget>
     </item>
@@ -111,10 +123,53 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>100000</number>
+       <number>9</number>
       </property>
       <property name="value">
        <number>5</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="plotwidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>481</width>
+     <height>391</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>0</y>
+     <width>251</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QCheckBox" name="flipxlabels">
+      <property name="text">
+       <string>Flip x labels</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="flipylabels">
+      <property name="text">
+       <string>Flip y labels</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="transposelabels">
+      <property name="text">
+       <string>Transpose labels</string>
       </property>
      </widget>
     </item>
@@ -130,8 +185,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>468</x>
+     <y>501</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -146,8 +201,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>489</x>
+     <y>501</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -155,5 +210,92 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>x_spin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>SpanGridDialog</receiver>
+   <slot>on_x_edited()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>197</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>97</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>y_spin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>SpanGridDialog</receiver>
+   <slot>on_y_edited()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>206</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>94</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>transposelabels</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SpanGridDialog</receiver>
+   <slot>transpose_toggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>298</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>82</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flipxlabels</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SpanGridDialog</receiver>
+   <slot>flipx_toggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>14</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flipylabels</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SpanGridDialog</receiver>
+   <slot>flipy_toggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>46</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>on_x_edited()</slot>
+  <slot>on_y_edited()</slot>
+  <slot>transpose_toggled(bool)</slot>
+  <slot>flipx_toggled(bool)</slot>
+  <slot>flipy_toggled(bool)</slot>
+ </slots>
 </ui>

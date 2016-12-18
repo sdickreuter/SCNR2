@@ -378,7 +378,7 @@ class SearchThread(MeasurementThread):
 
 
 class ScanThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels,stage, parent=None):
         try:
             self.spectrometer = spectrometer
             self.scanning_points = scanning_points
@@ -387,6 +387,7 @@ class ScanThread(MeasurementThread):
             self.i = 0
             self.n = scanning_points.shape[0]
             self.positions = np.zeros((self.n, 2))
+            self.labels = labels
             self.progress = progress.Progress(max=self.n)
             super(ScanThread, self).__init__(spectrometer)
         except:
@@ -418,8 +419,8 @@ class ScanThread(MeasurementThread):
 
 
 class ScanSearchThread(ScanThread):
-    def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
-        super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, stage)
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+        super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
         self.searchthread.specSignal.connect(self.specslot)
         self.searchthread.finishSignal.connect(self.searchfinishslot)
@@ -532,7 +533,7 @@ class ScanMeanThread(ScanThread):
 
     @pyqtSlot(np.ndarray)
     def meanfinished(self, spec):
-        self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
+        self.saveSignal.emit(spec, self.labels[self.i] + ".csv", self.positions[self.i, :], False, False)
         #self.specSignal.emit(spec)
         #self.proceed = True
 

@@ -499,7 +499,7 @@ class SCNR(QMainWindow):
     def on_searchgrid_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText("Searching Max.")
-        self.spectrum.scan_search_max(self.posModel.getMatrix())
+        self.spectrum.scan_search_max(self.posModel.getMatrix(), self.labels)
 
     @pyqtSlot()
     def on_search_clicked(self):
@@ -666,25 +666,9 @@ class SCNR(QMainWindow):
 
     @pyqtSlot()
     def on_spangrid_clicked(self):
-        xl, yl, ok = dialogs.SpanGrid_Dialog.getXY()
         positions = self.posModel.getMatrix()
-        if (positions.shape[0] >= 3) & ((xl is not 0) | (yl is not 0)):
-            a = np.ravel(positions[0, :])
-            b = np.ravel(positions[1, :])
-            c = np.ravel(positions[2, :])
-            grid = np.zeros((xl * yl, 2))
-            grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
-            grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
-
-            i = 0
-            for x in range(xl):
-                for y in range(yl):
-                    vec_x = a[0] + grid_vec_1[0] * x + grid_vec_2[0] * y
-                    vec_y = a[1] + grid_vec_1[1] * x + grid_vec_2[1] * y
-                    grid[i, 0] = vec_x
-                    grid[i, 1] = vec_y
-                    i += 1
-
+        grid, self.labels, ok = dialogs.SpanGrid_Dialog.getXY(positions)
+        if ok:
             self.posModel.update(grid)
 
     @pyqtSlot()
