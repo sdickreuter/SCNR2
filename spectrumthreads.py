@@ -451,7 +451,7 @@ class ScanLockinThread(ScanThread):
     saveSignal = pyqtSignal(np.ndarray, str, np.ndarray, bool, bool)
 
     def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
-        super(ScanThread, self).__init__(spectrometer, settings, scanning_points, stage)
+        super(ScanThread, self).__init__(spectrometer, settings, scanning_points, None, stage)
         # __init__(self, spectrometer, settings, stage, parent=None)
         self.meanthread = LockinThread(spectrometer, settings, stage, self)
         self.meanthread.finishSignal.connect(self.lockinfinished)
@@ -481,8 +481,8 @@ class ScanLockinThread(ScanThread):
 class ScanMeanThread(ScanThread):
     saveSignal = pyqtSignal(np.ndarray, str, np.ndarray, bool, bool)
 
-    def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
-        super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, stage)
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+        super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.initMeanThread()
 
     def stop(self):
@@ -530,13 +530,15 @@ class ScanMeanThread(ScanThread):
 
     @pyqtSlot(np.ndarray)
     def meanfinished(self, spec):
-        self.saveSignal.emit(spec, self.labels[self.i] + ".csv", self.positions[self.i, :], False, False)
-        #self.specSignal.emit(spec)
-        #self.proceed = True
+        if self.labels is not None:
+            self.saveSignal.emit(spec, self.labels[self.i] + ".csv", self.positions[self.i, :], False, False)
+        else:
+            self.saveSignal.emit(spec,str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
+
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
-        super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, stage)
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+        super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
         self.searchthread.specSignal.connect(self.specslot)
 

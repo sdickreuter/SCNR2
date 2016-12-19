@@ -44,6 +44,7 @@ class SCNR(QMainWindow):
     cam = None
     padthread = None
     spectrometer = None
+    labels = None
 
     savedir = "./Spectra/"
     path = "./"
