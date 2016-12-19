@@ -191,16 +191,16 @@ class Spectrum(QObject):
         self.updateStatus.emit('Scan Search finished')
         self.updatePositions.emit(pos)
 
-    def take_scan(self, positions, savedir, with_lockin, with_search):
+    def take_scan(self, positions, labels, savedir, with_lockin, with_search):
         self.save_path = savedir
         self.save_data(savedir)
         self.positions = positions
         if with_lockin:
             return True
         elif with_search:
-            self.workingthread = ScanSearchMeanThread(self._spectrometer, self.settings, positions, self.stage)
+            self.workingthread = ScanSearchMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
         else:
-            self.workingthread = ScanMeanThread(self._spectrometer, self.settings, positions, self.stage)
+            self.workingthread = ScanMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
             #self.workingthread = ScanThread(self._spectrometer, self.settings, positions, self.stage)
 
         self.workingthread.finishSignal.connect(self.finishedScanMean)

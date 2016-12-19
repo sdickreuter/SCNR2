@@ -449,7 +449,7 @@ class ScanLockinThread(ScanThread):
     saveSignal = pyqtSignal(np.ndarray, str, np.ndarray, bool, bool)
 
     def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
-        super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, stage)
+        super(ScanThread, self).__init__(spectrometer, settings, scanning_points, stage)
         # __init__(self, spectrometer, settings, stage, parent=None)
         self.meanthread = LockinThread(spectrometer, settings, stage, self)
         self.meanthread.finishSignal.connect(self.lockinfinished)
@@ -460,13 +460,8 @@ class ScanLockinThread(ScanThread):
             self.meanthread.stop()
             self.meanthread.thread.wait(self.settings.integration_time*1000+500)
             self.meanthread = None
-        super(ScanMeanThread, self).stop()
+        super(ScanThread, self).stop()
 
-    def __del__(self):
-        #self.meanthread.finishSignal.disconnect(self.lockinfinished)
-        #self.meanthread.specSignal.disconnect(self.specslot)
-        #self.saveSignal.disconnect()
-        super(ScanMeanThread, self).__del__()
 
     def intermediatework(self):
         self.meanthread.init()
