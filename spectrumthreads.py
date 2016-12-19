@@ -268,15 +268,10 @@ class SearchThread(MeasurementThread):
         def search_direction(direction, pos):
             measured = np.zeros(self.settings.rasterdim)
 
-            if direction == "x":
-                pass
-            elif direction == "y":
-                pass
-
             for k in range(len(pos)):
-                if j % 2:
+                if direction == "x":
                     self.stage.moveabs(x=pos[k])
-                else:
+                elif  direction == "y":
                     self.stage.moveabs(y=pos[k])
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
@@ -322,9 +317,11 @@ class SearchThread(MeasurementThread):
 
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
 
+        ontargetx = False
+        ontargety = False
+
         repetitions = 4
         self.progress = progress.Progress(max=repetitions)
-        last_perr = np.ones(4)
         for j in range(repetitions):
             self.stage.query_pos()
             origin = self.stage.last_pos()
@@ -346,6 +343,8 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(x=startpos[0])
                     else:
                         self.stage.moveabs(x=dx)
+                        if perr[1] < 0.01:
+                            ontargetx = True
                 else:
                     dy = float(popt[1])
                     if dy-startpos[1] > 1.0:
@@ -353,12 +352,15 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(y=startpos[1])
                     else:
                         self.stage.moveabs(y=dy)
+                        if perr[1] < 0.01:
+                            ontargety = True
 
                 plot(dir,popt, perr, pos, measured)
-                if perr[1] < 0.01 and last_perr[1] < 0.01:
+
+                if ontargetx and ontargety:
                     print("Particle localized, terminating early")
                     break
-                last_perr = perr
+
             else:
                 if j % 2:
                     self.stage.moveabs(x=startpos[0])
