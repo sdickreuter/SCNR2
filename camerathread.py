@@ -12,10 +12,13 @@ class CameraThread(QObject):
     #mutex = QMutex()
     enabled = False
 
-    def __init__(self, parent=None):
+    def __init__(self,flip = False, parent=None):
         if getattr(self.__class__, '_has_instance', False):
             RuntimeError('Cannot create another instance of Camera')
         self.__class__._has_instance = True
+
+        self.flip = flip
+
         self.isinitialized = False
         super(CameraThread, self).__init__(parent)
         self._cam = None
@@ -32,12 +35,12 @@ class CameraThread(QObject):
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 0)
                 self._cam.set_param('exp_priority', 0)
-                #self._cam.set_binning(2, skipping=False)
-                #self._cam.set_param('imgdataformat',2) # RGB24
+                self._cam.set_binning(2, skipping=False)
+                self._cam.set_param('imgdataformat',2) # RGB24
                 #self._cam.set_param('imgdataformat', 6) # RAW16 (monochrome)
-                self._cam.set_param('imgdataformat', 1) # MONO16
+                #self._cam.set_param('imgdataformat', 1) # MONO16
 
-                self._cam.set_param('buffers_queue_size',1)
+                #self._cam.set_param('buffers_queue_size',1)
                 self._cam.get_image()
 
                 self.thread.started.connect(self.process)
@@ -81,7 +84,10 @@ class CameraThread(QObject):
 
     def work(self):
         if self.enabled:
-            self.ImageReadySignal.emit(self._cam.get_image())
+            if self.flip:
+                self.ImageReadySignal.emit(np.flipud(self._cam.get_image()))
+            else:
+                self.ImageReadySignal.emit(self._cam.get_image())
 
     @pyqtSlot()
     def process(self):

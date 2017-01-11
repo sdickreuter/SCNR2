@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
     QMessageBox, QGridLayout
 import pyqtgraph as pg
-from skimage import exposure
+#from skimage import exposure
 
 # from PyQt5 import uic
 # Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
@@ -54,7 +54,7 @@ class SCNR(QMainWindow):
         self.ui = Ui_MainWindow()
 
         setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
-        print(setup)
+        #print(setup)
 
         if ok:
             init_cam = cam_ok
@@ -146,7 +146,7 @@ class SCNR(QMainWindow):
             w.setImageItem(self.img)
 
             try:
-                self.cam = camerathread.CameraThread()
+                self.cam = camerathread.CameraThread(flip=True)
             except:
                 print("Error initializing Camera")
             if self.cam.isinitialized:
