@@ -72,9 +72,8 @@ class MeasurementThread(QObject):
     @pyqtSlot()
     def stop(self):
         self.abort = True
-        #self.spectrometer.AbortAcquisition()
-
         self.thread.wait(self.spectrometer.exposure_time*1000+500)
+        self.spectrometer.AbortAcquisition()
         #self.thread.quit()
         #print("Done with thread")
 
@@ -544,10 +543,10 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     def stop(self):
         self.meanthread.stop()
-        self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
+        #self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
         self.meanthread = None
         self.searchthread.stop()
-        self.searchthread.thread.wait(self.settings.integration_time*1000+500)
+        #self.searchthread.thread.wait(self.settings.integration_time*1000+500)
         self.searchthread = None
         super(ScanMeanThread, self).stop()
 
