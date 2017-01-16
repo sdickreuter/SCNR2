@@ -96,12 +96,11 @@ class MeasurementThread(QObject):
 class LiveThread(MeasurementThread):
 
     def work(self):
-        if not self.abort:
-            try:
-                self.specSignal.emit(self.spec)
-            except TypeError as e:
-                print(e)
-                print("Communication out of sync, try again")
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
 
     @pyqtSlot()
     def process(self):
@@ -117,12 +116,11 @@ class LiveThread(MeasurementThread):
 class ImageThread(MeasurementThread):
 
     def work(self):
-        if not self.abort:
-            try:
-                self.specSignal.emit(self.spec)
-            except TypeError as e:
-                print(e)
-                print("Communication out of sync, try again")
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
 
     @pyqtSlot()
     def process(self):
@@ -317,6 +315,9 @@ class SearchThread(MeasurementThread):
 
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
         spec = self.spectrometer.TakeSingleTrack()
+        if spec is None:
+            self.abort = True
+            return False
 
         spec = smooth(self.wl, spec)
 
@@ -343,6 +344,10 @@ class SearchThread(MeasurementThread):
                 dir = "y"
 
             popt, perr, measured = search_direction(dir, pos)
+
+            if self.abort:
+                self.stage.moveabs(x=startpos[0], y=startpos[1])
+                return False
 
             if popt is not None:
                 if j % 2:
@@ -377,9 +382,6 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(y=startpos[1])
                 plot(dir, None, None, pos, measured)
 
-            if self.abort:
-                self.stage.moveabs(x=startpos[0], y=startpos[1])
-                return False
 
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
@@ -413,7 +415,7 @@ class ScanThread(MeasurementThread):
         if not self.abort:
             self.intermediatework()
         else:
-            return
+            return False
         x, y, z = self.stage.last_pos()
         self.positions[self.i, 0] = x
         self.positions[self.i, 1] = y
@@ -470,16 +472,17 @@ class ScanLockinThread(ScanThread):
         self.meanthread.specSignal.connect(self.specslot)
 
     def stop(self):
-        if self.meanthread is not None:
-            self.meanthread.stop()
-            self.meanthread.thread.wait(self.settings.integration_time*1000+500)
-            self.meanthread = None
+        self.meanthread.stop()
+        self.meanthread.thread.wait(self.settings.integration_time*1000+500)
+        self.meanthread = None
         super(ScanThread, self).stop()
 
 
     def intermediatework(self):
-        self.meanthread.init()
-        self.meanthread.process()
+        if not self.abort:
+            self.meanthread.init()
+        if not self.abort:
+            self.meanthread.process()
 
     @pyqtSlot(np.ndarray)
     def specslot(self, spec):
@@ -498,14 +501,10 @@ class ScanMeanThread(ScanThread):
         self.initMeanThread()
 
     def stop(self):
-        # if self.meanthread is not None:
-        #     self.meanthread.stop()
-        #     self.meanthread.wait(self.settings.integration_time*1000+500)
-        #     self.meanthread = None
+        self.meanthread.stop()
+        self.meanthread.wait(self.settings.integration_time*1000+500)
+        self.meanthread = None
         super(ScanMeanThread, self).stop()
-        #self.meanthread.finishSignal.disconnect()
-        #self.meanthread.specSignal.disconnect()
-        #self.saveSignal.disconnect()
 
     # def __del__(self):
     #     #self.meanthread.finishSignal.disconnect()
@@ -520,8 +519,10 @@ class ScanMeanThread(ScanThread):
         self.meanthread.init()
 
     def intermediatework(self):
-        self.meanthread.init()
-        self.meanthread.process()
+        if not self.abort:
+            self.meanthread.init()
+        if not self.abort:
+            self.meanthread.process()
         # self.initMeanThread()
         # self.meanthread.start()
         #self.meanthread.thread.wait()
@@ -556,9 +557,9 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     def stop(self):
         self.meanthread.stop()
+        self.searchthread.stop()
         self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
         self.meanthread = None
-        self.searchthread.stop()
         self.searchthread.thread.wait(self.settings.integration_time*1000+500)
         self.searchthread = None
         super(ScanMeanThread, self).stop()
@@ -569,11 +570,14 @@ class ScanSearchMeanThread(ScanMeanThread):
     #     super(ScanMeanThread, self).__del__()
 
     def intermediatework(self):
-        #self.searchthread.search()
+        if not self.abort:
+            self.searchthread.search()
+        if not self.abort:
+            self.meanthread.init()
+        if not self.abort:
+            self.meanthread.process()
+        #self.searchthread.start()
+        #self.searchthread.stop()
         #self.meanthread.init()
-        #self.meanthread.process()
-        self.searchthread.start()
-        self.searchthread.stop()
-        self.meanthread.init()
-        self.meanthread.start()
-        self.meanthread.stop()
+        #self.meanthread.start()
+        #self.meanthread.stop()
