@@ -416,7 +416,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(float)
     def on_yaxis(self, y):
-        self.yaxis = y
+        self.yaxis = -y
 
     @pyqtSlot()
     def check_pad_analog(self):

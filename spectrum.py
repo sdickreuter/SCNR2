@@ -180,7 +180,6 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedScanSearch(self, pos):
-        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
@@ -188,6 +187,7 @@ class Spectrum(QObject):
         plt.savefig(self.save_path + "grid.png")
         plt.close()
         #self.enableButtons.emit()
+        self.stop_process()
         self.updateStatus.emit('Scan Search finished')
         self.updatePositions.emit(pos)
 
@@ -211,7 +211,6 @@ class Spectrum(QObject):
 
     @pyqtSlot(np.ndarray)
     def finishedScanMean(self, pos):
-        self.stop_process()
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
@@ -219,6 +218,7 @@ class Spectrum(QObject):
         plt.savefig(self.save_path + "grid.png")
         plt.close()
         #self.enableButtons.emit()
+        self.stop_process()
         self.updateStatus.emit('Scan Mean finished')
 
     def take_series(self, path):
