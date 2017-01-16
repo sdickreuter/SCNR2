@@ -46,7 +46,7 @@ class SpectrometerServer:
     def run(self):
         while self.running:
             msg, param = self.socket.recv_pyobj()
-            #print(msg +' '+ str(param))
+            print('Received Message: ' + msg +' '+ str(param))
 
             if msg == '?':
                 self.send_object('!')
