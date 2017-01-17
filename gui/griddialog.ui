@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>534</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>534</height>
+    <height>580</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>500</width>
-    <height>534</height>
+    <height>580</height>
    </size>
   </property>
   <property name="baseSize">
@@ -50,7 +50,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>500</y>
+     <y>540</y>
      <width>340</width>
      <height>32</height>
     </rect>
@@ -174,6 +174,28 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>500</y>
+     <width>471</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Important: The Figure above is in the coordinate System of the  Piezo-Stage. If you want to compare it to the camera, please make sure that both coordinate systems are aligned. </string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="margin">
+    <number>1</number>
+   </property>
   </widget>
  </widget>
  <resources/>
