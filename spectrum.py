@@ -66,7 +66,7 @@ class Spectrum(QObject):
     def stop_process(self):
         try:
             self.workingthread.stop()
-            #self.workingthread.thread.wait(500)
+            self.workingthread.thread.wait(self.settings.integration_time*1000+500)
             self.workingthread = None
             #self._spectrometer.AbortAcquisition()
         except Exception as e:

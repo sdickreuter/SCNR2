@@ -72,8 +72,8 @@ class MeasurementThread(QObject):
     @pyqtSlot()
     def stop(self):
         self.abort = True
-        self.thread.wait(self.spectrometer.exposure_time*1000+500)
-        self.spectrometer.AbortAcquisition()
+        #self.thread.wait(self.spectrometer.exposure_time*1000+500)
+        #self.spectrometer.AbortAcquisition()
         #self.thread.quit()
         #print("Done with thread")
 
