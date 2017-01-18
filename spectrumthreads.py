@@ -259,7 +259,7 @@ class SearchThread(MeasurementThread):
     def stop(self):
         #super(SearchThread, self).stop()
         self.abort = True
-        self.thread.wait(self.settings.search_integration_time*1000+500)
+        #self.thread.wait(self.settings.search_integration_time*1000+500)
 
     def search(self):
 
@@ -377,7 +377,8 @@ class SearchThread(MeasurementThread):
 
                 if ontargetx and ontargety:
                     print("Particle localized, terminating early")
-                    break
+                    self.spectrometer.SetExposureTime(self.settings.integration_time)
+                    return True
 
             else:
                 if j % 2:
