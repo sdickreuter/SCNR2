@@ -106,8 +106,10 @@ class LiveThread(MeasurementThread):
     def process(self):
         while not self.abort:
             try:
-                self.spec = self.spectrometer.TakeSingleTrack()
-                self.work()
+                if not self.abort:
+                    self.spec = self.spectrometer.TakeSingleTrack()
+                if not self.abort:
+                    self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
@@ -126,8 +128,10 @@ class ImageThread(MeasurementThread):
     def process(self):
         while not self.abort:
             try:
-                self.spec = self.spectrometer.TakeImageofSlit()
-                self.work()
+                if not self.abort:
+                    self.spec = self.spectrometer.TakeImageofSlit()
+                if not self.abort:
+                    self.work()
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
