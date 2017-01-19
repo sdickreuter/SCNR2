@@ -288,7 +288,10 @@ class SCNR(QMainWindow):
         self.ui.searchmax_button.setEnabled(True)
         self.ui.lockin_button.setEnabled(True)
 
-        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        if self.settings.centre_wavelength > 0:
+            self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        else:
+            self.spectrometer.SetCentreWavelength(700)
         self.ui.centre_wavelength_spin.setValue(self.settings.centre_wavelength)
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)

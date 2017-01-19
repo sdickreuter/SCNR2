@@ -15,16 +15,19 @@ class SpectrometerServer:
         self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
 
-        self.spectrometer.SetTemperature(-40)
-        #self.spectrometer.SetTemperature(-10)
+        #self.spectrometer.SetTemperature(-40)
+        self.spectrometer.SetTemperature(-10)
 
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PAIR)
         port = "6667"
         self.socket.bind("tcp://*:%s" % port)
 
-        self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLOUT) # POLLIN for recv, POLLOUT for send
+        self.out_poller = zmq.Poller()
+        self.out_poller.register(self.socket, zmq.POLLOUT) # POLLIN for recv, POLLOUT for send
+
+        self.in_poller = zmq.Poller()
+        self.in_poller.register(self.socket, zmq.POLLIN) # POLLIN for recv, POLLOUT for send
 
         print("You can now start the Graphical User Interface.")
         print("IMPORTANT:")
@@ -38,15 +41,20 @@ class SpectrometerServer:
 
 
     def send_object(self, data):
-        if self.poller.poll(1000):
+        #if self.poller.poll(1000):
+        if self.out_poller.poll(1000):
             self.socket.send_pyobj(data)
         else:
             print("lost connection to client")
 
     def run(self):
         while self.running:
-            msg, param = self.socket.recv_pyobj()
-            print('Received Message: ' + msg +' '+ str(param))
+            if self.in_poller.poll(1000):
+                msg, param = self.socket.recv_pyobj()
+                print('Received Message: ' + msg +' '+ str(param))
+            else:
+                msg = '...'
+                param = None
 
             if msg == '?':
                 self.send_object('!')
@@ -127,6 +135,8 @@ class SpectrometerServer:
                 #self.send_array(self.spectrometer.TakeSingleTrack())
                 #self.send_object(self.spectrometer.TakeSingleTrack())
                 self.send_object(self.spectrometer.TakeSingleTrack())
+            elif msg == '...':
+                pass
             else:
                 self.send_object('?')
 

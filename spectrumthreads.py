@@ -130,8 +130,14 @@ class ImageThread(MeasurementThread):
             try:
                 if not self.abort:
                     self.spec = self.spectrometer.TakeImageofSlit()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
                 if not self.abort:
                     self.work()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
