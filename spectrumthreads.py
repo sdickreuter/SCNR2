@@ -383,8 +383,7 @@ class SearchThread(MeasurementThread):
 
                 if ontargetx and ontargety:
                     print("Particle localized, terminating early")
-                    self.spectrometer.SetExposureTime(self.settings.integration_time)
-                    return True
+                    break
 
             else:
                 if j % 2:
