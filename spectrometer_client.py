@@ -42,7 +42,7 @@ class SpectrometerClient:
             if sent:
                 if self.in_poller.poll(1000):
                     msg = self.socket.recv_pyobj()#flags=zmq.NOBLOCK)
-                    print(msg)
+                    #print(msg)
                     if msg == '!':
                         received = True
                 else:
@@ -129,57 +129,57 @@ class SpectrometerClient:
             #time.sleep(2)
 
     def Shutdown(self):
-        print("Send Request: shutdown")
+        #print("Send Request: shutdown")
         return self.make_request('shutdown', None)
 
     def GetWidth(self):
-        print("Send Request: getwidth")
+        #print("Send Request: getwidth")
         return self.make_request('getwidth', None)
 
     def GetTemperature(self):
-        print("Send Request: gettemperature")
+        #print("Send Request: gettemperature")
         return self.make_request('gettemperature',None)
 
     def GetSlitWidth(self):
-        print("Send Request: getslitwidth")
+        #print("Send Request: getslitwidth")
         return self.make_request('getslitwidth',None)
 
     def GetGratingInfo(self):
-        print("Send Request: getgratinginfo")
+        #print("Send Request: getgratinginfo")
         return self.make_request('getgratinginfo',None)
 
     def GetGrating(self):
-        print("Send Request: getgrating")
+        #print("Send Request: getgrating")
         return self.make_request('getgrating',None)
 
     def SetGrating(self, grating):
-        print("Send Request: setgrating")
+        #print("Send Request: setgrating")
         ret = self.make_request('setgrating',grating)
         self._return_value_is_ok(ret)
 
     def AbortAcquisition(self):
-        print("Send Request: abortacquisition")
+        #print("Send Request: abortacquisition")
         ret = self.make_request('abortacquisition',None)
         self._return_value_is_ok(ret)
 
     def SetNumberAccumulations(self, number):
-        print("Send Request: setnumberaccumulations")
+        #print("Send Request: setnumberaccumulations")
         ret = self.make_request('setnumberaccumulations',number)
         self._return_value_is_ok(ret)
 
     def SetExposureTime(self, seconds):
         self.exposure_time = seconds
-        print("Send Request: setexposuretime")
+        #print("Send Request: setexposuretime")
         ret = self.make_request('setexposuretime',seconds)
         self._return_value_is_ok(ret)
 
     def SetSlitWidth(self, slitwidth):
-        print("Send Request: setslitwidth")
+        #print("Send Request: setslitwidth")
         ret = self.make_request('setslitwidth',slitwidth)
         self._return_value_is_ok(ret)
 
     def _GetWavelength(self):
-        print("Send Request: getwavelength")
+        #print("Send Request: getwavelength")
         ret = self.make_request('getwavelength',None)
         if self._return_value_is_data(ret):
             return ret
@@ -190,13 +190,13 @@ class SpectrometerClient:
         return self.wl
 
     def SetFullImage(self):
-        print("Send Request: setfullimage")
+        #print("Send Request: setfullimage")
         self.mode = 'Image'
         ret = self.make_request('setfullimage',None)
         self._return_value_is_ok(ret)
 
     def TakeFullImage(self):
-        print("Send Request: takefullimage")
+        #print("Send Request: takefullimage")
         ret = self.make_request('takefullimage',None)
         if self._return_value_is_data(ret):
             return ret
@@ -204,7 +204,7 @@ class SpectrometerClient:
             return None
 
     def SetCentreWavelength(self, wavelength):
-        print("Send Request: setcentrewavelength")
+        #print("Send Request: setcentrewavelength")
         ret = self.make_request('setcentrewavelength',wavelength)
         wl = self._GetWavelength()
         if wl is not None:
@@ -214,13 +214,13 @@ class SpectrometerClient:
         self._return_value_is_ok(ret)
 
     def SetImageofSlit(self):
-        print("Send Request: setimageofslit")
+        #print("Send Request: setimageofslit")
         self.mode = 'Image'
         ret = self.make_request('setimageofslit',None)
         self._return_value_is_ok(ret)
 
     def TakeImageofSlit(self):
-        print("Send Request: takeimageofslit")
+        #print("Send Request: takeimageofslit")
         ret = self.make_request('takeimageofslit',None)
         if self._return_value_is_data(ret):
             return ret
@@ -228,13 +228,13 @@ class SpectrometerClient:
             return None
 
     def SetSingleTrack(self, hstart=None, hstop=None):
-        print("Send Request: setsingletrack")
+        #print("Send Request: setsingletrack")
         self.mode = 'SingleTrack'
         ret = self.make_request('setsingletrack',(hstart,hstop))
         self._return_value_is_ok(ret)
 
     def TakeSingleTrack(self):
-        print("Send Request: takesingletrack")
+        #print("Send Request: takesingletrack")
         #return np.mean(self.make_request('takesingletrack',None),axis=1)
         spec = self.make_request('takesingletrack',None)
         # for debuggin purposes

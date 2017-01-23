@@ -288,10 +288,13 @@ class SearchThread(MeasurementThread):
             for k in range(len(pos)):
                 if direction == "x":
                     self.stage.moveabs(x=pos[k])
+                    sigma_start = self.settings.sigma
                 elif  direction == "y":
                     self.stage.moveabs(y=pos[k])
+                    sigma_start = self.settings.sigma
                 elif direction == "z":
                     self.stage.moveabs(z=pos[k])
+                    sigma_start = self.settings.sigma*4
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
@@ -304,7 +307,7 @@ class SearchThread(MeasurementThread):
             maxind = np.argmax(measured[2:(len(pos))])
             minval = np.min(measured)
             maxval = np.max(measured)
-            initial_guess = (maxval - minval, pos[maxind], self.settings.sigma, minval)
+            initial_guess = (maxval - minval, pos[maxind], sigma_start, minval)
             try:
                 popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
                 perr = np.diag(pcov)
@@ -315,7 +318,7 @@ class SearchThread(MeasurementThread):
                     print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
                     print("Could not determine particle position: Peak outside bounds")
-                elif popt[2] < self.settings.sigma/2:
+                elif popt[2] < self.settings.sigma/4:
                     print("Could not determine particle position: Peak to narrow")
                 else:
                     return popt, perr, measured
@@ -357,13 +360,15 @@ class SearchThread(MeasurementThread):
                 pos = d + origin[1]
                 dir = "y"
             elif j in np.arange(2,repetitions,3):
-                pos = d*2 + origin[1]
+                pos = d*4 + origin[2]
                 dir = "z"
+
+            print("Iteration #: "+str(j)+"  Direction "+dir )
 
             popt, perr, measured = search_direction(dir, pos)
 
             if self.abort:
-                self.stage.moveabs(x=startpos[0], y=startpos[1])
+                self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                 return False
 
             if popt is not None:
@@ -402,10 +407,12 @@ class SearchThread(MeasurementThread):
                     break
 
             else:
-                if j % 2:
+                if j in np.arange(0, repetitions, 3):
                     self.stage.moveabs(x=startpos[0])
-                else:
+                elif j in np.arange(1, repetitions, 3):
                     self.stage.moveabs(y=startpos[1])
+                elif j in np.arange(2, repetitions, 3):
+                    self.stage.moveabs(z=startpos[2])
                 plot(dir, None, None, pos, measured)
 
 
