@@ -290,8 +290,10 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(x=pos[k])
                 elif  direction == "y":
                     self.stage.moveabs(y=pos[k])
+                elif direction == "z":
+                    self.stage.moveabs(z=pos[k])
                 if self.abort:
-                    self.stage.moveabs(x=startpos[0], y=startpos[1])
+                    self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
                 spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
@@ -329,7 +331,7 @@ class SearchThread(MeasurementThread):
             self.abort = True
             return False
 
-        spec = smooth(self.wl, spec)
+        #spec = smooth(self.wl, spec)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -339,19 +341,24 @@ class SearchThread(MeasurementThread):
 
         ontargetx = False
         ontargety = False
+        ontargetz = False
 
-        repetitions = 4
+        repetitions = 6
         self.progress = progress.Progress(max=repetitions)
+
         for j in range(repetitions):
             self.stage.query_pos()
             origin = self.stage.last_pos()
 
-            if j % 2:
+            if j in np.arange(0,repetitions,3):
                 pos = d + origin[0]
                 dir = "x"
-            else:
+            elif j in np.arange(1,repetitions,3):
                 pos = d + origin[1]
                 dir = "y"
+            elif j in np.arange(2,repetitions,3):
+                pos = d*2 + origin[1]
+                dir = "z"
 
             popt, perr, measured = search_direction(dir, pos)
 
@@ -360,28 +367,37 @@ class SearchThread(MeasurementThread):
                 return False
 
             if popt is not None:
-                if j % 2:
+                if j in np.arange(0,repetitions,3):
                     dx = float(popt[1])
                     if dx-startpos[0] > 1.0:
                         print("Position to far from start, skipping")
                         self.stage.moveabs(x=startpos[0])
                     else:
                         self.stage.moveabs(x=dx)
-                        if perr[1] < 0.01:
+                        if perr[1] < 0.01 and ontargetz:
                             ontargetx = True
-                else:
+                elif j in np.arange(1,repetitions,3):
                     dy = float(popt[1])
                     if dy-startpos[1] > 1.0:
                         print("Position to far from start, skipping result")
                         self.stage.moveabs(y=startpos[1])
                     else:
                         self.stage.moveabs(y=dy)
-                        if perr[1] < 0.01:
+                        if perr[1] < 0.01 and ontargetz:
                             ontargety = True
+                elif j in np.arange(2, repetitions, 3):
+                    dz = float(popt[1])
+                    if dz - startpos[2] > 2.0:
+                        print("Position to far from start, skipping result")
+                        self.stage.moveabs(z=startpos[2])
+                    else:
+                        self.stage.moveabs(z=dz)
+                        if perr[1] < 0.01:
+                            ontargetz = True
 
                 plot(dir,popt, perr, pos, measured)
 
-                if ontargetx and ontargety:
+                if ontargetx and ontargety and ontargetz:
                     print("Particle localized, terminating early")
                     break
 
