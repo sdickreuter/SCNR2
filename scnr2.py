@@ -471,6 +471,43 @@ class SCNR(QMainWindow):
             self.spectrum.take_scan(self.posModel.getMatrix(), self.labels, path, self.ui.lockin_checkBox.isChecked(),
                                     self.ui.search_checkBox.isChecked())
 
+
+    @pyqtSlot()
+    def on_scan3d_clicked(self):
+        prefix, ok = QInputDialog.getText(self, 'Save Folder',
+                                          'Enter Folder to save spectra to:')
+        if ok:
+            try:
+                os.mkdir(self.savedir + prefix)
+            except:
+                print("Error creating directory ./" + prefix)
+                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+
+            path = self.savedir + prefix + "/"
+            file = path + "cube.csv"
+            self.stage.query_pos()
+            x,y,z = self.stage.last_pos()
+
+            x = np.linspace(x - self.ui.cube_width_spin.value() / 2, x + self.ui.cube_width_spin.value() / 2,
+                            self.ui.cube_steps_spin.value())
+            y = np.linspace(y - self.ui.cube_width_spin.value() / 2, y + self.ui.cube_width_spin.value() / 2,
+                            self.ui.cube_steps_spin.value())
+            z = np.linspace(z - self.ui.cube_width_spin.value() / 2, z + self.ui.cube_width_spin.value() / 2,
+                            self.ui.cube_steps_spin.value())
+
+            xx,yy,zz = np.meshgrid(x,y,z)
+            xx = xx.ravel()
+            yy = yy.ravel()
+            zz = zz.ravel()
+
+            pos = np.vstack((xx,yy,zz))
+            pos = pos.transpose()
+
+            self.ui.status.setText("Scanning ...")
+            self.on_disableButtons()
+            self.spectrum.take_scan3d(pos, file)
+
+
     @pyqtSlot()
     def on_stop_clicked(self):
         self.ui.status.setText('Stopped')

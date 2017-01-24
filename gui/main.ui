@@ -999,6 +999,119 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="scan3d_tab">
+         <attribute name="title">
+          <string>3D Scan</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_15">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>3D Scan Settings</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="cube_width_label">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Scan Cube Width [um]:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cube_width_spin">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>2.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Scan Steps along Axis:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="cube_steps_spin">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="scan3d_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Scan</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
       <item>
@@ -1530,8 +1643,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>662</x>
-     <y>109</y>
+     <x>853</x>
+     <y>577</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1562,8 +1675,8 @@
    <slot>on_reset_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>578</y>
+     <x>853</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
@@ -1594,8 +1707,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>662</x>
-     <y>90</y>
+     <x>853</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -1610,8 +1723,8 @@
    <slot>on_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>758</x>
-     <y>679</y>
+     <x>864</x>
+     <y>717</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -1626,8 +1739,8 @@
    <slot>on_save_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>401</y>
+     <x>853</x>
+     <y>378</y>
     </hint>
     <hint type="destinationlabel">
      <x>902</x>
@@ -1642,8 +1755,8 @@
    <slot>on_saveas_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>432</y>
+     <x>853</x>
+     <y>408</y>
     </hint>
     <hint type="destinationlabel">
      <x>877</x>
@@ -1658,8 +1771,8 @@
    <slot>on_dark_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>224</y>
+     <x>853</x>
+     <y>208</y>
     </hint>
     <hint type="destinationlabel">
      <x>857</x>
@@ -1706,8 +1819,8 @@
    <slot>on_bg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>255</y>
+     <x>853</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -1738,8 +1851,8 @@
    <slot>on_loaddark_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>473</y>
+     <x>853</x>
+     <y>448</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -1754,8 +1867,8 @@
    <slot>on_loadlamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>505</y>
+     <x>853</x>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -1770,8 +1883,8 @@
    <slot>on_loadbg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>537</y>
+     <x>853</x>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
      <x>882</x>
@@ -1786,8 +1899,8 @@
    <slot>on_number_of_samples_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>853</x>
-     <y>177</y>
+     <x>852</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
@@ -1802,8 +1915,8 @@
    <slot>on_slit_width_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>853</x>
-     <y>210</y>
+     <x>852</x>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>838</x>
@@ -1834,8 +1947,8 @@
    <slot>on_centre_wavelength_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>853</x>
-     <y>243</y>
+     <x>852</x>
+     <y>224</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
@@ -1850,8 +1963,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>853</x>
-     <y>368</y>
+     <x>852</x>
+     <y>349</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -1930,8 +2043,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>662</x>
-     <y>87</y>
+     <x>853</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -1946,8 +2059,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>674</x>
-     <y>134</y>
+     <x>648</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -1962,8 +2075,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>674</x>
-     <y>134</y>
+     <x>726</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -1978,8 +2091,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>674</x>
-     <y>134</y>
+     <x>804</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2170,8 +2283,8 @@
    <slot>on_savesettings_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>577</y>
+     <x>853</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -2186,8 +2299,8 @@
    <slot>on_temp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>625</y>
+     <x>864</x>
+     <y>667</y>
     </hint>
     <hint type="destinationlabel">
      <x>1001</x>
@@ -2218,12 +2331,28 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>809</x>
-     <y>421</y>
+     <x>852</x>
+     <y>417</y>
     </hint>
     <hint type="destinationlabel">
      <x>1065</x>
      <y>295</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scan3d_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_scan3d_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>720</x>
+     <y>226</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>994</x>
+     <y>273</y>
     </hint>
    </hints>
   </connection>
@@ -2275,5 +2404,7 @@
   <slot>on_mode_changed(int)</slot>
   <slot>on_temp_clicked()</slot>
   <slot>on_lockin_clicked()</slot>
+  <slot>on_scan3d_clicked()</slot>
+  <slot>on_cube_steps_edited()</slot>
  </slots>
 </ui>

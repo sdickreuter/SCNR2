@@ -422,6 +422,84 @@ class SearchThread(MeasurementThread):
         self.spectrometer.SetExposureTime(self.settings.integration_time)
 
 
+class Scan3DThread(MeasurementThread):
+    def __init__(self, spectrometer, settings, scanning_points, file,stage, parent=None):
+        try:
+            self.spectrometer = spectrometer
+            self.scanning_points = scanning_points
+            self.settings = settings
+            self.stage = stage
+            self.i = 0
+            self.n = scanning_points.shape[0]
+            self.positions = np.zeros((self.n, 3))
+            self.file = file
+            self.f = None
+            self.progress = progress.Progress(max=self.n)
+            super(Scan3DThread, self).__init__(spectrometer)
+            self.initMeanThread()
+
+        except:
+            (type, value, traceback) = sys.exc_info()
+            sys.excepthook(type, value, traceback)
+
+    @pyqtSlot()
+    def process(self):
+        with open(self.file, 'rw') as self.f:
+            self.f.write("x,y,z,")# + "\r\n")
+            for i in range(len(self.wl)):
+                self.f.write(str(self.wl[i])+",")
+            self.f.write("\r\n")
+            while not self.abort:
+                try:
+                    self.work()
+                except:
+                    (type, value, traceback) = sys.exc_info()
+                    sys.excepthook(type, value, traceback)
+                    self.stop()
+
+    @pyqtSlot(np.ndarray)
+    def meanfinished(self, spec):
+        self.f.write(str(self.scanning_points[self.i, 0]) + "," +str(self.scanning_points[self.i, 1]) + "," +str(self.scanning_points[self.i, 2]) + ",")
+        for i in range(len(spec)):
+            self.f.write(str(spec[i]) + ",")
+        self.f.write("\r\n")
+
+    def stop(self):
+        self.meanthread.stop()
+        self.meanthread.wait(self.settings.integration_time*1000+500)
+        self.meanthread = None
+        super(ScanMeanThread, self).stop()
+
+    def initMeanThread(self):
+        self.meanthread = MeanThread(self.spectrometer, self.settings.number_of_samples, self)
+        self.meanthread.finishSignal.connect(self.meanfinished)
+        self.meanthread.specSignal.connect(self.specslot)
+        self.meanthread.init()
+
+    def intermediatework(self):
+        if not self.abort:
+            self.meanthread.init()
+        if not self.abort:
+            self.meanthread.process()
+
+    def work(self):
+        self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1],z=self.scanning_points[self.i, 2])
+        if not self.abort:
+            self.intermediatework()
+        else:
+            return False
+        x, y, z = self.stage.last_pos()
+        self.positions[self.i, 0] = x
+        self.positions[self.i, 1] = y
+        self.positions[self.i, 2] = z
+        self.progress.next()
+        self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+        self.i += 1
+        if self.i >= self.n:
+            self.progressSignal.emit(100, str(self.progress.eta_td))
+            self.finishSignal.emit(self.positions)
+            self.stop()
+
 
 class ScanThread(MeasurementThread):
     def __init__(self, spectrometer, settings, scanning_points, labels,stage, parent=None):
