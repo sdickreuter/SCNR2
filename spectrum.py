@@ -213,11 +213,19 @@ class Spectrum(QObject):
         self.positions = positions
         self.workingthread = Scan3DThread(self._spectrometer, self.settings, positions, file, self.stage)
 
-        self.workingthread.finishSignal.connect(self.finishedScanMean)
+        self.workingthread.finishSignal.connect(self.finishedScan3d)
         #self.workingthread.saveSignal.connect(self.save_spectrum)
         self.workingthread.specSignal.connect(self.specCallback)
         self.workingthread.progressSignal.connect(self.progressCallback)
         self.workingthread.start()
+
+
+    @pyqtSlot(np.ndarray)
+    def finishedScan3d(self):
+        #self.enableButtons.emit()
+        self.stop_process()
+        self.updateStatus.emit('Scan Mean finished')
+
 
     @pyqtSlot(np.ndarray)
     def finishedScanMean(self, pos):

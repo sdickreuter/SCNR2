@@ -314,7 +314,7 @@ class SearchThread(MeasurementThread):
                 if perr[0] > 1000 or perr[1] > 1 or perr[2] > 50:
                     print("Could not determine particle position: Variance too big")
                     print(perr)
-                elif popt[0] < 0.5:
+                elif popt[0] < 0.1:
                     print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
                     print("Could not determine particle position: Peak outside bounds")
@@ -435,16 +435,19 @@ class Scan3DThread(MeasurementThread):
             self.file = file
             self.f = None
             self.progress = progress.Progress(max=self.n)
+            self.wl = spectrometer.GetWavelength()
             super(Scan3DThread, self).__init__(spectrometer)
             self.initMeanThread()
-
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
+            print(type)
+            print(value)
 
     @pyqtSlot()
     def process(self):
-        with open(self.file, 'rw') as self.f:
+        print("Taking "+str(self.n)+" spectra")
+        with open(self.file, 'w') as self.f:
             self.f.write("x,y,z,")# + "\r\n")
             for i in range(len(self.wl)):
                 self.f.write(str(self.wl[i])+",")
@@ -466,9 +469,9 @@ class Scan3DThread(MeasurementThread):
 
     def stop(self):
         self.meanthread.stop()
-        self.meanthread.wait(self.settings.integration_time*1000+500)
+        self.meanthread.thread.wait(self.settings.integration_time*1000+500)
         self.meanthread = None
-        super(ScanMeanThread, self).stop()
+        super(Scan3DThread, self).stop()
 
     def initMeanThread(self):
         self.meanthread = MeanThread(self.spectrometer, self.settings.number_of_samples, self)
@@ -497,8 +500,14 @@ class Scan3DThread(MeasurementThread):
         self.i += 1
         if self.i >= self.n:
             self.progressSignal.emit(100, str(self.progress.eta_td))
-            self.finishSignal.emit(self.positions)
+            self.finishSignal.emit(np.array([]))
             self.stop()
+
+    @pyqtSlot(np.ndarray)
+    def specslot(self, spec):
+        self.specSignal.emit(spec)
+
+
 
 
 class ScanThread(MeasurementThread):
