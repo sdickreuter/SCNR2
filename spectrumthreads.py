@@ -82,7 +82,7 @@ class MeasurementThread(QObject):
     def process(self):
         try:
             while not self.abort:
-                    self.work()
+                self.work()
         except Exception as e:
             print(e)
             (type, value, traceback) = sys.exc_info()
@@ -103,10 +103,8 @@ class LiveThread(MeasurementThread):
     def process(self):
         try:
             while not self.abort:
-                    #if not self.abort:
-                        self.spec = self.spectrometer.TakeSingleTrack()
-                    #if not self.abort:
-                        self.work()
+                self.spec = self.spectrometer.TakeSingleTrack()
+                self.work()
         except Exception as e:
             print(e)
             (type, value, traceback) = sys.exc_info()
@@ -259,11 +257,6 @@ class SearchThread(MeasurementThread):
         else:
             return
         self.stop()
-
-    def stop(self):
-        #super(SearchThread, self).stop()
-        self.abort = True
-        #self.thread.wait(self.settings.search_integration_time*1000+500)
 
     def search(self):
 
@@ -465,9 +458,10 @@ class Scan3DThread(MeasurementThread):
             self.f.write(str(spec[i]) + ",")
         self.f.write("\r\n")
 
+    @pyqtSlot()
     def stop(self):
         self.meanthread.stop()
-        self.meanthread.thread.wait(self.settings.integration_time*1000+500)
+        #self.meanthread.thread.wait(self.settings.integration_time*1000+500)
         self.meanthread = None
         super(Scan3DThread, self).stop()
 
@@ -559,9 +553,11 @@ class ScanSearchThread(ScanThread):
         self.searchthread.specSignal.connect(self.specslot)
         self.searchthread.finishSignal.connect(self.searchfinishslot)
 
+    @pyqtSlot()
     def stop(self):
         self.searchthread.stop()
         super(ScanSearchThread, self).stop()
+        self.searchthread = None
 
     def __del__(self):
         #self.searchthread.specSignal.disconnect(self.specslot)
@@ -589,11 +585,12 @@ class ScanLockinThread(ScanThread):
         self.meanthread.finishSignal.connect(self.lockinfinished)
         self.meanthread.specSignal.connect(self.specslot)
 
+    @pyqtSlot()
     def stop(self):
         self.meanthread.stop()
-        self.meanthread.thread.wait(self.settings.integration_time*1000+500)
-        self.meanthread = None
+        #self.meanthread.thread.wait(self.settings.integration_time*1000+500)
         super(ScanThread, self).stop()
+        self.meanthread = None
 
 
     def intermediatework(self):
@@ -618,11 +615,12 @@ class ScanMeanThread(ScanThread):
         super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.initMeanThread()
 
+    @pyqtSlot()
     def stop(self):
         self.meanthread.stop()
-        self.meanthread.wait(self.settings.integration_time*1000+500)
-        self.meanthread = None
+        #self.meanthread.wait(self.settings.integration_time*1000+500)
         super(ScanMeanThread, self).stop()
+        self.meanthread = None
 
     # def __del__(self):
     #     #self.meanthread.finishSignal.disconnect()
@@ -673,14 +671,15 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
         self.searchthread.specSignal.connect(self.specslot)
 
+    @pyqtSlot()
     def stop(self):
         self.meanthread.stop()
         self.searchthread.stop()
-        self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
-        self.meanthread = None
-        self.searchthread.thread.wait(self.settings.integration_time*1000+500)
-        self.searchthread = None
+        #self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
+        #self.searchthread.thread.wait(self.settings.integration_time*1000+500)
         super(ScanMeanThread, self).stop()
+        self.searchthread = None
+        self.meanthread = None
 
     # def __del__(self):
     #     self.stop()
