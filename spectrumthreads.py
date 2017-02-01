@@ -285,7 +285,7 @@ class SearchThread(MeasurementThread):
                     sigma_start = self.settings.sigma
                 elif direction == "z":
                     self.stage.moveabs(z=pos[k])
-                    sigma_start = self.settings.sigma*4
+                    sigma_start = self.settings.sigma*3
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
@@ -309,7 +309,7 @@ class SearchThread(MeasurementThread):
                     print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
                     print("Could not determine particle position: Peak outside bounds")
-                elif popt[2] < self.settings.sigma/4:
+                elif popt[2] < self.settings.sigma/100:
                     print("Could not determine particle position: Peak to narrow")
                 else:
                     return popt, perr, measured
