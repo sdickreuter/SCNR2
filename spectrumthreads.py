@@ -56,23 +56,17 @@ class MeasurementThread(QObject):
             super(MeasurementThread, self).__init__(parent)
             self.spectrometer = spectrometer
             self.abort = False
-            self.thread = QThread(parent)
-            self.moveToThread(self.thread)
-            self.thread.started.connect(self.process)
-            #self.thread.finished.connect(self.stop)
         except:
             (type, value, traceback) = sys.exc_info()
             sys.excepthook(type, value, traceback)
         self.spec = np.zeros(self.spectrometer._width)
         print("New "+ self.__class__.__name__ +" created: "+str(id(self)))
 
-    def start(self):
-        self.thread.start()
-
     @pyqtSlot()
     def stop(self):
         self.abort = True
         #self.thread.wait(self.spectrometer.exposure_time*1000+500)
+        #self.thread.wait()
         #self.spectrometer.AbortAcquisition()
         #self.thread.quit()
         #print("Done with thread")
@@ -80,21 +74,24 @@ class MeasurementThread(QObject):
     def __del__(self):
         self.__class__.has_instance = False
 
+    @pyqtSlot()
     def work(self):
         pass
 
     @pyqtSlot()
     def process(self):
-        while not self.abort:
-            try:
-                self.work()
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
-                self.stop()
+        try:
+            while not self.abort:
+                    self.work()
+        except Exception as e:
+            print(e)
+            (type, value, traceback) = sys.exc_info()
+            sys.excepthook(type, value, traceback)
+            self.stop()
 
 class LiveThread(MeasurementThread):
 
+    @pyqtSlot()
     def work(self):
         try:
             self.specSignal.emit(self.spec)
@@ -104,15 +101,16 @@ class LiveThread(MeasurementThread):
 
     @pyqtSlot()
     def process(self):
-        while not self.abort:
-            try:
-                if not self.abort:
-                    self.spec = self.spectrometer.TakeSingleTrack()
-                if not self.abort:
-                    self.work()
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
+        try:
+            while not self.abort:
+                    #if not self.abort:
+                        self.spec = self.spectrometer.TakeSingleTrack()
+                    #if not self.abort:
+                        self.work()
+        except Exception as e:
+            print(e)
+            (type, value, traceback) = sys.exc_info()
+            sys.excepthook(type, value, traceback)
 
 
 class ImageThread(MeasurementThread):
@@ -301,8 +299,8 @@ class SearchThread(MeasurementThread):
                 spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
-                measured[k] = np.max(spec[100:1900])
-                #measured[k] = np.sum(spec)
+                #measured[k] = np.max(spec[100:1900])
+                measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
             minval = np.min(measured)
@@ -311,7 +309,7 @@ class SearchThread(MeasurementThread):
             try:
                 popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
                 perr = np.diag(pcov)
-                if perr[0] > 1000 or perr[1] > 1 or perr[2] > 50:
+                if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
                     print("Could not determine particle position: Variance too big")
                     print(perr)
                 elif popt[0] < 0.1:

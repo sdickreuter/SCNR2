@@ -43,12 +43,12 @@ class Spectrum(QObject):
 
         self._spec = None
 
-        self.workingthread = None
+        self.worker = None
 
     def __del__(self):
-        if not self.workingthread is None:
-            self.workingthread.stop()
-            self.workingthread = None
+        if not self.worker is None:
+            self.worker.stop()
+            self.worker = None
 
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
@@ -65,25 +65,38 @@ class Spectrum(QObject):
 
     def stop_process(self):
         try:
-            self.workingthread.stop()
-            self.workingthread.thread.wait(self.settings.integration_time*1000+500)
-            self.workingthread = None
+            self.worker.stop()
+            self.thread.quit()
+            # if  self.workingthread.thread.wait(self.settings.integration_time*1000+500):
+            #     self.workingthread = None
+            # else:
+            #     print("problem with thread")
+            print(self.thread.wait())
+            self.thread = None
             #self._spectrometer.AbortAcquisition()
         except Exception as e:
             print(e)
         self.enableButtons.emit()
 
+    def start_process(self, worker):
+        self.thread = QThread(self)
+        worker.moveToThread(self.thread)
+        self.thread.started.connect(worker.process)
+        self.thread.finished.connect(worker.stop)
+        self.thread.start()
+
+
     def take_live(self):
-        # self.workingthread = LiveThread(self.getspecthread)
-        self.workingthread = LiveThread(self._spectrometer)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.start()
+
+        self.worker = LiveThread(self._spectrometer)
+        self.worker.specSignal.connect(self.specCallback)
+        self.start_process(self.worker)
 
     def take_live_image(self):
         # self.workingthread = LiveThread(self.getspecthread)
-        self.workingthread = ImageThread(self._spectrometer)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.start()
+        self.worker = ImageThread(self._spectrometer)
+        self.worker.specSignal.connect(self.specCallback)
+        self.start_process(self.worker)
 
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
@@ -121,44 +134,44 @@ class Spectrum(QObject):
         self.updateStatus.emit('Background Spectrum acquired')
 
     def startMeanThread(self):
-        self.workingthread = MeanThread(self._spectrometer, self.settings.number_of_samples)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
+        self.worker = MeanThread(self._spectrometer, self.settings.number_of_samples)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
 
     def take_dark(self):
         self.startMeanThread()
-        self.workingthread.finishSignal.connect(self.finishedDarkCallback)
-        self.workingthread.start()
+        self.worker.finishSignal.connect(self.finishedDarkCallback)
+        self.start_process(self.worker)
 
     def take_lamp(self):
         self.startMeanThread()
-        self.workingthread.finishSignal.connect(self.finishedLampCallback)
-        self.workingthread.start()
+        self.worker.finishSignal.connect(self.finishedLampCallback)
+        self.start_process(self.worker)
 
     def take_mean(self):
         self.startMeanThread()
-        self.workingthread.finishSignal.connect(self.finishedMeanCallback)
-        self.workingthread.start()
+        self.worker.finishSignal.connect(self.finishedMeanCallback)
+        self.start_process(self.worker)
 
     def take_bg(self):
         self.startMeanThread()
-        self.workingthread.finishSignal.connect(self.finishedBGCallback)
-        self.workingthread.start()
+        self.worker.finishSignal.connect(self.finishedBGCallback)
+        self.start_process(self.worker)
 
     def take_lockin(self):
-        self.workingthread = LockinThread(self._spectrometer, self.settings, self.stage)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.finishSignal.connect(self.finishedLockinCallback)
-        self.workingthread.start()
+        self.worker = LockinThread(self._spectrometer, self.settings, self.stage)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.finishSignal.connect(self.finishedLockinCallback)
+        self.start_process(self.worker)
 
     def search_max(self):
         print(self.settings.search_integration_time)
-        self.workingthread = SearchThread(self._spectrometer, self.settings, self.stage)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.finishSignal.connect(self.finishedSearch)
-        self.workingthread.start()
+        self.worker = SearchThread(self._spectrometer, self.settings, self.stage)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.finishSignal.connect(self.finishedSearch)
+        self.start_process(self.worker)
 
     def scan_search_max(self, pos, labels):
         # self.stage.query_pos()
@@ -166,11 +179,11 @@ class Spectrum(QObject):
         # pos = np.matrix([[x, y]])
         self.positions = pos
         self.save_path = "search_max/"
-        self.workingthread = ScanSearchThread(self._spectrometer, self.settings, pos, labels,self.stage)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.finishSignal.connect(self.finishedScanSearch)
-        self.workingthread.start()
+        self.worker = ScanSearchThread(self._spectrometer, self.settings, pos, labels, self.stage)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.finishSignal.connect(self.finishedScanSearch)
+        self.start_process(self.worker)
 
     @pyqtSlot(np.ndarray)
     def finishedSearch(self, pos):
@@ -198,26 +211,26 @@ class Spectrum(QObject):
         if with_lockin:
             return True
         elif with_search:
-            self.workingthread = ScanSearchMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
+            self.worker = ScanSearchMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
         else:
-            self.workingthread = ScanMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
+            self.worker = ScanMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
             #self.workingthread = ScanThread(self._spectrometer, self.settings, positions, self.stage)
 
-        self.workingthread.finishSignal.connect(self.finishedScanMean)
-        self.workingthread.saveSignal.connect(self.save_spectrum)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.start()
+        self.worker.finishSignal.connect(self.finishedScanMean)
+        self.worker.saveSignal.connect(self.save_spectrum)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.start_process(self.worker)
 
     def take_scan3d(self, positions, file):
         self.positions = positions
-        self.workingthread = Scan3DThread(self._spectrometer, self.settings, positions, file, self.stage)
+        self.worker = Scan3DThread(self._spectrometer, self.settings, positions, file, self.stage)
 
-        self.workingthread.finishSignal.connect(self.finishedScan3d)
+        self.worker.finishSignal.connect(self.finishedScan3d)
         #self.workingthread.saveSignal.connect(self.save_spectrum)
-        self.workingthread.specSignal.connect(self.specCallback)
-        self.workingthread.progressSignal.connect(self.progressCallback)
-        self.workingthread.start()
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.start_process(self.worker)
 
 
     @pyqtSlot(np.ndarray)
@@ -244,7 +257,7 @@ class Spectrum(QObject):
         self.save_data(self.series_path)
         self.worker_mode = "series"
         self.series_count = 0
-        self.start_process(self._live_spectrum)
+        self.start_process(self.worker)
 
     def save_data(self, prefix):
         self.save_path = prefix
