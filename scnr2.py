@@ -125,7 +125,9 @@ class SCNR(QMainWindow):
 
         # init detector mode combobox
         self.ui.mode_combobox.addItem("Spectrum")
-        self.ui.mode_combobox.addItem("Image")
+        self.ui.mode_combobox.addItem("Image of Slit")
+        self.ui.mode_combobox.addItem("Full Image")
+
 
         # init camera stuff
         if init_cam:
@@ -278,6 +280,8 @@ class SCNR(QMainWindow):
                 self.setSpectrumMode()
             elif index == 1:
                 self.setImageMode()
+            elif index == 2:
+                self.setFullImageMode()
 
     def setSpectrumMode(self):
         self.ui.dark_button.setEnabled(True)
@@ -297,8 +301,6 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.spectrometer.SetSingleTrack()
 
-        #self.ui.left_tab.setCurrentIndex(0)
-
     def setImageMode(self):
         self.ui.dark_button.setDisabled(True)
         self.ui.bg_button.setDisabled(True)
@@ -312,11 +314,17 @@ class SCNR(QMainWindow):
         self.ui.slitwidth_spin.setValue(2500)
         self.spectrometer.SetImageofSlit()
         self.ui.centre_wavelength_spin.setValue(0)
-        # if self.ui.image_combobox.currentIndex() == 0:
-        #    self.spectrometer.SetImageofSlit()
-        # elif self.ui.image_combobox.currentIndex() ==1:
-        #    self.spectrometer.SetFullImage()
-        #self.ui.left_tab.setCurrentIndex(2)
+
+    def setFullImageMode(self):
+        self.ui.dark_button.setDisabled(True)
+        self.ui.bg_button.setDisabled(True)
+        self.ui.ref_button.setDisabled(True)
+        self.ui.mean_button.setDisabled(True)
+        self.ui.series_button.setDisabled(True)
+        self.ui.searchmax_button.setDisabled(True)
+        self.ui.lockin_button.setDisabled(True)
+        self.spectrometer.SetFullImage()
+
 
     # ----- END Slot for Detektor Mode
 
@@ -531,10 +539,13 @@ class SCNR(QMainWindow):
     def on_live_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Liveview')
-        if self.spectrometer.mode == 'SingleTrack':
+        if self.spectrometer.mode == 'singletrack':
             self.spectrum.take_live()
-        elif self.spectrometer.mode == 'Image':
+        elif self.spectrometer.mode == 'imageofslit':
             self.spectrum.take_live_image()
+        elif self.spectrometer.mode == 'fullimage':
+            self.spectrum.take_live_image()
+
 
     @pyqtSlot()
     def on_searchgrid_clicked(self):

@@ -139,6 +139,34 @@ class ImageThread(MeasurementThread):
                 sys.excepthook(type, value, traceback)
 
 
+class FullImageThread(MeasurementThread):
+
+    def work(self):
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
+
+    @pyqtSlot()
+    def process(self):
+        while not self.abort:
+            try:
+                if not self.abort:
+                    self.spec = self.spectrometer.TakeFullImage()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
+                if not self.abort:
+                    self.work()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
+            except:
+                (type, value, traceback) = sys.exc_info()
+                sys.excepthook(type, value, traceback)
+
+
 class MeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
@@ -154,7 +182,6 @@ class MeanThread(MeasurementThread):
     def work(self):
         self.spec = self.spectrometer.TakeSingleTrack()
         if self.spec is not None:
-            print('Spectrum aquired' +str(self.spec.shape))
             self.mean = (self.mean + self.spec)  # / 2
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))

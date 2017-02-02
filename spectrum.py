@@ -98,6 +98,12 @@ class Spectrum(QObject):
         self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
+    def take_live_fullimage(self):
+        # self.workingthread = LiveThread(self.getspecthread)
+        self.worker = FullImageThread(self._spectrometer)
+        self.worker.specSignal.connect(self.specCallback)
+        self.start_process(self.worker)
+
     @pyqtSlot(np.ndarray)
     def finishedLockinCallback(self, spec):
         self.stop_process()

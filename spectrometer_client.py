@@ -215,7 +215,7 @@ class SpectrometerClient:
 
     def SetImageofSlit(self):
         #print("Send Request: setimageofslit")
-        self.mode = 'Image'
+        self.mode = 'imageofslit'
         ret = self.make_request('setimageofslit',None)
         self._return_value_is_ok(ret)
 
@@ -227,9 +227,23 @@ class SpectrometerClient:
         else:
             return None
 
+    def SetFullImage(self):
+        #print("Send Request: setimageofslit")
+        self.mode = 'fullimage'
+        ret = self.make_request('setfullimage',None)
+        self._return_value_is_ok(ret)
+
+    def TakeFullImage(self):
+        # print("Send Request: takeimageofslit")
+        ret = self.make_request('takefullimage', None)
+        if self._return_value_is_data(ret):
+            return ret
+        else:
+            return None
+
     def SetSingleTrack(self, hstart=None, hstop=None):
         #print("Send Request: setsingletrack")
-        self.mode = 'SingleTrack'
+        self.mode = 'singletrack'
         ret = self.make_request('setsingletrack',(hstart,hstop))
         self._return_value_is_ok(ret)
 
