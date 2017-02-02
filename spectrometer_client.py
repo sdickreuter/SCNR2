@@ -189,20 +189,6 @@ class SpectrometerClient:
     def GetWavelength(self):
         return self.wl
 
-    def SetFullImage(self):
-        #print("Send Request: setfullimage")
-        self.mode = 'Image'
-        ret = self.make_request('setfullimage',None)
-        self._return_value_is_ok(ret)
-
-    def TakeFullImage(self):
-        #print("Send Request: takefullimage")
-        ret = self.make_request('takefullimage',None)
-        if self._return_value_is_data(ret):
-            return ret
-        else:
-            return None
-
     def SetCentreWavelength(self, wavelength):
         #print("Send Request: setcentrewavelength")
         ret = self.make_request('setcentrewavelength',wavelength)

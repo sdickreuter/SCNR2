@@ -287,7 +287,7 @@ class SearchThread(MeasurementThread):
 
     def search(self):
 
-        def plot(title, popt, perr, pos, measured):
+        def plot(title, popt, perr, pos, measured, maxwl):
             fig = plt.figure()
             ax = fig.add_subplot(111)
             ax.plot(pos, measured, 'bo')
@@ -296,12 +296,18 @@ class SearchThread(MeasurementThread):
                 ax.text(0.1, 0.9, str(round(popt[1],3)) + ' +- ' + str(round(perr[1],3)), ha='left', va='center', transform=ax.transAxes)
                 ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
                 ax.set_title(title)
+            if not maxwl is None:
+                ax2 = ax.twinx()
+                ax2.plot(pos, maxwl, 'r.')
+                ax2.set_ylabel('maxwl', color='r')
+                ax2.tick_params('y', colors='r')
             plt.savefig("search_max/search" + str(j) + ".png")
             plt.close()
 
 
         def search_direction(direction, pos):
             measured = np.zeros(self.settings.rasterdim)
+            maxwl = np.zeros(self.settings.rasterdim)
 
             for k in range(len(pos)):
                 if direction == "x":
@@ -320,6 +326,7 @@ class SearchThread(MeasurementThread):
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
                 #measured[k] = np.max(spec[100:1900])
+                maxwl[k] = self.spectrometer.GetWavelength()[np.argmax(spec)]
                 measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
@@ -329,21 +336,22 @@ class SearchThread(MeasurementThread):
             try:
                 popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
                 perr = np.diag(pcov)
-                if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
+                #if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
+                if perr[1] > 1:
                     print("Could not determine particle position: Variance too big")
                     print(perr)
                 elif popt[0] < 0.1:
                     print("Could not determine particle position: Peak too small")
-                elif popt[1] < (min(pos) - 0.5) or popt[1] > (max(pos) + 0.5):
+                elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                     print("Could not determine particle position: Peak outside bounds")
                 elif popt[2] < self.settings.sigma/100:
                     print("Could not determine particle position: Peak to narrow")
                 else:
-                    return popt, perr, measured
+                    return popt, perr, measured, maxwl
             except RuntimeError as e:
                 print(e)
                 print("Could not determine particle position: Fit error")
-            return None, None, measured
+            return None, None, measured, None
 
 
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
@@ -383,7 +391,7 @@ class SearchThread(MeasurementThread):
 
             print("Iteration #: "+str(j)+"  Direction "+dir )
 
-            popt, perr, measured = search_direction(dir, pos)
+            popt, perr, measured, maxwl = search_direction(dir, pos)
 
             if self.abort:
                 self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
@@ -392,7 +400,7 @@ class SearchThread(MeasurementThread):
             if popt is not None:
                 if j in np.arange(0,repetitions,3):
                     dx = float(popt[1])
-                    if dx-startpos[0] > 1.0:
+                    if dx-startpos[0] > self.settings.rasterwidth:
                         print("Position to far from start, skipping")
                         self.stage.moveabs(x=startpos[0])
                     else:
@@ -401,8 +409,8 @@ class SearchThread(MeasurementThread):
                             ontargetx = True
                 elif j in np.arange(1,repetitions,3):
                     dy = float(popt[1])
-                    if dy-startpos[1] > 1.0:
-                        print("Position to far from start, skipping result")
+                    if dy-startpos[1] > self.settings.rasterwidth:
+                        print("Position to far from start, skipping")
                         self.stage.moveabs(y=startpos[1])
                     else:
                         self.stage.moveabs(y=dy)
@@ -410,15 +418,15 @@ class SearchThread(MeasurementThread):
                             ontargety = True
                 elif j in np.arange(2, repetitions, 3):
                     dz = float(popt[1])
-                    if dz - startpos[2] > 2.0:
-                        print("Position to far from start, skipping result")
+                    if dz - startpos[2] > self.settings.rasterwidth*3:
+                        print("Position to far from start, skipping")
                         self.stage.moveabs(z=startpos[2])
                     else:
                         self.stage.moveabs(z=dz)
                         if perr[1] < 0.01:
                             ontargetz = True
 
-                plot(dir,popt, perr, pos, measured)
+                plot(dir,popt, perr, pos, measured, maxwl)
 
                 if ontargetx and ontargety and ontargetz:
                     print("Particle localized, terminating early")
@@ -431,7 +439,7 @@ class SearchThread(MeasurementThread):
                     self.stage.moveabs(y=startpos[1])
                 elif j in np.arange(2, repetitions, 3):
                     self.stage.moveabs(z=startpos[2])
-                plot(dir, None, None, pos, measured)
+                plot(dir, None, None, pos, measured, None)
 
 
             self.progress.next()

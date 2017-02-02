@@ -369,11 +369,11 @@ class SCNR(QMainWindow):
     @pyqtSlot(np.ndarray)
     def on_update_spectrum(self, spec):
         if spec is not None:
-            if self.spectrometer.mode == "Image":
+            if self.spectrometer.mode == "imageofslit" or self.spectrometer.mode == "fullimage":
                 #plow, phigh = np.percentile(spec, (2, 98))
                 #spec = exposure.rescale_intensity(spec, in_range=(plow, phigh))
                 self.detector_img.setImage(spec,autoLevels=False)
-            elif self.spectrometer.mode == 'SingleTrack':
+            elif self.spectrometer.mode == 'singletrack':
                 self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
         else:
             QMessageBox.warning(self, 'Error', "Communication with Spectrometer out of sync, please try again.", QMessageBox.Ok)
@@ -544,7 +544,7 @@ class SCNR(QMainWindow):
         elif self.spectrometer.mode == 'imageofslit':
             self.spectrum.take_live_image()
         elif self.spectrometer.mode == 'fullimage':
-            self.spectrum.take_live_image()
+            self.spectrum.take_live_fullimage()
 
 
     @pyqtSlot()
