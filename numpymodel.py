@@ -5,17 +5,17 @@ class NumpyModel(QAbstractTableModel):
     def __init__(self, data, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self._data = np.array(data)
-        self._cols = data.shape[1]
+        self._cols = data.shape[0]
         self.r, self.c = self._data.shape
 
     def getMatrix(self):
         return self._data.copy()
 
     def rowCount(self, parent=None):
-        return self._data.shape[0]
+        return self._data.shape[1]
 
     def columnCount(self, parent=None):
-        return self._data.shape[1]
+        return self._data.shape[0]
 
     def data(self, index, role=Qt.DisplayRole):
         if index.isValid():
@@ -59,7 +59,10 @@ class NumpyModel(QAbstractTableModel):
 
         self.beginInsertRows(QModelIndex(), position, position + count - 1)
         #self._data = np.append(self._data,data,axis=0)
-        self._data = np.vstack((self._data,data))
+        if position > 0:
+            self._data = np.vstack((self._data,data))
+        else:
+            self._data = data
         self.endInsertRows()
         return True
 
