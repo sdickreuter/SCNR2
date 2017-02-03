@@ -715,7 +715,7 @@ class SCNR(QMainWindow):
         positions = self.posModel.getMatrix()
         grid, self.labels, ok = dialogs.SpanGrid_Dialog.getXY(positions)
         if ok:
-            self.clear()
+            self.posModel.clear()
             self.posModel.addData(grid)
 
     @pyqtSlot()
