@@ -386,7 +386,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def on_updatePositions(self, pos):
-        self.posModel.update(pos)
+        self.posModel.addData(pos)
 
     @pyqtSlot()
     def on_disableButtons(self):
@@ -707,28 +707,21 @@ class SCNR(QMainWindow):
     def on_addpos_clicked(self):
         self.stage.query_pos()
         x, y, z = self.stage.last_pos()
-        positions = self.posModel.getMatrix()
-        if positions.shape[1] == 2:
-            positions = np.append(positions, np.matrix([x, y]), axis=0)
-        else:
-            positions = np.matrix([x, y])
-        self.posModel.update(positions)
+        positions = np.matrix([x, y])
+        self.posModel.addData(positions)
 
     @pyqtSlot()
     def on_spangrid_clicked(self):
         positions = self.posModel.getMatrix()
         grid, self.labels, ok = dialogs.SpanGrid_Dialog.getXY(positions)
         if ok:
-            self.posModel.update(grid)
+            self.clear()
+            self.posModel.addData(grid)
 
     @pyqtSlot()
     def on_scan_add(self):
-        positions = self.posModel.getMatrix()
-        if positions.shape[1] == 2:
-            positions = np.append(positions, np.matrix([0.0, 0.0]), axis=0)
-        else:
-            positions = np.matrix([0.0, 0.0])
-        self.posModel.update(positions)
+        positions = np.matrix([0.0, 0.0])
+        self.posModel.addData(positions)
 
     @pyqtSlot()
     def on_scan_remove(self):
@@ -736,17 +729,15 @@ class SCNR(QMainWindow):
         rows = np.array([], dtype=int)
         for index in indices:
             rows = np.append(rows, index.row())
-        positions = self.posModel.getMatrix()
-        positions = np.delete(positions, rows, axis=0)
-        self.posModel.update(positions)
+        self.posModel.removeRows(rows)
 
     @pyqtSlot()
     def on_scan_clear(self):
-        self.posModel.update(np.matrix([[]]))
+        self.posModel.clear()
 
     @pyqtSlot(np.ndarray)
     def update_positions(self, pos):
-        self.posModel.update(pos)
+        self.posModel.addData(pos)
 
     # ----- END Scanning Listview Slots
 
