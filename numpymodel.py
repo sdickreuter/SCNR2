@@ -58,7 +58,8 @@ class NumpyModel(QAbstractTableModel):
         count = data.shape[0]
 
         self.beginInsertRows(QModelIndex(), position, position + count - 1)
-        self._data = np.append(self._data,data,axis=0)
+        #self._data = np.append(self._data,data,axis=0)
+        self._data = np.vstack(data)
         self.endInsertRows()
         return True
 
