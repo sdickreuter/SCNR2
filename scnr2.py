@@ -24,8 +24,6 @@ import settings
 import camerathread
 import gamepadthread
 import numpymodel
-import settings
-import spectrum
 import dialogs
 from custom_pyqtgraph_classes import movableCrosshair, xmovableCrosshair
 from gui.main import Ui_MainWindow
