@@ -245,7 +245,7 @@ class SCNR(QMainWindow):
         self.vh = self.ui.posTable.verticalHeader()
         self.vh.setVisible(False)
         self.hh = self.ui.posTable.horizontalHeader()
-        self.hh.setModel(self.posModel)
+        #self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
 
         self.show_pos()
