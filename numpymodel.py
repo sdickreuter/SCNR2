@@ -70,14 +70,16 @@ class NumpyModel(QAbstractTableModel):
     def removeRows(self, rows):
         position = min(rows)
         count = len(rows)
-        self.beginRemoveRows(QModelIndex(), position, position + count - 1)
-        self._data = np.delete(self._data, rows, axis=0)
-        self.endRemoveRows()
+        for row in rows:
+            if row in np.arange(0,self._data.shape[1]):
+                self.beginRemoveRows(QModelIndex(), position, position + count - 1)
+                self._data = np.delete(self._data, rows, axis=0)
+                self.endRemoveRows()
         return True
 
 
     def clear(self):
-        count = self._data.shape[0]
+        count = self._data.shape[1]
         self.beginRemoveRows(QModelIndex(), 0, count - 1)
         self._data = np.matrix([[],[]])
         self.endRemoveRows()
