@@ -735,10 +735,6 @@ class SCNR(QMainWindow):
     def on_scan_clear(self):
         self.posModel.clear()
 
-    @pyqtSlot(np.ndarray)
-    def update_positions(self, pos):
-        self.posModel.addData(pos)
-
     # ----- END Scanning Listview Slots
 
     # ----- Slots for Settings
