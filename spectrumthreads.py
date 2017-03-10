@@ -266,7 +266,7 @@ class LockinThread(MeasurementThread):
             self.stop()
 
 class SearchThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, parent=None):
+    def __init__(self, spectrometer, settings, stage, ref_spec = None, parent=None):
         try:
             self.settings = settings
             self.stage = stage

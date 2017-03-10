@@ -151,6 +151,9 @@ class SCNR(QMainWindow):
                     self.cam = camerathread.CameraThread(flip=False)
                 elif setup == 1:  # Freespace Setup
                     self.cam = camerathread.CameraThread(flip=True)
+
+                img = self.cam.get_image()
+                print(img.shape)
             except:
                 print("Error initializing Camera")
             if self.cam.isinitialized:
@@ -344,7 +347,7 @@ class SCNR(QMainWindow):
         if self.ui.autocontrast_checkBox.isChecked():
             plow, phigh = np.percentile(img, (1, 99))
             img = exposure.rescale_intensity(img, in_range=(plow, phigh))
-            img = exposure.equalize_adapthist(img, clip_limit=0.03)
+            #img = exposure.equalize_adapthist(img, clip_limit=0.03)
             autolevels = True
 
         self.img.setImage(img,autoLevels=autolevels,autoDownsample = True)

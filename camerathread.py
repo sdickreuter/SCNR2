@@ -36,9 +36,9 @@ class CameraThread(QObject):
                 self._cam.set_param('aeag', 0)
                 self._cam.set_param('exp_priority', 0)
                 self._cam.set_binning(2, skipping=False)
-                self._cam.set_param('imgdataformat',2) # RGB24
+                #self._cam.set_param('imgdataformat',2) # RGB24
                 #self._cam.set_param('imgdataformat', 6) # RAW16 (monochrome)
-                #self._cam.set_param('imgdataformat', 1) # MONO16
+                self._cam.set_param('imgdataformat', 1) # MONO16
 
                 #self._cam.set_param('buffers_queue_size',1)
                 self._cam.get_image()
@@ -90,6 +90,9 @@ class CameraThread(QObject):
         else:
             img = self._cam.get_image()
 
+        img = np.array(self._cam.get_image(),dtype = np.int32)
+        img = img[:,:,0] + np.left_shift(img[:,:,1],8)
+
         if self.flip:
             img = np.flipud(img)
 
@@ -97,10 +100,12 @@ class CameraThread(QObject):
 
     def work(self):
         if self.enabled:
+            img = np.array(self._cam.get_image(),dtype = np.int32)
+            img = img[:,:,0] + np.left_shift(img[:,:,1],8)
             if self.flip:
-                self.ImageReadySignal.emit(np.flipud(self._cam.get_image()))
+                self.ImageReadySignal.emit(np.flipud(img))
             else:
-                self.ImageReadySignal.emit(self._cam.get_image())
+                self.ImageReadySignal.emit(img)
 
     @pyqtSlot()
     def process(self):
