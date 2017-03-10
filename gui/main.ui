@@ -1001,7 +1001,7 @@
         </widget>
         <widget class="QWidget" name="scan3d_tab">
          <attribute name="title">
-          <string>3D Scan</string>
+          <string>Misc</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -1013,7 +1013,7 @@
              </size>
             </property>
             <property name="text">
-             <string>3D Scan Settings</string>
+             <string>3D Scan</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -1094,6 +1094,44 @@
             </property>
             <property name="text">
              <string>Scan</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Advanced Camera Settings</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="autocontrast_checkBox">
+            <property name="text">
+             <string>Enable Auto Contrast</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="camreference_button">
+            <property name="text">
+             <string>Take Camera Reference Image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clear_reference_button">
+            <property name="text">
+             <string>Clear Reference Image</string>
             </property>
            </widget>
           </item>
@@ -2356,6 +2394,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>camreference_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_camreference_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>801</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>999</x>
+     <y>334</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clear_reference_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_clear_reference_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>784</x>
+     <y>345</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>991</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_lefttab_changed(int)</slot>
@@ -2406,5 +2476,7 @@
   <slot>on_lockin_clicked()</slot>
   <slot>on_scan3d_clicked()</slot>
   <slot>on_cube_steps_edited()</slot>
+  <slot>on_camreference_clicked()</slot>
+  <slot>on_clear_reference_clicked()</slot>
  </slots>
 </ui>

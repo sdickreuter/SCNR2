@@ -84,3 +84,16 @@ class NumpyModel(QAbstractTableModel):
         self._data = np.empty((0,2))
         self.endRemoveRows()
         return True
+
+if __name__ == '__main__':
+
+    position = np.matrix([[1,1],[2,2],[3,4],[5,6]])
+    posModel = NumpyModel(position)
+    print(posModel.getMatrix())
+    posModel.clear()
+    print(posModel.getMatrix())
+    posModel.addData(position)
+    posModel.addData(np.matrix([10,20]))
+    print(posModel.getMatrix())
+    posModel.removeRows([1,2,3,7])
+    print(posModel.getMatrix())

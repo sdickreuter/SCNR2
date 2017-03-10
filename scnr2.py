@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
     QMessageBox, QGridLayout
 import pyqtgraph as pg
-#from skimage import exposure
+from skimage import exposure
 
 # from PyQt5 import uic
 # Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
@@ -43,6 +43,7 @@ class SCNR(QMainWindow):
     padthread = None
     spectrometer = None
     labels = None
+    cam_reference_image = None
 
     savedir = "./Spectra/"
     path = "./"
@@ -331,10 +332,23 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
-        #plow, phigh = np.percentile(img, (2, 98))
-        #img = exposure.rescale_intensity(img, in_range=(plow, phigh))
+        if self.cam_reference_image is not None:
+            img -= self.cam_reference_image
+            img -= np.min(img)
+
+        if self.ui.autocontrast_checkBox.isChecked():
+            plow, phigh = np.percentile(img, (1, 99))
+            img = exposure.rescale_intensity(img, in_range=(plow, phigh))
 
         self.img.setImage(img,autoLevels=False,autoDownsample = True)
+
+    @pyqtSlot()
+    def on_camreference_clicked(self):
+        self.cam_reference_image = self.cam.get_image()
+
+    @pyqtSlot()
+    def on_clear_reference_clicked(self):
+        self.cam_reference_image = None
 
     @pyqtSlot(int)
     def on_lefttab_changed(self, index):
@@ -344,9 +358,9 @@ class SCNR(QMainWindow):
             else:
                 self.cam.disable()
 
-            # ----- END Slots for Camera Stuff
+    # ----- END Slots for Camera Stuff
 
-            # ----- Slots for Spectrum Stuff
+    # ----- Slots for Spectrum Stuff
 
     def correct_spec(self, spec):
         if self.ui.correct_checkBox.isChecked():

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -507,6 +507,24 @@ class Ui_MainWindow(object):
         self.scan3d_button.setMinimumSize(QtCore.QSize(0, 20))
         self.scan3d_button.setObjectName("scan3d_button")
         self.verticalLayout_5.addWidget(self.scan3d_button)
+        self.line_11 = QtWidgets.QFrame(self.scan3d_tab)
+        self.line_11.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_11.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_11.setObjectName("line_11")
+        self.verticalLayout_5.addWidget(self.line_11)
+        self.label_17 = QtWidgets.QLabel(self.scan3d_tab)
+        self.label_17.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_17.setObjectName("label_17")
+        self.verticalLayout_5.addWidget(self.label_17)
+        self.autocontrast_checkBox = QtWidgets.QCheckBox(self.scan3d_tab)
+        self.autocontrast_checkBox.setObjectName("autocontrast_checkBox")
+        self.verticalLayout_5.addWidget(self.autocontrast_checkBox)
+        self.camreference_button = QtWidgets.QPushButton(self.scan3d_tab)
+        self.camreference_button.setObjectName("camreference_button")
+        self.verticalLayout_5.addWidget(self.camreference_button)
+        self.clear_reference_button = QtWidgets.QPushButton(self.scan3d_tab)
+        self.clear_reference_button.setObjectName("clear_reference_button")
+        self.verticalLayout_5.addWidget(self.clear_reference_button)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem1)
         self.right_tab.addTab(self.scan3d_tab, "")
@@ -770,6 +788,8 @@ class Ui_MainWindow(object):
         self.lockin_button.clicked.connect(MainWindow.on_lockin_clicked)
         self.search_int_time_spin.editingFinished.connect(MainWindow.on_search_int_time_edited)
         self.scan3d_button.clicked.connect(MainWindow.on_scan3d_clicked)
+        self.camreference_button.clicked.connect(MainWindow.on_camreference_clicked)
+        self.clear_reference_button.clicked.connect(MainWindow.on_clear_reference_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -814,11 +834,15 @@ class Ui_MainWindow(object):
         self.label_14.setText(_translate("MainWindow", "Starting Sigma [um]"))
         self.savesettings_button.setText(_translate("MainWindow", "Save Settings"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.settings_tab), _translate("MainWindow", "Settings"))
-        self.label_15.setText(_translate("MainWindow", "3D Scan Settings"))
+        self.label_15.setText(_translate("MainWindow", "3D Scan"))
         self.cube_width_label.setText(_translate("MainWindow", "Scan Cube Width [um]:"))
         self.label_16.setText(_translate("MainWindow", "Scan Steps along Axis:"))
         self.scan3d_button.setText(_translate("MainWindow", "Scan"))
-        self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "3D Scan"))
+        self.label_17.setText(_translate("MainWindow", "Advanced Camera Settings"))
+        self.autocontrast_checkBox.setText(_translate("MainWindow", "Enable Auto Contrast"))
+        self.camreference_button.setText(_translate("MainWindow", "Take Camera Reference Image"))
+        self.clear_reference_button.setText(_translate("MainWindow", "Clear Reference Image"))
+        self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temp.:"))
         self.searchmax_button.setText(_translate("MainWindow", "Search Maximum"))

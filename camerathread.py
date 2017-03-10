@@ -82,6 +82,19 @@ class CameraThread(QObject):
     def stop(self):
         self.abort = True
 
+    def get_image(self):
+        if self.enabled:
+            self.enabled = False
+            img = self._cam.get_image()
+            self.enabled = True
+        else:
+            img = self._cam.get_image()
+
+        if self.flip:
+            img = np.flipud(img)
+
+        return img
+
     def work(self):
         if self.enabled:
             if self.flip:
