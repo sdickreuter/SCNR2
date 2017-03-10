@@ -147,7 +147,10 @@ class SCNR(QMainWindow):
             w.setImageItem(self.img)
 
             try:
-                self.cam = camerathread.CameraThread(flip=True)
+                if setup == 0:  # Microscope Setup
+                    self.cam = camerathread.CameraThread(flip=False)
+                elif setup == 1:  # Freespace Setup
+                    self.cam = camerathread.CameraThread(flip=True)
             except:
                 print("Error initializing Camera")
             if self.cam.isinitialized:
