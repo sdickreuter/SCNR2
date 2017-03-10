@@ -332,6 +332,7 @@ class SCNR(QMainWindow):
 
     @pyqtSlot(np.ndarray)
     def update_camera(self, img):
+        self.cam.disable()
         if self.cam_reference_image is not None:
             img -= self.cam_reference_image
             img -= np.min(img)
@@ -342,6 +343,7 @@ class SCNR(QMainWindow):
             img = exposure.equalize_adapthist(img, clip_limit=0.03)
 
         self.img.setImage(img,autoLevels=False,autoDownsample = True)
+        self.cam.enable()
 
     @pyqtSlot()
     def on_camreference_clicked(self):
