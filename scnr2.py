@@ -339,6 +339,7 @@ class SCNR(QMainWindow):
         if self.ui.autocontrast_checkBox.isChecked():
             plow, phigh = np.percentile(img, (1, 99))
             img = exposure.rescale_intensity(img, in_range=(plow, phigh))
+            img = exposure.equalize_adapthist(img, clip_limit=0.03)
 
         self.img.setImage(img,autoLevels=False,autoDownsample = True)
 
