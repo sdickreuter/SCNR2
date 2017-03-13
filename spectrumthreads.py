@@ -223,23 +223,36 @@ class LockinThread(MeasurementThread):
     def calc_lockin(self):
 
         res = np.zeros(self.spectrometer._width)
-        for i in range(self.spectrometer._width):
-            d = np.abs(np.fft.rfft(self.lockin[i, :]))
+        for ind in range(self.spectrometer._width):
+            d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
             f = np.fft.rfftfreq(d.shape[0])
-            res[i] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
+            res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
         indices= [300,800,1200,1600]
-        for i in indices:
+        for i,ind in enumerate(indices):
             x = np.arange(0, self.number_of_samples)
             ref = np.cos(2 * np.pi * x * self.settings.f*2+np.pi)
-            buf = self.lockin[i, :]
+            buf = self.lockin[ind, :]
             buf = buf - np.min(buf)
-            ax.plot(x, buf/np.max(buf))
+            ax.plot(x, buf/np.max(buf)+i)
         #ax.plot(x, ref/np.max(ref), 'g-')
         plt.savefig("search_max/lockin.png")
         plt.close()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        for i,ind in enumerate(indices):
+            d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
+            f = np.fft.rfftfreq(d.shape[0])
+            ax.plot(f, d/d.max()  +i)
+
+        plt.axvline(x=self.settings.f)
+        plt.axvline(x=self.settings.f*2)
+        plt.savefig("search_max/fft.png")
+        plt.close()
+
 
         return res
 
