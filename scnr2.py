@@ -342,7 +342,9 @@ class SCNR(QMainWindow):
         autolevels = False
         if self.cam_reference_image is not None:
             img -= self.cam_reference_image
+            #img = img / self.cam_reference_image
             img -= np.min(img)
+            #img *= 1000
 
         if self.ui.autocontrast_checkBox.isChecked():
             plow, phigh = np.percentile(img, (1, 99))

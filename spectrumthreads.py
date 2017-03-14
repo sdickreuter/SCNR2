@@ -221,13 +221,14 @@ class LockinThread(MeasurementThread):
         self.stage.moveabs(x=x, y=y, z=z)
 
     def calc_lockin(self):
-        ref = np.cos(2 * np.pi * self.i * self.settings.f-np.pi/2)
+        x = np.arange(0, self.number_of_samples)
+        ref = np.cos(2 * np.pi * x * self.settings.f*2)
 
         res = np.zeros(self.spectrometer._width)
         for ind in range(self.spectrometer._width):
-            # d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
-            # f = np.fft.rfftfreq(d.shape[0])
-            # res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
+            #d = np.absolute(np.fft.rfft(self.lockin[ind, :]*ref))
+            #f = np.fft.rfftfreq(d.shape[0])
+            #res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
             d = np.absolute(np.fft.rfft(self.lockin[ind, :] * ref))
             res[ind] = d[0]
 
@@ -235,19 +236,21 @@ class LockinThread(MeasurementThread):
         ax = fig.add_subplot(111)
         indices= [300,800,1200,1600]
         for i,ind in enumerate(indices):
-            x = np.arange(0, self.number_of_samples)
             buf = self.lockin[ind, :]
             buf = buf - np.min(buf)
             ax.plot(x, buf/np.max(buf)+i)
+            ax.plot(x, ref/ref.max()+i)
         #ax.plot(x, ref/np.max(ref), 'g-')
         plt.savefig("search_max/lockin.png")
         plt.close()
 
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        indices= [1000]
         for i,ind in enumerate(indices):
-            d = np.absolute(np.fft.rfft(self.lockin[ind, :]*ref))
-            f = np.fft.rfftfreq(d.shape[0])
+            d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
+            f = np.fft.rfftfreq(x.shape[0])
             ax.plot(f, d/d.max()  +i)
 
         plt.axvline(x=self.settings.f)
@@ -333,7 +336,7 @@ class SearchThread(MeasurementThread):
                     sigma_start = self.settings.sigma
                 elif direction == "z":
                     self.stage.moveabs(z=pos[k])
-                    sigma_start = self.settings.sigma*3
+                    sigma_start = self.settings.sigma*2
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
@@ -401,7 +404,9 @@ class SearchThread(MeasurementThread):
                 pos = d + origin[1]
                 dir = "y"
             elif j in np.arange(2,repetitions,3):
-                pos = d*4 + origin[2]
+                #pos = d*4 + origin[2]
+                # change factor to adapt search for different setups
+                pos = d * 1 + origin[2]
                 dir = "z"
 
             print("Iteration #: "+str(j)+"  Direction "+dir )
