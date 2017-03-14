@@ -221,19 +221,21 @@ class LockinThread(MeasurementThread):
         self.stage.moveabs(x=x, y=y, z=z)
 
     def calc_lockin(self):
+        ref = np.cos(2 * np.pi * self.i * self.settings.f-np.pi/2)
 
         res = np.zeros(self.spectrometer._width)
         for ind in range(self.spectrometer._width):
-            d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
-            f = np.fft.rfftfreq(d.shape[0])
-            res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
+            # d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
+            # f = np.fft.rfftfreq(d.shape[0])
+            # res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
+            d = np.absolute(np.fft.rfft(self.lockin[ind, :] * ref))
+            res[ind] = d[0]
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
         indices= [300,800,1200,1600]
         for i,ind in enumerate(indices):
             x = np.arange(0, self.number_of_samples)
-            ref = np.cos(2 * np.pi * x * self.settings.f*2+np.pi)
             buf = self.lockin[ind, :]
             buf = buf - np.min(buf)
             ax.plot(x, buf/np.max(buf)+i)
@@ -244,7 +246,7 @@ class LockinThread(MeasurementThread):
         fig = plt.figure()
         ax = fig.add_subplot(111)
         for i,ind in enumerate(indices):
-            d = np.absolute(np.fft.rfft(self.lockin[ind, :]))
+            d = np.absolute(np.fft.rfft(self.lockin[ind, :]*ref))
             f = np.fft.rfftfreq(d.shape[0])
             ax.plot(f, d/d.max()  +i)
 
