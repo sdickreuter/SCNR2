@@ -241,7 +241,7 @@ class LockinThread(MeasurementThread):
             ax.plot(x, buf/np.max(buf)+i)
             ax.plot(x, ref/ref.max()+i)
         #ax.plot(x, ref/np.max(ref), 'g-')
-        plt.savefig("search_max/lockin.png")
+        plt.savefig("search_max/traces.png")
         plt.close()
 
 
@@ -256,6 +256,12 @@ class LockinThread(MeasurementThread):
         plt.axvline(x=self.settings.f)
         plt.axvline(x=self.settings.f*2)
         plt.savefig("search_max/fft.png")
+        plt.close()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(self.spectrometer.GetWavelength(),res)
+        plt.savefig("search_max/lockin.png")
         plt.close()
 
 
@@ -284,10 +290,13 @@ class LockinThread(MeasurementThread):
             self.stop()
 
 class SearchThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, ref_spec = None, parent=None):
+    def __init__(self, spectrometer, settings, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         try:
             self.settings = settings
             self.stage = stage
+            self.ref_spec = ref_spec
+            self.dark_spec = dark_spec
+            self.bg_spec = bg_spec
             super(SearchThread, self).__init__(spectrometer)
             self.wl = self.spectrometer.GetWavelength()
         except:
@@ -302,6 +311,24 @@ class SearchThread(MeasurementThread):
         else:
             return
         self.stop()
+
+    def get_spec(self):
+        spec = self.spectrometer.TakeSingleTrack()
+
+        if not self.dark_spec is None and not self.ref_spec is None and not self.bg_spec is None:
+            return (spec - self.bg_spec) / (self.ref_spec - self.dark_spec)
+
+        elif not self.dark_spec is None and not self.ref_spec is None:
+            return 1 - ( (spec - self.dark_spec) / (self.ref_spec - self.dark_spec) )
+
+        elif not self.dark_spec is None:
+            return spec - self.dark_spec
+
+        elif not self.spectrum.bg is None:
+            return spec - self.bg_spec
+
+        else:
+            return spec
 
     def search(self):
 
@@ -340,7 +367,8 @@ class SearchThread(MeasurementThread):
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
-                spec = self.spectrometer.TakeSingleTrack()
+                #spec = self.spectrometer.TakeSingleTrack()
+                spec = self.get_spec()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
                 #measured[k] = np.max(spec[100:1900])
@@ -406,7 +434,7 @@ class SearchThread(MeasurementThread):
             elif j in np.arange(2,repetitions,3):
                 #pos = d*4 + origin[2]
                 # change factor to adapt search for different setups
-                pos = d * 1 + origin[2]
+                pos = d * 3 + origin[2]
                 dir = "z"
 
             print("Iteration #: "+str(j)+"  Direction "+dir )
@@ -602,9 +630,9 @@ class ScanThread(MeasurementThread):
 
 
 class ScanSearchThread(ScanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
-        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
+        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec, self)
         self.searchthread.specSignal.connect(self.specslot)
         self.searchthread.finishSignal.connect(self.searchfinishslot)
 
@@ -721,9 +749,9 @@ class ScanMeanThread(ScanThread):
 
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
-        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage, self)
+        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec,self)
         self.searchthread.specSignal.connect(self.specslot)
 
     @pyqtSlot()

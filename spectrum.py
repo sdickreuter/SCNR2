@@ -173,7 +173,7 @@ class Spectrum(QObject):
 
     def search_max(self):
         print(self.settings.search_integration_time)
-        self.worker = SearchThread(self._spectrometer, self.settings, self.stage)
+        self.worker = SearchThread(self._spectrometer, self.settings, self.stage,self.lamp,self.dark,self.bg)
         self.worker.specSignal.connect(self.specCallback)
         self.worker.progressSignal.connect(self.progressCallback)
         self.worker.finishSignal.connect(self.finishedSearch)
@@ -185,7 +185,7 @@ class Spectrum(QObject):
         # pos = np.matrix([[x, y]])
         self.positions = pos
         self.save_path = "search_max/"
-        self.worker = ScanSearchThread(self._spectrometer, self.settings, pos, labels, self.stage)
+        self.worker = ScanSearchThread(self._spectrometer, self.settings, pos, labels, self.stage,self.lamp,self.dark,self.bg)
         self.worker.specSignal.connect(self.specCallback)
         self.worker.progressSignal.connect(self.progressCallback)
         self.worker.finishSignal.connect(self.finishedScanSearch)

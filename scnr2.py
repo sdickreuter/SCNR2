@@ -377,18 +377,22 @@ class SCNR(QMainWindow):
 
     def correct_spec(self, spec):
         if self.ui.correct_checkBox.isChecked():
-            if not self.spectrum.dark is None:
-                if not self.spectrum.bg is None:
-                    if not self.spectrum.lamp is None:
-                        return (spec - self.spectrum.bg) / (self.spectrum.lamp - self.spectrum.dark)
-                    return self.spectrum._spec - self.spectrum.bg
-                else:
-                    if not self.spectrum.lamp is None:
-                        return (spec - self.spectrum.dark) / (self.spectrum.lamp - self.spectrum.dark)
-                    return spec - self.spectrum.dark
+
+            if not self.spectrum.dark is None and not self.spectrum.lamp is None and not self.spectrum.bg is None:
+                return (spec - self.spectrum.bg) / (self.spectrum.lamp - self.spectrum.dark)
+
+            elif not self.spectrum.dark is None and not self.spectrum.lamp is None:
+                return 1 - ( (spec - self.spectrum.dark) / (self.spectrum.lamp - self.spectrum.dark) )
+
+            elif not self.spectrum.dark is None:
+                return spec - self.spectrum.dark
+
+            elif not self.spectrum.bg is None:
+                return spec - self.spectrum.bg
+
             else:
-                if not self.spectrum.bg is None:
-                    return spec - self.spectrum.bg
+                return spec
+
         return spec
 
     @pyqtSlot(np.ndarray)
