@@ -373,9 +373,9 @@ class SearchThread(MeasurementThread):
                     spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
-                #measured[k] = np.max(spec[100:1900])
+                measured[k] = np.max(spec[100:1900])
+                #measured[k] = np.sum(spec[100:1900])
                 maxwl[k] = self.spectrometer.GetWavelength()[np.argmax(spec)]
-                measured[k] = np.sum(spec)
 
             maxind = np.argmax(measured[2:(len(pos))])
             minval = np.min(measured)
@@ -388,9 +388,9 @@ class SearchThread(MeasurementThread):
                 if perr[1] > 1:
                     print("Could not determine particle position: Variance too big")
                     print(perr)
-                elif popt[0] < 0.1:
-                    print("Could not determine particle position: Peak too small")
-                elif popt[1] < (min(pos) * 0.1) or popt[1] > (max(pos) * 10.0):
+                #elif popt[0] < *0.1:
+                #    print("Could not determine particle position: Peak too small")
+                elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                     print("Could not determine particle position: Peak outside bounds")
                 elif popt[2] < self.settings.sigma/100:
                     print("Could not determine particle position: Peak to narrow")
