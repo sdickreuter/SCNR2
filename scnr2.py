@@ -173,7 +173,7 @@ class SCNR(QMainWindow):
         # init stage
         if init_stage:
             try:
-                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping, z_correction_angle = 0)
                 # self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except Exception as e:
                 print(e)
@@ -252,7 +252,6 @@ class SCNR(QMainWindow):
         self.vh = self.ui.posTable.verticalHeader()
         self.vh.setVisible(False)
         self.hh = self.ui.posTable.horizontalHeader()
-        #self.hh.setModel(self.posModel)
         self.hh.setVisible(True)
 
         self.show_pos()
@@ -268,10 +267,9 @@ class SCNR(QMainWindow):
     def show_pos(self):
         if not self.stage is None:
             pos = self.stage.last_pos()
-            # print(pos)
-            self.ui.label_x.setText("x: {0:+8.4f}".format(pos[0]))
-            self.ui.label_y.setText("y: {0:+8.4f}".format(pos[1]))
-            self.ui.label_z.setText("z: {0:+8.4f}".format(pos[2]))
+            self.ui.label_x.setText("x: {0:+6.3f}".format(pos[0]))
+            self.ui.label_y.setText("y: {0:+6.3f}".format(pos[1]))
+            self.ui.label_z.setText("z: {0:+6.3f}".format(pos[2]))
 
 
         # ----- Slot for Detector Mode
@@ -444,7 +442,7 @@ class SCNR(QMainWindow):
             self.ui.lockin_button.setDisabled(False)
             self.ui.lockin_checkBox.setDisabled(False)
         self.ui.stop_button.setDisabled(True)
-        self.pad_active = True
+        #self.pad_active = True
 
     # ----- END Slots for Spectrum Stuff
 
@@ -840,15 +838,20 @@ class SCNR(QMainWindow):
             return np.array(data)
         return None
 
+    @pyqtSlot()
+    def on_z_correction_angle_edited(self):
+        if self.ui.zcorrection_checkbox.isChecked():
+            self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
+
 
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
     # sys.stderr.write('\r')
-    # if QMessageBox.question(None, '', "Are you sure you want to quit?",
-    #                        QMessageBox.Yes | QMessageBox.No,
-    #                        QMessageBox.No) == QMessageBox.Yes:
-    #    QApplication.quit()
-    QApplication.quit()
+    if QMessageBox.question(None, '', "Are you sure you want to quit?",
+                          QMessageBox.Yes | QMessageBox.No,
+                           QMessageBox.No) == QMessageBox.Yes:
+        QApplication.quit()
+    #QApplication.quit()
 
 
 if __name__ == '__main__':

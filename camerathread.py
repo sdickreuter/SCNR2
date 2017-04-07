@@ -31,7 +31,7 @@ class CameraThread(QObject):
                 print(xi.get_device_info(0, 'device_name'))
 
                 self._cam = xi.Xi_Camera(DevID=0)
-                self._cam.set_debug_level("Warning")
+                self._cam.set_debug_level("Error")
                 self._cam.set_param('exposure', self.exposure_us)
                 self._cam.set_param('aeag', 0)
                 self._cam.set_param('exp_priority', 0)
