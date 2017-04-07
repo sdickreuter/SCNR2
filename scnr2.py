@@ -174,7 +174,7 @@ class SCNR(QMainWindow):
         # init stage
         if init_stage:
             try:
-                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping, z_correction_angle = 0)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping)
                 # self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except Exception as e:
                 print(e)
@@ -850,7 +850,8 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_z_correction_angle_edited(self):
         if self.ui.zcorrection_checkbox.isChecked():
-            self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
+            if self.stage is not None:
+                self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
 
 
 def sigint_handler(*args):

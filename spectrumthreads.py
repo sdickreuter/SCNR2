@@ -324,7 +324,7 @@ class SearchThread(MeasurementThread):
         elif not self.dark_spec is None:
             return spec - self.dark_spec
 
-        elif not self.spectrum.bg is None:
+        elif not self.bg_spec is None:
             return spec - self.bg_spec
 
         else:
@@ -366,7 +366,7 @@ class SearchThread(MeasurementThread):
                     sigma_start = self.settings.sigma*self.settings.zmult/2
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
-                    return None, None, None
+                    return None, None, None, None
                 if self.settings.correct_search:
                     spec = self.get_spec()
                 else:
@@ -390,7 +390,7 @@ class SearchThread(MeasurementThread):
                     print(perr)
                 elif popt[0] < 0.1:
                     print("Could not determine particle position: Peak too small")
-                elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
+                elif popt[1] < (min(pos) * 0.1) or popt[1] > (max(pos) * 10.0):
                     print("Could not determine particle position: Peak outside bounds")
                 elif popt[2] < self.settings.sigma/100:
                     print("Could not determine particle position: Peak to narrow")
@@ -466,7 +466,7 @@ class SearchThread(MeasurementThread):
                             ontargety = True
                 elif j in np.arange(2, repetitions, 3):
                     dz = float(popt[1])
-                    if dz - startpos[2] > self.settings.rasterwidth*3:
+                    if dz - startpos[2] > self.settings.rasterwidth*self.settings.zmult:
                         print("Position to far from start, skipping")
                         self.stage.moveabs(z=startpos[2])
                     else:
