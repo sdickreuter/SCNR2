@@ -73,6 +73,7 @@ class SCNR(QMainWindow):
 
         # init settings
         self.settings = settings.Settings()
+        self.ui.search_correct_checkBox.setChecked(False)
 
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)
         self.ui.centre_wavelength_spin.setValue(self.settings.centre_wavelength)
@@ -813,6 +814,14 @@ class SCNR(QMainWindow):
     @pyqtSlot()
     def on_sigma_edited(self):
         self.settings.sigma = self.ui.sigma_spin.value()
+
+    @pyqtSlot()
+    def on_search_zmult_edited(self):
+        self.settings.zmult = self.ui.search_zmult_spin.value()
+
+    @pyqtSlot(bool)
+    def on_search_corrected_toggled(self,state):
+        self.settings.correct_search = self.ui.search_correct_checkBox.isChecked()
 
     @pyqtSlot()
     def on_savesettings_clicked(self):

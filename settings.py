@@ -17,6 +17,8 @@ class Settings(object):
             RuntimeError("Error loading settings.")
             return
 
+        self.settings.correct_search = False
+
         self.integration_time = float(self.config['spectrum']['integration_time'])
         self.number_of_samples = int(self.config['spectrum']['number_of_samples'])
 
@@ -34,6 +36,7 @@ class Settings(object):
         self.rasterdim = int(self.config['searchmax']['rasterdim'])
         self.rasterwidth = float(self.config['searchmax']['rasterwidth'])
         self.search_integration_time = float(self.config['searchmax']['integration_time'])
+        self.zmult = int(self.config['searchmax']['zmult'])
 
         self.cam_exposure_time = float(self.config['camera']['exposure_time'])
 
@@ -64,6 +67,7 @@ class Settings(object):
         self.config.set('searchmax', 'rasterdim', str(self.rasterdim))
         self.config.set('searchmax', 'rasterwidth', str(self.rasterwidth))
         self.config.set('searchmax', 'integration_time', str(self.search_integration_time))
+        self.config.set('searchmax', 'zmult', str(self.zmult))
 
         self.config.set('camera', 'exposure_time', str(self.cam_exposure_time))
 

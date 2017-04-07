@@ -363,12 +363,14 @@ class SearchThread(MeasurementThread):
                     sigma_start = self.settings.sigma
                 elif direction == "z":
                     self.stage.moveabs(z=pos[k])
-                    sigma_start = self.settings.sigma*2
+                    sigma_start = self.settings.sigma*self.settings.zmult/2
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
                     return None, None, None
-                #spec = self.spectrometer.TakeSingleTrack()
-                spec = self.get_spec()
+                if self.settings.correct_search:
+                    spec = self.get_spec()
+                else:
+                    spec = self.spectrometer.TakeSingleTrack()
                 spec = smooth(self.wl, spec)
                 self.specSignal.emit(spec)
                 #measured[k] = np.max(spec[100:1900])
@@ -432,9 +434,7 @@ class SearchThread(MeasurementThread):
                 pos = d + origin[1]
                 dir = "y"
             elif j in np.arange(2,repetitions,3):
-                #pos = d*4 + origin[2]
-                # change factor to adapt search for different setups
-                pos = d * 3 + origin[2]
+                pos = d * self.settings.zmult + origin[2]
                 dir = "z"
 
             print("Iteration #: "+str(j)+"  Direction "+dir )
