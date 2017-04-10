@@ -14,7 +14,7 @@ Ui_StartUpDialog = uic.loadUiType("gui/startup.ui")[0]
 import numpy as np
 import string
 import pyqtgraph as pg
-
+import itertools
 
 class Settings_Dialog(QDialog):
     updateSignal = pyqtSignal()
@@ -96,6 +96,33 @@ class SpanGrid_Dialog(QDialog):
         else:
             return None, None, None
 
+
+    def get_letters(self,size):
+        def iter_all_ascii():
+            size = 1
+            while True:
+                for s in itertools.product(string.digits[1:10], repeat=size):
+                    yield "".join(s)
+                size += 1
+
+        letters = np.array([])
+        for s in itertools.islice(iter_all_ascii(), size):
+            letters = np.append(letters,s)
+        return letters
+
+    def get_numbers(self,size):
+        def iter_all_numbers():
+            size = 1
+            while True:
+                for s in itertools.product(string.digits[1:10], repeat=size):
+                    yield "".join(s)
+                size += 1
+        numbers = np.array([])
+        for s in itertools.islice(iter_all_numbers(), size):
+            numbers = np.append(numbers,s)
+        return numbers
+
+
     @pyqtSlot()
     def gen_grid(self, xl, yl):
         a = np.ravel(self.vectors[0, :])
@@ -105,12 +132,18 @@ class SpanGrid_Dialog(QDialog):
         grid_vec_2 = [b[0] - a[0], b[1] - a[1]]
         grid_vec_1 = [c[0] - a[0], c[1] - a[1]]
         labels = []# np.empty((xl * yl),dtype=np.string_)
+        # if not self.transpose:
+        #     labelsx = np.array(list(string.ascii_uppercase))[:xl]
+        #     labelsy = np.array(list(string.digits))[1:yl + 1]
+        # else:
+        #     labelsy = np.array(list(string.ascii_uppercase))[:yl]
+        #     labelsx = np.array(list(string.digits))[1:xl + 1]
         if not self.transpose:
-            labelsx = np.array(list(string.ascii_uppercase))[:xl]
-            labelsy = np.array(list(string.digits))[1:yl + 1]
+            labelsx = self.get_letters(xl)
+            labelsy = self.get_numbers(yl)
         else:
-            labelsy = np.array(list(string.ascii_uppercase))[:yl]
-            labelsx = np.array(list(string.digits))[1:xl + 1]
+            labelsy = self.get_letters(yl)
+            labelsx = self.get_numbers(xl)
 
         labelsy = labelsy[::-1]
 
