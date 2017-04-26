@@ -223,14 +223,20 @@ class LockinThread(MeasurementThread):
     def calc_lockin(self):
         x = np.arange(0, self.number_of_samples)
         ref = np.cos(2 * np.pi * x * self.settings.f*2)
+        ref2 = np.cos(2 * np.pi * x * self.settings.f*2+np.pi/2)
 
         res = np.zeros(self.spectrometer._width)
+        res_phase = np.zeros(self.spectrometer._width)
         for ind in range(self.spectrometer._width):
             #d = np.absolute(np.fft.rfft(self.lockin[ind, :]*ref))
             #f = np.fft.rfftfreq(d.shape[0])
             #res[ind] = (d[(f < self.settings.f*2+self.settings.f/10)])[-1]
-            d = np.absolute(np.fft.rfft(self.lockin[ind, :] * ref))
-            res[ind] = d[0]
+            #d = np.absolute(np.fft.rfft(self.lockin[ind, :] * ref))
+            #res[ind] = d[0]
+            x2 = np.sum(self.lockin[ind, :] * ref) / len(ref)
+            y2 = np.sum(self.lockin[ind, :] * ref2) / len(ref2)
+            res_phase[ind] = np.angle(x2 + 1j * y2)
+            res[ind] = np.abs(x2 + 1j * y2) * (np.pi - np.abs(res_phase[ind]))
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -260,7 +266,9 @@ class LockinThread(MeasurementThread):
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(self.spectrometer.GetWavelength(),res)
+        ax.plot(self.spectrometer.GetWavelength(),res / res.max())
+        ax.plot(self.spectrometer.GetWavelength(), res_phase / res_phase.max())  # /lamp[mask])
+
         plt.savefig("search_max/lockin.png")
         plt.close()
 
