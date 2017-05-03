@@ -1180,9 +1180,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>Advanced Stage Settings</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="zcorrection_checkbox">
             <property name="text">
-             <string>Correct z movement for angled sample</string>
+             <string>Correct z Movement for Angled Sample</string>
             </property>
            </widget>
           </item>
@@ -1191,7 +1201,7 @@
             <item>
              <widget class="QLabel" name="label_18">
               <property name="text">
-               <string>Sample angle [°]</string>
+               <string>Sample Angle [°]</string>
               </property>
              </widget>
             </item>
@@ -1209,6 +1219,33 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Advanced Spectrometer Settings</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox">
+            <property name="text">
+             <string>Increase Minimum Vertical Pixels</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer_3">
@@ -1256,7 +1293,7 @@
       <item>
        <widget class="QLabel" name="label_temp">
         <property name="text">
-         <string>Detector Temp.:</string>
+         <string>Detector Temperature:</string>
         </property>
        </widget>
       </item>
@@ -2524,8 +2561,8 @@
    <slot>on_z_correction_angle_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>366</y>
+     <x>853</x>
+     <y>407</y>
     </hint>
     <hint type="destinationlabel">
      <x>947</x>
@@ -2562,6 +2599,22 @@
     <hint type="destinationlabel">
      <x>887</x>
      <y>530</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_increase_minimum_readout_toggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>716</x>
+     <y>488</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>924</x>
+     <y>570</y>
     </hint>
    </hints>
   </connection>
@@ -2620,5 +2673,6 @@
   <slot>on_z_correction_angle_edited()</slot>
   <slot>on_search_zmult_edited()</slot>
   <slot>on_search_corrected_toggled(bool)</slot>
+  <slot>on_increase_minimum_readout_toggled(bool)</slot>
  </slots>
 </ui>

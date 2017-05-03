@@ -103,6 +103,10 @@ class SpectrometerServer:
                 self.spectrometer.SetSlitWidth(param)
                 self.send_object('ok')
 
+            elif msg == 'setminvertreadout':
+                self.spectrometer.SetSingleTrackMinimumVerticalPixels(param)
+                self.send_object('ok')
+
             elif msg == 'getwavelength':
                 self.send_object(self.spectrometer.GetWavelength())
 

@@ -178,6 +178,10 @@ class SpectrometerClient:
         ret = self.make_request('setslitwidth',slitwidth)
         self._return_value_is_ok(ret)
 
+    def SetMinVertReadout(self, pixels):
+        ret = self.make_request('setminvertreadout', pixels)
+        self._return_value_is_ok(ret)
+
     def _GetWavelength(self):
         #print("Send Request: getwavelength")
         ret = self.make_request('getwavelength',None)

@@ -823,6 +823,13 @@ class SCNR(QMainWindow):
     def on_search_corrected_toggled(self,state):
         self.settings.correct_search = self.ui.search_correct_checkBox.isChecked()
 
+    @pyqtSlot(bool)
+    def on_increase_minimum_readout_toggled(self,state):
+        if state:
+            self.spectrometer.SetMinVertReadout(8)
+        else:
+            self.spectrometer.SetMinVertReadout(1)
+
     @pyqtSlot()
     def on_savesettings_clicked(self):
         if self.cam is not None:
