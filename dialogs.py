@@ -101,7 +101,7 @@ class SpanGrid_Dialog(QDialog):
         def iter_all_ascii():
             size = 1
             while True:
-                for s in itertools.product(string.digits[1:10], repeat=size):
+                for s in itertools.product(string.ascii_uppercase[1:10], repeat=size):
                     yield "".join(s)
                 size += 1
 
