@@ -596,6 +596,7 @@ class SCNR(QMainWindow):
         self.ui.status.setText("Saving Data ...")
         save_as = QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
                                               'CSV Files (*.csv)')
+        save_as.setDefaultSuffix('csv')
         print(save_as[0])
         # prefix, ok = QInputDialog.getText(self, 'Save Folder', 'Enter Folder to save spectra to:')
         if not self.spectrum.mean is None:

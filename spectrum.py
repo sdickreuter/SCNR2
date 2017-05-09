@@ -360,13 +360,10 @@ class Spectrum(QObject):
         self.mean = None
         self.bg = None
 
-    @staticmethod
-    def _gen_filename():
-        return str(datetime.now().year) + str(datetime.now().month).zfill(2) \
-               + str(datetime.now().day).zfill(2) + '_' + str(datetime.now().hour).zfill(2) + \
-               str(datetime.now().minute).zfill(2) + str(datetime.now().second).zfill(2) + '.csv'
-
-    def _millis(starttime):
-        dt = datetime.now() - starttime
-        ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
-        return ms
+    # def plot_last_mean(self):
+    #     spec = self.correct_spectrum(self.mean)
+    #
+    #     try:
+    #         os.mkdir(savedir + "overview/")
+    #     except:
+    #         pass
