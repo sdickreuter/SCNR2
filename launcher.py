@@ -1,8 +1,8 @@
 import os
 import subprocess
 
-from PyQt5.QtCore import pyqtSlot, QThread, QObject
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from qtpy.QtCore import pyqtSlot, QThread, QObject
+from qtpy.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from gui.launcher_main import Ui_MainWindow
 

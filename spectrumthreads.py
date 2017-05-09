@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import progress
 import scipy.optimize as opt
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject
+from qtpy.QtCore import pyqtSlot, QThread, pyqtSignal, QObject
 from scipy.signal import savgol_filter
 import time
 

@@ -3,7 +3,7 @@ __author__ = 'sei'
 from spectrumthreads import *
 import numpy as np
 from datetime import datetime
-from PyQt5.QtCore import pyqtSignal, QObject
+from qtpy.QtCore import pyqtSignal, QObject
 import time
 from AndorSpectrometer import Spectrometer
 

@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 import ximea as xi
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QObject#, QMutex
+from qtpy.QtCore import pyqtSlot, QThread, pyqtSignal, QObject#, QMutex
 
 
 class CameraThread(QObject):

@@ -2,8 +2,10 @@ import os
 
 import numpy as np
 import time
-from PyQt5.QtCore import pyqtSlot, QTimer, QEvent
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, QWidget, QSizePolicy, \
+import qtpy
+qtpy.QT_API = qtpy.PYSIDE
+from qtpy.QtCore import pyqtSlot, QTimer
+from qtpy.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, \
     QMessageBox, QGridLayout
 import pyqtgraph as pg
 from skimage import exposure

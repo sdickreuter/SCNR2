@@ -2,9 +2,9 @@ __author__ = 'sei'
 
 # from SCNR_settingsdialog import Ui_SettingsDialog
 # from SCNR_griddialog import Ui_SpanGridDialog
-from PyQt5.QtWidgets import QDialog, QVBoxLayout
-from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from qtpy.QtWidgets import QDialog, QVBoxLayout
+from qtpy import uic
+from qtpy.QtCore import pyqtSignal, pyqtSlot
 
 Ui_SettingsDialog = uic.loadUiType("gui/settingsdialog.ui")[0]
 Ui_SpanGridDialog = uic.loadUiType("gui/griddialog.ui")[0]
