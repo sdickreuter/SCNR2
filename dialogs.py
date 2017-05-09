@@ -1,23 +1,24 @@
 __author__ = 'sei'
 
-# from SCNR_settingsdialog import Ui_SettingsDialog
-# from SCNR_griddialog import Ui_SpanGridDialog
-from qtpy.QtWidgets import QDialog, QVBoxLayout
-from qtpy import uic
-from qtpy.QtCore import pyqtSignal, pyqtSlot
+from qtpy import QtWidgets
+from qtpy import QtCore
 
-Ui_SettingsDialog = uic.loadUiType("gui/settingsdialog.ui")[0]
-Ui_SpanGridDialog = uic.loadUiType("gui/griddialog.ui")[0]
-Ui_SlitWidthDialog = uic.loadUiType("gui/slitwidthdialog.ui")[0]
-Ui_StartUpDialog = uic.loadUiType("gui/startup.ui")[0]
+#from qtpy import uic
+#Ui_SettingsDialog = uic.loadUiType("gui/settingsdialog.ui")[0]
+#Ui_SpanGridDialog = uic.loadUiType("gui/griddialog.ui")[0]
+#Ui_StartUpDialog = uic.loadUiType("gui/startup.ui")[0]
+
+from gui.settingsdialog import Ui_SettingsDialog
+from gui.griddialog import Ui_SpanGridDialog
+from gui.startup import Ui_Startup_Dialog
 
 import numpy as np
 import string
 import pyqtgraph as pg
 import itertools
 
-class Settings_Dialog(QDialog):
-    updateSignal = pyqtSignal()
+class Settings_Dialog(QtWidgets.QDialog):
+    updateSignal = QtCore.Signal()
 
     def __init__(self, settings, parent=None):
         super(Settings_Dialog, self).__init__(parent)
@@ -50,24 +51,24 @@ class Settings_Dialog(QDialog):
         self.hide()
 
 
-class SlitWidth_Dialog(QDialog):
-    changeSlitSignal = pyqtSignal(int)
+# class SlitWidth_Dialog(QtWidgets.QDialog):
+#     changeSlitSignal = QtCore.Signal(int)
+#
+#     def __init__(self, slitwidth, parent=None):
+#         super(SlitWidth_Dialog, self).__init__(parent)
+#         self.ui = Ui_SlitWidthDialog()
+#         self.ui.setupUi(self)
+#         self.ui.slitwidth_spin.setValue(slitwidth)
+#
+#     def accept(self):
+#         self.changeSlitSignal.emit(self.ui.slitwidth_spin.value())
+#         self.hide()
+#
+#     def reject(self):
+#         self.hide()
 
-    def __init__(self, slitwidth, parent=None):
-        super(SlitWidth_Dialog, self).__init__(parent)
-        self.ui = Ui_SlitWidthDialog()
-        self.ui.setupUi(self)
-        self.ui.slitwidth_spin.setValue(slitwidth)
 
-    def accept(self):
-        self.changeSlitSignal.emit(self.ui.slitwidth_spin.value())
-        self.hide()
-
-    def reject(self):
-        self.hide()
-
-
-class SpanGrid_Dialog(QDialog):
+class SpanGrid_Dialog(QtWidgets.QDialog):
     def __init__(self, vectors, parent=None):
         super(SpanGrid_Dialog, self).__init__(parent)
         self.vectors = vectors
@@ -79,7 +80,7 @@ class SpanGrid_Dialog(QDialog):
 
         self.pw = pg.PlotWidget()
         self.plot = self.pw.plot()
-        l1 = QVBoxLayout(self.ui.plotwidget)
+        l1 = QtWidgets.QVBoxLayout(self.ui.plotwidget)
         l1.addWidget(self.pw)
         self.pw.setLabel('left', 'Y')
         self.pw.setLabel('bottom', 'X')
@@ -92,7 +93,7 @@ class SpanGrid_Dialog(QDialog):
         if (vectors.shape[0] >= 3):
             dialog = SpanGrid_Dialog(vectors, parent)
             result = dialog.exec_()
-            return dialog.grid, dialog.labels, result == QDialog.Accepted
+            return dialog.grid, dialog.labels, result == QtWidgets.QDialog.Accepted
         else:
             return None, None, None
 
@@ -123,7 +124,7 @@ class SpanGrid_Dialog(QDialog):
         return numbers
 
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def gen_grid(self, xl, yl):
         a = np.ravel(self.vectors[0, :])
         b = np.ravel(self.vectors[1, :])
@@ -168,7 +169,7 @@ class SpanGrid_Dialog(QDialog):
         labels = np.array(labels)
         return grid, labels
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def update_plot(self):
         self.pw.clear()
         self.plot = self.pw.plot()
@@ -179,39 +180,40 @@ class SpanGrid_Dialog(QDialog):
             self.pw.addItem(buf)
 
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_x_edited(self):
         self.grid, self.labels = self.gen_grid(self.ui.x_spin.value(), self.ui.y_spin.value())
         self.update_plot()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_y_edited(self):
         self.grid, self.labels = self.gen_grid(self.ui.x_spin.value(), self.ui.y_spin.value())
         self.update_plot()
 
-    @pyqtSlot(bool)
+    @QtCore.Slot(bool)
     def flipx_toggled(self, state):
         self.flip_x = state
         self.grid, self.labels = self.gen_grid(self.ui.x_spin.value(), self.ui.y_spin.value())
         self.update_plot()
 
-    @pyqtSlot(bool)
+    @QtCore.Slot(bool)
     def flipy_toggled(self, state):
         self.flip_y = state
         self.grid, self.labels = self.gen_grid(self.ui.x_spin.value(), self.ui.y_spin.value())
         self.update_plot()
 
-    @pyqtSlot(bool)
+    @QtCore.Slot(bool)
     def transpose_toggled(self, state):
         self.transpose = state
         self.grid, self.labels = self.gen_grid(self.ui.x_spin.value(), self.ui.y_spin.value())
         self.update_plot()
 
 
-class StartUp_Dialog(QDialog):
+class StartUp_Dialog(QtWidgets.QDialog):
     def __init__(self, settings, parent=None):
         super(StartUp_Dialog, self).__init__(parent)
-        self.ui = Ui_StartUpDialog()
+        #self.ui = Ui_StartUpDialog()
+        self.ui = Ui_Startup_Dialog()
         self.ui.setupUi(self)
 
     # static method to create the dialog and return (x steps, y steps, accepted)
@@ -219,18 +221,27 @@ class StartUp_Dialog(QDialog):
     def getOptions(parent=None):
         dialog = StartUp_Dialog(parent)
         result = dialog.exec_()
-        return dialog.ui.setup_combobox.currentIndex(), dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), QDialog.Accepted
+        return dialog.ui.setup_combobox.currentIndex(), dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), result == QtWidgets.QDialog.Accepted
+
 
 
 if __name__ == '__main__':
     import sys
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    import os
+    #from PyQt5.QtWidgets import QApplication, QMainWindow
+    os.environ["QT_API"] = "pyside"
+    from qtpy import QtWidgets
 
-    app = QApplication(sys.argv)
-    xl, yl, ok = SpanGrid_Dialog.getXY(np.array([[0, 0], [0, 1], [1, 0]]))
+    #app = QtWidgets.QApplication(sys.argv)
+    #xl, yl, ok = SpanGrid_Dialog.getXY(np.array([[0, 0], [0, 1], [1, 0]]))
+    #print(xl)
+    #print(yl)
+    #res = app.exec()
 
-    print(xl)
-    print(yl)
+    app = QtWidgets.QApplication(sys.argv)
+    opt = StartUp_Dialog.getOptions()
+    print(opt)
+    #res = app.exec()
 
-    res = app.exec()
-    sys.exit(res)
+
+    sys.exit(0)

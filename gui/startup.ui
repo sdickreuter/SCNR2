@@ -1,78 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>Startup_Dialog</class>
+ <widget class="QDialog" name="Startup_Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
-    <height>178</height>
+    <width>282</width>
+    <height>141</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Choose start up options</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Choose the Setup you want to use:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="setup_combobox">
-     <item>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>281</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>Microscope Setup</string>
+       <string>Choose the Setup you want to use:</string>
       </property>
-     </item>
-     <item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="setup_combobox">
+      <item>
+       <property name="text">
+        <string>Microscope Setup</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Freespace Setup</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="stage_checkbox">
       <property name="text">
-       <string>Freespace Setup</string>
+       <string>Use Piezo-Stage</string>
       </property>
-     </item>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="stage_checkbox">
-     <property name="text">
-      <string>Use Piezo-Stage</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="cam_checkbox">
-     <property name="text">
-      <string>Use Camera</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-  </layout>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cam_checkbox">
+      <property name="text">
+       <string>Use Camera</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDialogButtonBox" name="buttonBox">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>Startup_Dialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -88,7 +98,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>Startup_Dialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

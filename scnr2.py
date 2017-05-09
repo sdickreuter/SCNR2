@@ -2,11 +2,9 @@ import os
 
 import numpy as np
 import time
-import qtpy
-qtpy.QT_API = qtpy.PYSIDE
-from qtpy.QtCore import pyqtSlot, QTimer
-from qtpy.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog, QInputDialog, \
-    QMessageBox, QGridLayout
+#os.environ["QT_API"] = "pyside"
+from qtpy import QtCore,QtWidgets
+
 import pyqtgraph as pg
 from skimage import exposure
 
@@ -37,7 +35,7 @@ init_stage = True
 init_spectrometer = True
 
 
-class SCNR(QMainWindow):
+class SCNR(QtWidgets.QMainWindow):
     _window_title = "SCNR2"
     _heartbeat = 100  # ms delay at which the plot/gui is refreshed, and the gamepad moves the stage
     stage = None
@@ -50,11 +48,12 @@ class SCNR(QMainWindow):
     savedir = "./Spectra/"
     path = "./"
 
-    def __init__(self, parent=None):
+    def __init__(self, options,parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
 
-        setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
+        #setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
+        setup, stage_ok, cam_ok = options
         #print(setup)
 
         if ok:
@@ -69,7 +68,6 @@ class SCNR(QMainWindow):
                 print("Setup not specified, quitting.")
                 super(SCNR, self).close()
         else:
-            self.ui.setupUi(self)
             super(SCNR, self).close()
 
         self.ui.setupUi(self)
@@ -92,7 +90,7 @@ class SCNR(QMainWindow):
         # vb = CustomViewBox()
         # self.pw = pg.PlotWidget(viewBox=vb, enableMenu=False)
         self.plot = self.pw.plot()
-        l1 = QVBoxLayout(self.ui.specwidget)
+        l1 = QtWidgets.QVBoxLayout(self.ui.specwidget)
         l1.addWidget(self.pw)
         self.pw.setLabel('left', 'Intensity [a.u.]')
         self.pw.setLabel('bottom', 'Wavelength [nm]')
@@ -104,7 +102,7 @@ class SCNR(QMainWindow):
         self.slitmarker = xmovableCrosshair(pos=[self.settings.slitmarker_x, self.settings.slitmarker_y], size=15)
         vb.addItem(self.slitmarker)
         gv.setCentralWidget(vb)
-        l = QGridLayout(self.ui.detectorwidget)
+        l = QtWidgets.QGridLayout(self.ui.detectorwidget)
         l.setSpacing(0)
         l.addWidget(gv, 0, 0)
 
@@ -142,7 +140,7 @@ class SCNR(QMainWindow):
             vb2.addItem(self.cammarker)
             gv2.setCentralWidget(vb2)
 
-            l2 = QGridLayout(self.ui.camwidget)
+            l2 = QtWidgets.QGridLayout(self.ui.camwidget)
             l2.setSpacing(0)
             l2.addWidget(gv2, 0, 0)
 
@@ -169,7 +167,7 @@ class SCNR(QMainWindow):
                 self.cam = None
                 # self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
-                QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QMessageBox.Ok)
+                QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QtWidgets.QMessageBox.Ok)
                 self.ui.left_tab.removeTab(1)
         else:
             self.ui.left_tab.removeTab(1)
@@ -195,7 +193,7 @@ class SCNR(QMainWindow):
                     self.ui.lockin_checkBox.setEnabled(True)
                 else:
                     self.stage = None
-                    QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QMessageBox.Ok)
+                    QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize PI Stage.", QtWidgets.QMessageBox.Ok)
 
         # for testing:
         else:
@@ -218,7 +216,7 @@ class SCNR(QMainWindow):
                     self.padthread.yaxisSignal.connect(self.on_yaxis)
                     self.yaxis = 0.0
                     self.padthread.start()
-                    self.gamepad_timer = QTimer(self)
+                    self.gamepad_timer = QtCore.QTimer(self)
                     self.gamepad_timer.timeout.connect(self.check_pad_analog)
                     self.gamepad_timer.start(100)
                     self.pad_active = True
@@ -226,7 +224,7 @@ class SCNR(QMainWindow):
                     self.pad_active = False
                     self.padthread = None
                     print("Could not initialize Gamepad")
-                    QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QMessageBox.Ok)
+                    QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QtWidgets.QMessageBox.Ok)
 
         # init spectrum stuff
         self.spectrum = spectrum.Spectrum(self.spectrometer, self.stage, self.settings)
@@ -279,7 +277,7 @@ class SCNR(QMainWindow):
 
         # ----- Slot for Detector Mode
 
-    @pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_mode_changed(self, index):
         if init_spectrometer:
             self.spectrometer.AbortAcquisition()
@@ -339,7 +337,7 @@ class SCNR(QMainWindow):
 
     # ----- Slots for Camera Stuff
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def update_camera(self, img):
         self.cam.disable()
         autolevels = False
@@ -358,15 +356,15 @@ class SCNR(QMainWindow):
         self.img.setImage(img,autoLevels=autolevels,autoDownsample = True)
         self.cam.enable()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_camreference_clicked(self):
         self.cam_reference_image = self.cam.get_image()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_clear_reference_clicked(self):
         self.cam_reference_image = None
 
-    @pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_lefttab_changed(self, index):
         if init_cam:
             if index == 1:
@@ -383,7 +381,7 @@ class SCNR(QMainWindow):
             return self.spectrum.correct_spectrum(spec)
         return spec
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def on_update_spectrum(self, spec):
         if spec is not None:
             if self.spectrometer.mode == "imageofslit" or self.spectrometer.mode == "fullimage":
@@ -393,21 +391,21 @@ class SCNR(QMainWindow):
             elif self.spectrometer.mode == 'singletrack':
                 self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
         else:
-            QMessageBox.warning(self, 'Error', "Communication with Spectrometer out of sync, please try again.", QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(self, 'Error', "Communication with Spectrometer out of sync, please try again.", QtWidgets.QMessageBox.Ok)
 
-    @pyqtSlot(str)
+    @QtCore.Slot(str)
     def on_updateStatus(self, status):
         self.ui.status.setText(status)
 
-    @pyqtSlot(float)
+    @QtCore.Slot(float)
     def on_updateProgress(self, progress):
         self.ui.progressBar.setValue(int(progress))
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def on_updatePositions(self, pos):
         self.posModel.addData(pos)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_disableButtons(self):
         self.ui.right_tab.setDisabled(True)
         self.ui.stage_frame.setDisabled(True)
@@ -419,7 +417,7 @@ class SCNR(QMainWindow):
         self.ui.lockin_checkBox.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_enableButtons(self):
         self.ui.right_tab.setDisabled(False)
         self.ui.temp_button.setDisabled(False)
@@ -438,15 +436,15 @@ class SCNR(QMainWindow):
 
     # ----- Slots for Gamepad
 
-    @pyqtSlot(float)
+    @QtCore.Slot(float)
     def on_xaxis(self, x):
         self.xaxis = x
 
-    @pyqtSlot(float)
+    @QtCore.Slot(float)
     def on_yaxis(self, y):
         self.yaxis = -y
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def check_pad_analog(self):
         if self.pad_active:
             x_step = self.xaxis
@@ -475,9 +473,9 @@ class SCNR(QMainWindow):
 
         # ----- Slots for Buttons
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_start_scan_clicked(self):
-        prefix, ok = QInputDialog.getText(self, 'Save Folder',
+        prefix, ok = QtWidgets.QInputDialog.getText(self, 'Save Folder',
                                           'Enter Folder to save spectra to:')
         if ok:
             try:
@@ -486,7 +484,7 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
-                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QtWidgets.QMessageBox.Ok)
 
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
@@ -497,16 +495,16 @@ class SCNR(QMainWindow):
                                     self.ui.search_checkBox.isChecked())
 
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_scan3d_clicked(self):
-        prefix, ok = QInputDialog.getText(self, 'Save Folder',
+        prefix, ok = QtWidgets.QInputDialog.getText(self, 'Save Folder',
                                           'Enter Folder to save spectra to:')
         if ok:
             try:
                 os.mkdir(self.savedir + prefix)
             except:
                 print("Error creating directory ./" + prefix)
-                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QtWidgets.QMessageBox.Ok)
 
             path = self.savedir + prefix + "/"
             file = path + "cube.csv"
@@ -533,26 +531,26 @@ class SCNR(QMainWindow):
             self.spectrum.take_scan3d(pos, file)
 
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_stop_clicked(self):
         self.ui.status.setText('Stopped')
         self.spectrum.stop_process()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_reset_clicked(self):
         self.spectrum.reset()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_lockin_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Acquiring ...')
         self.spectrum.take_lockin()
 
-    # @pyqtSlot()
+    # @QtCore.Slot()
     # def on_direction_clicked(self):
     #     self.direction_dialog.rundialog()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_live_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Liveview')
@@ -564,22 +562,22 @@ class SCNR(QMainWindow):
             self.spectrum.take_live_fullimage()
 
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_searchgrid_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText("Searching Max.")
         self.spectrum.scan_search_max(self.posModel.getMatrix(), self.labels)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_search_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText("Searching Max.")
         self.spectrum.search_max()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_save_clicked(self):
         self.ui.status.setText("Saving Data ...")
-        prefix, ok = QInputDialog.getText(self, 'Save Folder',
+        prefix, ok = QtWidgets.QInputDialog.getText(self, 'Save Folder',
                                           'Enter Folder to save spectra to:')
         if ok:
             try:
@@ -588,51 +586,54 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
-                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QtWidgets.QMessageBox.Ok)
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
             self.spectrum.save_data(path)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_saveas_clicked(self):
         self.ui.status.setText("Saving Data ...")
-        save_as = QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
+        save_as = QtWidgets.QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
                                               'CSV Files (*.csv)')
-        save_as.setDefaultSuffix('csv')
-        print(save_as[0])
-        # prefix, ok = QInputDialog.getText(self, 'Save Folder', 'Enter Folder to save spectra to:')
+
+        #print(save_as[0])
+        save_as = save_as[0]
+        if not save_as[-4:] == '.csv':
+            save_as += ".csv"
+        # prefix, ok = QtWidgets.QInputDialog.getText(self, 'Save Folder', 'Enter Folder to save spectra to:')
         if not self.spectrum.mean is None:
             try:
-                self.spectrum.save_spectrum(self.spectrum.mean, save_as[0], None, False, True)
+                self.spectrum.save_spectrum(self.spectrum.mean, save_as, None, False, True)
             except:
-                print("Error Saving file " + save_as[0])
-                QMessageBox.warning(self, 'Error', "Error Saving file " + save_as[0], QMessageBox.Ok)
+                print("Error Saving file " + save_as)
+                QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_dark_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Taking Dark Spectrum')
         self.spectrum.take_dark()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_lamp_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Taking Lamp Spectrum')
         self.spectrum.take_lamp()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_mean_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Taking Normal Spectrum')
         self.spectrum.take_mean()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_bg_clicked(self):
         self.on_disableButtons()
         self.ui.status.setText('Taking Background Spectrum')
         self.spectrum.take_bg()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_series_clicked(self):
         self.ui.status.setText('Taking Time Series')
         prefix = self.prefix_dialog.rundialog()
@@ -643,7 +644,7 @@ class SCNR(QMainWindow):
             except:
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
-                QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QtWidgets.QMessageBox.Ok)
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
             self.spectrum.take_series(path)
@@ -651,55 +652,55 @@ class SCNR(QMainWindow):
             self.ui.status.setText("Error")
             # self.on_disableButtons()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_loaddark_clicked(self):
         buf = self._load_spectrum_from_file()
         if not buf is None:
             self.spectrum.dark = buf
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_loadlamp_clicked(self):
         buf = self._load_spectrum_from_file()
         if not buf is None:
             self.spectrum.lamp = buf
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_loadbg_clicked(self):
         buf = self._load_spectrum_from_file()
         if not buf is None:
             self.spectrum.bg = buf
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_xup_clicked(self):
         self.stage.moverel(dx=self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_xdown_clicked(self):
         self.stage.moverel(dx=-self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_yup_clicked(self):
         self.stage.moverel(dy=self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_ydown_clicked(self):
         self.stage.moverel(dy=-self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_zup_clicked(self):
         self.stage.moverel(dz=self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_zdown_clicked(self):
         self.stage.moverel(dz=-self.settings.stepsize)
         self.show_pos()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_stepup_clicked(self):
         self.settings.stepsize *= 10
         if self.settings.stepsize > 10:
@@ -707,7 +708,7 @@ class SCNR(QMainWindow):
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
         self.settings.save()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_stepdown_clicked(self):
         self.settings.stepsize /= 10
         if self.settings.stepsize < 0.001:
@@ -715,7 +716,7 @@ class SCNR(QMainWindow):
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
         self.settings.save()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_temp_clicked(self):
         self.ui.label_temp.setText('Detector Temperature: ' + str(round(self.spectrometer.GetTemperature(), 1)) + ' °C')
 
@@ -723,14 +724,14 @@ class SCNR(QMainWindow):
 
     # ----- Scanning Listview Slots
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_addpos_clicked(self):
         self.stage.query_pos()
         x, y, z = self.stage.last_pos()
         positions = np.matrix([x, y])
         self.posModel.addData(positions)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_spangrid_clicked(self):
         positions = self.posModel.getMatrix()
         grid, self.labels, ok = dialogs.SpanGrid_Dialog.getXY(positions)
@@ -738,12 +739,12 @@ class SCNR(QMainWindow):
             self.posModel.clear()
             self.posModel.addData(grid)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_scan_add(self):
         positions = np.matrix([0.0, 0.0])
         self.posModel.addData(positions)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_scan_remove(self):
         indices = self.ui.posTable.selectionModel().selectedIndexes()
         rows = np.array([], dtype=int)
@@ -751,7 +752,7 @@ class SCNR(QMainWindow):
             rows = np.append(rows, index.row())
         self.posModel.removeRows(rows)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_scan_clear(self):
         self.posModel.clear()
 
@@ -759,68 +760,68 @@ class SCNR(QMainWindow):
 
     # ----- Slots for Settings
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_int_time_edited(self):
         self.settings.integration_time = self.ui.integration_time_spin.value()
         self.spectrometer.SetExposureTime(self.ui.integration_time_spin.value())
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_number_of_samples_edited(self):
         self.settings.number_of_samples = self.ui.number_of_samples_spin.value()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_slit_width_edited(self):
         self.settings.slit_width = self.ui.slitwidth_spin.value()
         self.spectrometer.SetSlitWidth(self.ui.slitwidth_spin.value())
         time.sleep(0.5)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_centre_wavelength_edited(self):
         self.settings.centre_wavelength = self.ui.centre_wavelength_spin.value()
         self.spectrometer.SetCentreWavelength(self.ui.centre_wavelength_spin.value())
 
-    @pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_grating_changed(self, index):
         self.spectrometer.SetGrating(index + 1)
 
-    @pyqtSlot()
-    @pyqtSlot()
+    @QtCore.Slot()
+    @QtCore.Slot()
     def on_exposure_time_edited(self):
         self.settings.cam_exposure_time = self.ui.exposure_time_spin.value()
         self.cam.set_exposure(self.settings.cam_exposure_time * 1000)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_search_int_time_edited(self):
         self.settings.search_integration_time = self.ui.search_int_time_spin.value()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_rasterdim_edited(self):
         self.settings.rasterdim = self.ui.rasterdim_spin.value()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_rasterwidth_edited(self):
         self.settings.rasterwidth = self.ui.rasterwidth_spin.value()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_sigma_edited(self):
         self.settings.sigma = self.ui.sigma_spin.value()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_search_zmult_edited(self):
         self.settings.zmult = self.ui.search_zmult_spin.value()
 
-    @pyqtSlot(bool)
+    @QtCore.Slot(bool)
     def on_search_corrected_toggled(self,state):
         self.settings.correct_search = self.ui.search_correct_checkBox.isChecked()
 
-    @pyqtSlot(bool)
+    @QtCore.Slot(bool)
     def on_increase_minimum_readout_toggled(self,state):
         if state:
             self.spectrometer.SetMinVertReadout(8)
         else:
             self.spectrometer.SetMinVertReadout(1)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_savesettings_clicked(self):
         if self.cam is not None:
             pos = self.cammarker.pos()
@@ -832,7 +833,7 @@ class SCNR(QMainWindow):
         self.settings.save()
 
     def _load_spectrum_from_file(self):
-        save_dir = QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
+        save_dir = QtWidgets.QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
 
         if len(save_dir[0]) > 1:
             save_dir = save_dir[0]
@@ -844,7 +845,7 @@ class SCNR(QMainWindow):
             return np.array(data)
         return None
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def on_z_correction_angle_edited(self):
         if self.ui.zcorrection_checkbox.isChecked():
             if self.stage is not None:
@@ -854,11 +855,11 @@ class SCNR(QMainWindow):
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
     # sys.stderr.write('\r')
-    if QMessageBox.question(None, '', "Are you sure you want to quit?",
-                          QMessageBox.Yes | QMessageBox.No,
-                           QMessageBox.No) == QMessageBox.Yes:
-        QApplication.quit()
-    #QApplication.quit()
+    if QtWidgets.QMessageBox.question(None, '', "Are you sure you want to quit?",
+                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                           QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.Yes:
+        QtWidgets.QApplication.quit()
+    #QtWidgets.QApplication.quit()
 
 
 if __name__ == '__main__':
@@ -867,25 +868,30 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, sigint_handler)
 
-    try:
-        app = QApplication(sys.argv)
-        #timer = QTimer()
-        #timer.start(500)  # You may change this if you wish.
-        #timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
-        main = SCNR()
-        main.show()
-    except Exception as e:
-        print(e)
+    app = QtWidgets.QApplication(sys.argv)
+    setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
+    #app.quit()
 
-    try:
-        res = app.exec()
-    except Exception as e:
-        print(e)
+
+    #try:
+    #app = QtWidgets.QApplication(sys.argv)
+    #timer = QtCore.QTimer()
+    #timer.start(500)  # You may change this if you wish.
+    #timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
+    if ok:
+        main = SCNR([setup,stage_ok,cam_ok])
+        main.show()
+    #except Exception as e:
+    #    print(e)
+        try:
+            res = app.exec()
+        except Exception as e:
+            print(e)
 
     sys.exit(0)
 
     # try:
-    #     app = QApplication(sys.argv)
+    #     app = QtWidgets.QApplication(sys.argv)
     #     main = SCNR()
     #     main.show()
     # except Exception as e:

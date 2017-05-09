@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import progress
 import scipy.optimize as opt
-from qtpy.QtCore import pyqtSlot, QThread, pyqtSignal, QObject
+from qtpy import QtCore
 from scipy.signal import savgol_filter
 import time
 
@@ -41,10 +41,10 @@ def smooth(x, y):
     return buf
 
 
-class MeasurementThread(QObject):
-    specSignal = pyqtSignal(np.ndarray)
-    progressSignal = pyqtSignal(float, str)
-    finishSignal = pyqtSignal(np.ndarray)
+class MeasurementThread(QtCore.QObject):
+    specSignal = QtCore.Signal(np.ndarray)
+    progressSignal = QtCore.Signal(float, str)
+    finishSignal = QtCore.Signal(np.ndarray)
 
 
     def __init__(self, spectrometer, parent=None):
@@ -62,7 +62,7 @@ class MeasurementThread(QObject):
         self.spec = np.zeros(self.spectrometer._width)
         print("New "+ self.__class__.__name__ +" created: "+str(id(self)))
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.abort = True
         #self.thread.wait(self.spectrometer.exposure_time*1000+500)
@@ -74,11 +74,11 @@ class MeasurementThread(QObject):
     def __del__(self):
         self.__class__.has_instance = False
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def work(self):
         pass
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         try:
             while not self.abort:
@@ -91,7 +91,7 @@ class MeasurementThread(QObject):
 
 class LiveThread(MeasurementThread):
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def work(self):
         try:
             self.specSignal.emit(self.spec)
@@ -99,7 +99,7 @@ class LiveThread(MeasurementThread):
             print(e)
             print("Communication out of sync, try again")
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         try:
             while not self.abort:
@@ -120,7 +120,7 @@ class ImageThread(MeasurementThread):
             print(e)
             print("Communication out of sync, try again")
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         while not self.abort:
             try:
@@ -148,7 +148,7 @@ class FullImageThread(MeasurementThread):
             print(e)
             print("Communication out of sync, try again")
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         while not self.abort:
             try:
@@ -224,6 +224,8 @@ class LockinThread(MeasurementThread):
         x = np.arange(0, self.number_of_samples)
         ref = np.cos(2 * np.pi * x * self.settings.f*2)
         ref2 = np.cos(2 * np.pi * x * self.settings.f*2+np.pi/2)
+        #ref = np.cos(2 * np.pi * x * self.settings.f)
+        #ref2 = np.cos(2 * np.pi * x * self.settings.f+np.pi/2)
 
         res = np.zeros(self.spectrometer._width)
         res_phase = np.zeros(self.spectrometer._width)
@@ -266,9 +268,9 @@ class LockinThread(MeasurementThread):
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(self.spectrometer.GetWavelength(),res / res.max())
+        res_phase = np.abs(res_phase)
         ax.plot(self.spectrometer.GetWavelength(), res_phase / res_phase.max())  # /lamp[mask])
-
+        ax.plot(self.spectrometer.GetWavelength(),res / res.max())
         plt.savefig("search_max/lockin.png")
         plt.close()
 
@@ -277,7 +279,9 @@ class LockinThread(MeasurementThread):
 
     def work(self):
 
-        ref = np.cos(2 * np.pi * self.i * self.settings.f)#+1
+        ref = np.cos(2 * np.pi * self.i * self.settings.f)
+        #ref = (np.cos(2 * np.pi * self.i * self.settings.f)+1)/2
+
         self.move_stage(ref)
         spec = self.spectrometer.TakeSingleTrack()
         self.lockin[:, self.i] = spec
@@ -526,7 +530,7 @@ class Scan3DThread(MeasurementThread):
             print(type)
             print(value)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         print("Taking "+str(self.n)+" spectra")
         with open(self.file, 'w') as self.f:
@@ -542,14 +546,14 @@ class Scan3DThread(MeasurementThread):
                     sys.excepthook(type, value, traceback)
                     self.stop()
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def meanfinished(self, spec):
         self.f.write(str(self.scanning_points[self.i, 0]) + "," +str(self.scanning_points[self.i, 1]) + "," +str(self.scanning_points[self.i, 2]) + ",")
         for i in range(len(spec)):
             self.f.write(str(spec[i]) + ",")
         self.f.write("\r\n")
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.meanthread.stop()
         #self.meanthread.thread.wait(self.settings.integration_time*1000+500)
@@ -586,7 +590,7 @@ class Scan3DThread(MeasurementThread):
             self.finishSignal.emit(np.array([]))
             self.stop()
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def specslot(self, spec):
         self.specSignal.emit(spec)
 
@@ -644,7 +648,7 @@ class ScanSearchThread(ScanThread):
         self.searchthread.specSignal.connect(self.specslot)
         self.searchthread.finishSignal.connect(self.searchfinishslot)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.searchthread.stop()
         super(ScanSearchThread, self).stop()
@@ -657,17 +661,17 @@ class ScanSearchThread(ScanThread):
     def intermediatework(self):
         self.searchthread.search()
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def specslot(self, spec):
         self.specSignal.emit(spec)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def searchfinishslot(self, pos):
         print(pos)
 
 
 class ScanLockinThread(ScanThread):
-    saveSignal = pyqtSignal(np.ndarray, str, np.ndarray, bool, bool)
+    saveSignal = QtCore.Signal(np.ndarray, str, np.ndarray, bool, bool)
 
     def __init__(self, spectrometer, settings, scanning_points, stage, parent=None):
         super(ScanThread, self).__init__(spectrometer, settings, scanning_points, None, stage)
@@ -676,7 +680,7 @@ class ScanLockinThread(ScanThread):
         self.meanthread.finishSignal.connect(self.lockinfinished)
         self.meanthread.specSignal.connect(self.specslot)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.meanthread.stop()
         #self.meanthread.thread.wait(self.settings.integration_time*1000+500)
@@ -690,23 +694,23 @@ class ScanLockinThread(ScanThread):
         if not self.abort:
             self.meanthread.process()
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def specslot(self, spec):
         self.specSignal.emit(spec)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def lockinfinished(self, spec):
         self.saveSignal.emit(self.lockin, str(self.i).zfill(5) + "_lockin.csv", self.positions[self.i, :], False, False)
 
 
 class ScanMeanThread(ScanThread):
-    saveSignal = pyqtSignal(np.ndarray, str, np.ndarray, bool, bool)
+    saveSignal = QtCore.Signal(np.ndarray, str, np.ndarray, bool, bool)
 
     def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
         super(ScanMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.initMeanThread()
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.meanthread.stop()
         #self.meanthread.wait(self.settings.integration_time*1000+500)
@@ -744,11 +748,11 @@ class ScanMeanThread(ScanThread):
         #    time.sleep(0.1)
         #self.meanthread.process()
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def specslot(self, spec):
         self.specSignal.emit(spec)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def meanfinished(self, spec):
         if self.labels is not None:
             self.saveSignal.emit(spec, self.labels[self.i] + ".csv", self.positions[self.i, :], False, False)
@@ -762,7 +766,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec,self)
         self.searchthread.specSignal.connect(self.specslot)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.meanthread.stop()
         self.searchthread.stop()

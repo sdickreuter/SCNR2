@@ -3,13 +3,13 @@ import time
 
 import numpy as np
 import ximea as xi
-from qtpy.QtCore import pyqtSlot, QThread, pyqtSignal, QObject#, QMutex
+from qtpy import QtCore
 
 
-class CameraThread(QObject):
-    ImageReadySignal = pyqtSignal(np.ndarray)
+class CameraThread(QtCore.QObject):
+    ImageReadySignal = QtCore.Signal(np.ndarray)
     exposure_us = 150000
-    #mutex = QMutex()
+    #mutex = QtCore.QMutex()
     enabled = False
 
     def __init__(self,flip = False, parent=None):
@@ -24,7 +24,7 @@ class CameraThread(QObject):
         self._cam = None
         try:
             self.abort = False
-            self.thread = QThread()
+            self.thread = QtCore.QThread()
             num_dev = xi.get_device_count()
 
             if num_dev > 0:
@@ -78,7 +78,7 @@ class CameraThread(QObject):
     def disable(self):
         self.enabled = False
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def stop(self):
         self.abort = True
 
@@ -107,7 +107,7 @@ class CameraThread(QObject):
             else:
                 self.ImageReadySignal.emit(img)
 
-    @pyqtSlot()
+    @QtCore.Slot()
     def process(self):
         while not self.abort:
             try:

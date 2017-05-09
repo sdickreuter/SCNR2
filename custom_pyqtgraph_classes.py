@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
+#from qtpy import QtCore, QtGui
 
 class CustomViewBox(pg.ViewBox):
     def __init__(self, *args, **kwds):

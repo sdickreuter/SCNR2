@@ -3,7 +3,7 @@ __author__ = 'sei'
 from spectrumthreads import *
 import numpy as np
 from datetime import datetime
-from qtpy.QtCore import pyqtSignal, QObject
+from qtpy import QtCore
 import time
 from AndorSpectrometer import Spectrometer
 
@@ -13,14 +13,14 @@ from AndorSpectrometer import Spectrometer
 eol = "\n"
 
 
-class Spectrum(QObject):
-    specSignal = pyqtSignal(np.ndarray)
-    updatePositions = pyqtSignal(np.ndarray)
+class Spectrum(QtCore.QObject):
+    specSignal = QtCore.Signal(np.ndarray)
+    updatePositions = QtCore.Signal(np.ndarray)
 
-    updateStatus = pyqtSignal(str)
-    updateProgress = pyqtSignal(float)
-    disableButtons = pyqtSignal()
-    enableButtons = pyqtSignal()
+    updateStatus = QtCore.Signal(str)
+    updateProgress = QtCore.Signal(float)
+    disableButtons = QtCore.Signal()
+    enableButtons = QtCore.Signal()
 
     def __init__(self, spectrometer, stage, settings):
         super(Spectrum, self).__init__(None)
@@ -67,12 +67,12 @@ class Spectrum(QObject):
             return spec
 
 
-    @pyqtSlot(float, str)
+    @QtCore.Slot(float, str)
     def progressCallback(self, progress, eta):
         self.updateProgress.emit(progress)
         self.updateStatus.emit('ETA: ' + eta)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def specCallback(self, spec):
         self._spec = spec
         self.specSignal.emit(spec)
@@ -96,7 +96,7 @@ class Spectrum(QObject):
         self.enableButtons.emit()
 
     def start_process(self, worker):
-        self.thread = QThread(self)
+        self.thread = QtCore.QThread(self)
         worker.moveToThread(self.thread)
         self.thread.started.connect(worker.process)
         self.thread.finished.connect(worker.stop)
@@ -121,35 +121,35 @@ class Spectrum(QObject):
         self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedLockinCallback(self, spec):
         self.stop_process()
         self.lockin = spec
         #self.enableButtons.emit()
         self.updateStatus.emit('Lockin Spectrum acquired')
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedDarkCallback(self, spec):
         self.stop_process()
         self.dark = spec
         #self.enableButtons.emit()
         self.updateStatus.emit('Dark Spectrum acquired')
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedLampCallback(self, spec):
         self.stop_process()
         self.lamp = spec
         #self.enableButtons.emit()
         self.updateStatus.emit('Lamp Spectrum acquired')
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedMeanCallback(self, spec):
         self.stop_process()
         self.mean = spec
         #self.enableButtons.emit()
         self.updateStatus.emit('Mean Spectrum acquired')
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedBGCallback(self, spec):
         self.stop_process()
         self.bg = spec
@@ -208,13 +208,13 @@ class Spectrum(QObject):
         self.worker.finishSignal.connect(self.finishedScanSearch)
         self.start_process(self.worker)
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedSearch(self, pos):
         self.stop_process()
         #self.enableButtons.emit()
         self.updateStatus.emit('Search finished')
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedScanSearch(self, pos):
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
@@ -256,14 +256,14 @@ class Spectrum(QObject):
         self.start_process(self.worker)
 
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedScan3d(self):
         #self.enableButtons.emit()
         self.stop_process()
         self.updateStatus.emit('Scan Mean finished')
 
 
-    @pyqtSlot(np.ndarray)
+    @QtCore.Slot(np.ndarray)
     def finishedScanMean(self, pos):
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
@@ -301,7 +301,7 @@ class Spectrum(QObject):
             #self.save_spectrum(self.lockin, 'lockin.csv', None, True, False)
             self.save_lockin_data(self.lockin, 'lockin.csv')
 
-    @pyqtSlot(np.ndarray, str, np.ndarray, bool, bool)
+    @QtCore.Slot(np.ndarray, str, np.ndarray, bool, bool)
     def save_spectrum(self, spec, filename, pos, islockin, isfullPath):
         wl = self._spectrometer.GetWavelength()
         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
@@ -347,7 +347,7 @@ class Spectrum(QObject):
 
         f.close()
 
-    @pyqtSlot(np.ndarray, str)
+    @QtCore.Slot(np.ndarray, str)
     def save_lockin_data(self, spec, filename):
         wl = self._spectrometer.GetWavelength()
         data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
