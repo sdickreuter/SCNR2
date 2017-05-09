@@ -67,6 +67,7 @@ class SCNR(QMainWindow):
                 print("Setup not specified, quitting.")
                 super(SCNR, self).close()
         else:
+            self.ui.setupUi(self)
             super(SCNR, self).close()
 
         self.ui.setupUi(self)
@@ -255,6 +256,7 @@ class SCNR(QMainWindow):
         self.hh = self.ui.posTable.horizontalHeader()
         self.hh.setVisible(True)
 
+        self.on_temp_clicked()
         self.show_pos()
 
     def closeEvent(self, event):
@@ -376,22 +378,7 @@ class SCNR(QMainWindow):
 
     def correct_spec(self, spec):
         if self.ui.correct_checkBox.isChecked():
-
-            if not self.spectrum.dark is None and not self.spectrum.lamp is None and not self.spectrum.bg is None:
-                return (spec - self.spectrum.bg) / (self.spectrum.lamp - self.spectrum.dark)
-
-            elif not self.spectrum.dark is None and not self.spectrum.lamp is None:
-                return 1 - ( (spec - self.spectrum.dark) / (self.spectrum.lamp - self.spectrum.dark) )
-
-            elif not self.spectrum.dark is None:
-                return spec - self.spectrum.dark
-
-            elif not self.spectrum.bg is None:
-                return spec - self.spectrum.bg
-
-            else:
-                return spec
-
+            return self.spectrum.correct_spectrum(spec)
         return spec
 
     @pyqtSlot(np.ndarray)

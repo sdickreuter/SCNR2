@@ -50,6 +50,23 @@ class Spectrum(QObject):
             self.worker.stop()
             self.worker = None
 
+    def correct_spectrum(self, spec):
+        if not self.spectrum.dark is None and not self.lamp is None and not self.bg is None:
+            return (spec - self.bg) / (self.lamp - self.dark)
+
+        elif not self.dark is None and not self.lamp is None:
+            return 1 - ( (spec - self.dark) / (self.lamp - self.dark) )
+
+        elif not self.dark is None:
+            return spec - self.dark
+
+        elif not self.bg is None:
+            return spec - self.bg
+
+        else:
+            return spec
+
+
     @pyqtSlot(float, str)
     def progressCallback(self, progress, eta):
         self.updateProgress.emit(progress)
