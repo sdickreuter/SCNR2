@@ -51,7 +51,7 @@ class Spectrum(QtCore.QObject):
             self.worker = None
 
     def correct_spectrum(self, spec):
-        if not self.spectrum.dark is None and not self.lamp is None and not self.bg is None:
+        if not self.dark is None and not self.lamp is None and not self.bg is None:
             return (spec - self.bg) / (self.lamp - self.dark)
 
         elif not self.dark is None and not self.lamp is None:
