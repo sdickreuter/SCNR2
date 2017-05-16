@@ -1248,6 +1248,20 @@
            </widget>
           </item>
           <item>
+           <widget class="Line" name="line_14">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="autofocus_button">
+            <property name="text">
+             <string>Autofocus</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -1794,7 +1808,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>657</x>
-     <y>555</y>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1858,7 +1872,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>657</x>
-     <y>133</y>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -2049,8 +2063,8 @@
    <slot>on_number_of_samples_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>158</y>
+     <x>675</x>
+     <y>107</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
@@ -2065,8 +2079,8 @@
    <slot>on_slit_width_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>190</y>
+     <x>675</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>838</x>
@@ -2081,8 +2095,8 @@
    <slot>on_grating_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>255</y>
+     <x>675</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
      <x>840</x>
@@ -2097,8 +2111,8 @@
    <slot>on_centre_wavelength_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>223</y>
+     <x>675</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
@@ -2113,8 +2127,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>323</y>
+     <x>675</x>
+     <y>115</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2129,8 +2143,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>422</y>
+     <x>675</x>
+     <y>120</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -2145,8 +2159,8 @@
    <slot>on_rasterwidth_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>455</y>
+     <x>675</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2161,8 +2175,8 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>487</y>
+     <x>675</x>
+     <y>122</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
@@ -2178,7 +2192,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>657</x>
-     <y>75</y>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>798</x>
@@ -2194,7 +2208,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>657</x>
-     <y>104</y>
+     <y>77</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -2209,8 +2223,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>648</x>
-     <y>272</y>
+     <x>675</x>
+     <y>120</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2225,8 +2239,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>726</x>
-     <y>272</y>
+     <x>675</x>
+     <y>120</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2241,8 +2255,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>804</x>
-     <y>272</y>
+     <x>675</x>
+     <y>120</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2417,8 +2431,8 @@
    <slot>on_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>125</y>
+     <x>675</x>
+     <y>106</y>
     </hint>
     <hint type="destinationlabel">
      <x>921</x>
@@ -2433,8 +2447,8 @@
    <slot>on_savesettings_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>853</x>
-     <y>576</y>
+     <x>657</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -2481,8 +2495,8 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>852</x>
-     <y>390</y>
+     <x>675</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>1065</x>
@@ -2562,7 +2576,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>853</x>
-     <y>407</y>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>947</x>
@@ -2577,8 +2591,8 @@
    <slot>on_search_zmult_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>801</x>
-     <y>506</y>
+     <x>675</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
      <x>905</x>
@@ -2593,8 +2607,8 @@
    <slot>on_search_corrected_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>653</x>
-     <y>539</y>
+     <x>657</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>887</x>
@@ -2615,6 +2629,22 @@
     <hint type="destinationlabel">
      <x>924</x>
      <y>570</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>autofocus_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_autofocus_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>803</x>
+     <y>525</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1078</x>
+     <y>541</y>
     </hint>
    </hints>
   </connection>
@@ -2674,5 +2704,6 @@
   <slot>on_search_zmult_edited()</slot>
   <slot>on_search_corrected_toggled(bool)</slot>
   <slot>on_increase_minimum_readout_toggled(bool)</slot>
+  <slot>on_autofocus_clicked()</slot>
  </slots>
 </ui>

@@ -83,12 +83,12 @@ class CameraThread(QtCore.QObject):
         self.abort = True
 
     def get_image(self):
-        if self.enabled:
-            self.enabled = False
-            img = self._cam.get_image()
-            self.enabled = True
-        else:
-            img = self._cam.get_image()
+        # if self.enabled:
+        #     self.enabled = False
+        #     img = self._cam.get_image()
+        #     self.enabled = True
+        # else:
+        #     img = self._cam.get_image()
 
         img = np.array(self._cam.get_image(),dtype = np.int32)
         img = img[:,:,0] + np.left_shift(img[:,:,1],8)

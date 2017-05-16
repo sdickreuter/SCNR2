@@ -832,6 +832,16 @@ class SCNR(QtWidgets.QMainWindow):
             self.settings.slitmarker_x = pos.x()
         self.settings.save()
 
+    @QtCore.Slot()
+    def on_autofocus_clicked(self):
+        self.on_disableButtons()
+        if self.spectrometer.mode == 'singletrack':
+            self.spectrometer.SetSlitWidth(500)
+            self.spectrometer.SetCentreWavelength(0)
+            self.spectrum.start_autofocus()
+        else:
+            print("Must be in Spectrum-Mode to do autofocus!")
+
     def _load_spectrum_from_file(self):
         save_dir = QtWidgets.QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
 

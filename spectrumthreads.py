@@ -140,6 +140,49 @@ class ImageThread(MeasurementThread):
                 sys.excepthook(type, value, traceback)
 
 
+class AutoFocusThread(MeasurementThread):
+
+    def focus(self):
+        def calc_f(dist=2):
+            img = self.spectrometer.TakeSingleTrack(raw=True)
+            n, m = img.shape
+            f = 0
+            for i in range(n):
+                f += np.sum(np.square(np.subtract(img[n, :], np.roll(img[n, :], dist))))
+
+        self.stage.query_pos()
+        startpos = self.stage.last_pos()
+        d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
+        pos = d * self.settings.zmult + startpos[2]
+        focus = np.zeros(self.settings.rasterdim)
+        for k in range(len(pos)):
+            self.stage.moveabs(z=startpos[2]+pos[k])
+            focus[k] = calc_f()
+            if self.abort:
+                break
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(pos, focus, 'bo')
+        plt.savefig("search_max/autofocus.png")
+        plt.close()
+
+    @QtCore.Slot()
+    def process(self):
+        while not self.abort:
+            try:
+                if not self.abort:
+                    self.focus()
+                else:
+                    print("Autofocus Thread aborted")
+                    print(self.spec)
+            except:
+                (type, value, traceback) = sys.exc_info()
+                sys.excepthook(type, value, traceback)
+
+
+
+
 class FullImageThread(MeasurementThread):
 
     def work(self):
@@ -265,7 +308,7 @@ class LockinThread(MeasurementThread):
         res_phase = np.angle(x2 + 1j * y2)
         res_amp = np.abs(x2 + 1j * y2)
         #res = np.abs(x2 + 1j * y2) * (np.pi - np.abs(res_phase))
-        res = np.abs(x2 + 1j * y2) #* (np.abs(res_phase))
+        res = res_amp * (np.abs(res_phase))
         #print(res_phase[np.argmax(res_amp)])
 
 

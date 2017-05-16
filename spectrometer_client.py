@@ -237,7 +237,7 @@ class SpectrometerClient:
         ret = self.make_request('setsingletrack',(hstart,hstop))
         self._return_value_is_ok(ret)
 
-    def TakeSingleTrack(self):
+    def TakeSingleTrack(self, raw = False):
         #print("Send Request: takesingletrack")
         #return np.mean(self.make_request('takesingletrack',None),axis=1)
         spec = self.make_request('takesingletrack',None)
@@ -250,7 +250,10 @@ class SpectrometerClient:
         # plt.close()
         if self._return_value_is_data(spec):
             spec = np.flipud(spec)  # After changing Calibration with Andor Solis, data is now flipped, has to be flipped back
-            return np.mean(spec, axis=1)
+            if raw:
+                return spec
+            else:
+                return np.mean(spec, axis=1)
         else:
             return None
         #return np.mean(spec[:, 1:(spec.shape[1] - 1)], axis=1)

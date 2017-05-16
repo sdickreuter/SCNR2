@@ -103,6 +103,13 @@ class Spectrum(QtCore.QObject):
         self.thread.start()
 
 
+    def start_autofocus(self):
+
+        self.worker = AutoFocusThread(self._spectrometer)
+        #self.worker.specSignal.connect(self.specCallback)
+        self.start_process(self.worker)
+
+
     def take_live(self):
 
         self.worker = LiveThread(self._spectrometer)
@@ -207,6 +214,14 @@ class Spectrum(QtCore.QObject):
         self.worker.progressSignal.connect(self.progressCallback)
         self.worker.finishSignal.connect(self.finishedScanSearch)
         self.start_process(self.worker)
+
+    @QtCore.Slot(np.ndarray)
+    def finishedAutofocus(self, pos):
+        self._spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self._spectrometer.SetSlitWidth(self.settings.slit_width)
+        self.stop_process()
+        #self.enableButtons.emit()
+        self.updateStatus.emit('Autofocus finished')
 
     @QtCore.Slot(np.ndarray)
     def finishedSearch(self, pos):
