@@ -140,80 +140,80 @@ class ImageThread(MeasurementThread):
                 sys.excepthook(type, value, traceback)
 
 
-class AutoFocusThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, parent=None):
-        self.stage = stage
-        self.settings = settings
-        super(AutoFocusThread, self).__init__(spectrometer)
-        print("Autofocus Thread initialized")
-
-    def work(self):
-        def calc_f(dist=3):
-            img = self.spectrometer.TakeSingleTrack(raw=True)
-            img = img[900:1050,:]
-            plt.imshow(img.T)
-            plt.savefig("search_max/autofocus_0.png")
-            plt.close()
-
-            n, m = img.shape
-            f = 0
-            for i in range(n):
-                f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
-            return f
-            #grad = np.gradient(img)
-            #return np.sum(np.square(grad[0])+np.square(grad[1]))
-
-        self.stage.query_pos()
-        startpos = self.stage.last_pos()
-        d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
-        pos = d * self.settings.zmult + startpos[2]
-        focus = np.zeros(self.settings.rasterdim)
-        for k in range(len(pos)):
-            self.stage.moveabs(z=pos[k])
-            focus[k] = calc_f()
-            print(str(k)+' '+str(focus[k]))
-            if self.abort:
-                self.stage.moveabs(z=startpos[2])
-                self.finishSignal.emit(np.zeros(2000))
-                break
-
-        maxind = np.argmax(focus)
-        minval = np.min(focus)
-        maxval = np.max(focus)
-        initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
-        try:
-            popt, pcov = opt.curve_fit(gauss, pos, focus, p0=initial_guess)
-            perr = np.diag(pcov)
-            # if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
-            if perr[1] > 1:
-                print("Could not determine focus: Variance too big")
-                print(perr)
-            # elif popt[0] < *0.1:
-            #    print("Could not determine particle position: Peak too small")
-            elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
-                print("Could not determine focus: Peak outside bounds")
-            elif popt[2] < self.settings.sigma / 100:
-                print("Could not determine focus: Peak to narrow")
-            #else:
-                #return popt, perr, measured, maxwl
-        except RuntimeError as e:
-            print(e)
-            print("Could not determine particle position: Fit error")
-
-        x = np.linspace(min(pos), max(pos))
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
-                transform=ax.transAxes)
-        ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
-        ax.set_title("Focus")
-        ax.plot(pos, focus, 'o')
-        plt.savefig("search_max/autofocus.png")
-        plt.close()
-
-        self.stage.moveabs(z=popt[1])
-        self.finishSignal.emit(np.zeros(2000))
-        self.stop()
+# class AutoFocusThread(MeasurementThread):
+#     def __init__(self, spectrometer, settings, stage, parent=None):
+#         self.stage = stage
+#         self.settings = settings
+#         super(AutoFocusThread, self).__init__(spectrometer)
+#         print("Autofocus Thread initialized")
+#
+#     def work(self):
+#         def calc_f(dist=3):
+#             img = self.spectrometer.TakeSingleTrack(raw=True)
+#             img = img[900:1050,:]
+#             plt.imshow(img.T)
+#             plt.savefig("search_max/autofocus_0.png")
+#             plt.close()
+#
+#             n, m = img.shape
+#             f = 0
+#             for i in range(n):
+#                 f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+#             return f
+#             #grad = np.gradient(img)
+#             #return np.sum(np.square(grad[0])+np.square(grad[1]))
+#
+#         self.stage.query_pos()
+#         startpos = self.stage.last_pos()
+#         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
+#         pos = d * self.settings.zmult + startpos[2]
+#         focus = np.zeros(self.settings.rasterdim)
+#         for k in range(len(pos)):
+#             self.stage.moveabs(z=pos[k])
+#             focus[k] = calc_f()
+#             print(str(k)+' '+str(focus[k]))
+#             if self.abort:
+#                 self.stage.moveabs(z=startpos[2])
+#                 self.finishSignal.emit(np.zeros(2000))
+#                 break
+#
+#         maxind = np.argmax(focus)
+#         minval = np.min(focus)
+#         maxval = np.max(focus)
+#         initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
+#         try:
+#             popt, pcov = opt.curve_fit(gauss, pos, focus, p0=initial_guess)
+#             perr = np.diag(pcov)
+#             # if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
+#             if perr[1] > 1:
+#                 print("Could not determine focus: Variance too big")
+#                 print(perr)
+#             # elif popt[0] < *0.1:
+#             #    print("Could not determine particle position: Peak too small")
+#             elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
+#                 print("Could not determine focus: Peak outside bounds")
+#             elif popt[2] < self.settings.sigma / 100:
+#                 print("Could not determine focus: Peak to narrow")
+#             #else:
+#                 #return popt, perr, measured, maxwl
+#         except RuntimeError as e:
+#             print(e)
+#             print("Could not determine particle position: Fit error")
+#
+#         x = np.linspace(min(pos), max(pos))
+#         fig = plt.figure()
+#         ax = fig.add_subplot(111)
+#         ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
+#                 transform=ax.transAxes)
+#         ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+#         ax.set_title("Focus")
+#         ax.plot(pos, focus, 'o')
+#         plt.savefig("search_max/autofocus.png")
+#         plt.close()
+#
+#         self.stage.moveabs(z=popt[1])
+#         self.finishSignal.emit(np.zeros(2000))
+#         self.stop()
 
 
 class FullImageThread(MeasurementThread):
@@ -458,6 +458,15 @@ class SearchThread(MeasurementThread):
             return spec
 
     def search(self):
+        def calc_focus(dist=3):
+            img = self.spectrometer.TakeSingleTrack(raw=True)
+            img = img[900:1050, :]
+            n, m = img.shape
+            f = 0
+            for i in range(n):
+                # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
+                f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+            return f
 
         def plot(title, popt, perr, pos, measured, maxwl):
             fig = plt.figure()
@@ -484,32 +493,47 @@ class SearchThread(MeasurementThread):
             for k in range(len(pos)):
                 if direction == "x":
                     self.stage.moveabs(x=pos[k])
-                    sigma_start = self.settings.sigma
+                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
+                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
                 elif  direction == "y":
                     self.stage.moveabs(y=pos[k])
-                    sigma_start = self.settings.sigma
+                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
+                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
                 elif direction == "z":
                     self.stage.moveabs(z=pos[k])
-                    sigma_start = self.settings.sigma*self.settings.zmult/2
+                    self.spectrometer.SetWavelength(0)
+                    self.spectrometer.SetSlitwidth(500)
+
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
+                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
+                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
                     return None, None, None, None
-                if self.settings.correct_search:
-                    spec = self.get_spec()
-                else:
-                    spec = self.spectrometer.TakeSingleTrack()
-                spec = smooth(self.wl, spec)
-                self.specSignal.emit(spec)
-                #measured[k] = np.max(spec[100:1900])
-                measured[k] = np.sum(spec[100:1900])
-                maxwl[k] = self.spectrometer.GetWavelength()[np.argmax(spec)]
 
-            maxind = np.argmax(measured[2:(len(pos))])
+                if direction == "x" or direction == "y":
+                    if self.settings.correct_search:
+                        spec = self.get_spec()
+                    else:
+                        spec = self.spectrometer.TakeSingleTrack()
+                    spec = smooth(self.wl, spec)
+                    self.specSignal.emit(spec)
+                    #measured[k] = np.max(spec[100:1900])
+                    measured[k] = np.sum(spec[100:1900])
+                    maxwl[k] = self.spectrometer.GetWavelength()[np.argmax(spec)]
+                else:
+                    measured[k] = calc_focus()
+
+            maxind = np.argmax(measured)
             minval = np.min(measured)
             maxval = np.max(measured)
+            if direction == "x" or direction == "y":
+                sigma_start = self.settings.sigma
+            else:
+                sigma_start = self.settings.sigma * 2
+
             initial_guess = (maxval - minval, pos[maxind], sigma_start, minval)
             try:
-                popt, pcov = opt.curve_fit(gauss, pos[2:(len(pos))], measured[2:(len(pos))], p0=initial_guess)
+                popt, pcov = opt.curve_fit(gauss, pos, measured, p0=initial_guess)
                 perr = np.diag(pcov)
                 #if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
                 if perr[1] > 1:
@@ -539,7 +563,6 @@ class SearchThread(MeasurementThread):
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
-
 
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
 
@@ -573,7 +596,7 @@ class SearchThread(MeasurementThread):
                 return False
 
             if popt is not None:
-                if j in np.arange(0,repetitions,3):
+                if j in np.arange(1,repetitions,3):
                     dx = float(popt[1])
                     if dx-startpos[0] > self.settings.rasterwidth:
                         print("Position to far from start, skipping")
@@ -582,7 +605,7 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(x=dx)
                         if perr[1] < 0.01 and ontargetz:
                             ontargetx = True
-                elif j in np.arange(1,repetitions,3):
+                elif j in np.arange(2,repetitions,3):
                     dy = float(popt[1])
                     if dy-startpos[1] > self.settings.rasterwidth:
                         print("Position to far from start, skipping")
@@ -591,7 +614,7 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(y=dy)
                         if perr[1] < 0.01 and ontargetz:
                             ontargety = True
-                elif j in np.arange(2, repetitions, 3):
+                elif j in np.arange(0, repetitions, 3):
                     dz = float(popt[1])
                     if dz - startpos[2] > self.settings.rasterwidth*self.settings.zmult:
                         print("Position to far from start, skipping")

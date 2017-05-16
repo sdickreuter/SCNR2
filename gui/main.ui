@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1121</width>
-    <height>970</height>
+    <width>925</width>
+    <height>955</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,16 +119,6 @@
            <widget class="QPushButton" name="live_button">
             <property name="text">
              <string>Liveview</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="lockin_button">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Take Lockin Spectrum</string>
             </property>
            </widget>
           </item>
@@ -1255,9 +1245,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="autofocus_button">
+           <widget class="QPushButton" name="lockin_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>Autofocus</string>
+             <string>Take Lockin Spectrum</string>
             </property>
            </widget>
           </item>
@@ -2629,22 +2622,6 @@
     <hint type="destinationlabel">
      <x>924</x>
      <y>570</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>autofocus_button</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_autofocus_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>803</x>
-     <y>525</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1078</x>
-     <y>541</y>
     </hint>
    </hints>
   </connection>
