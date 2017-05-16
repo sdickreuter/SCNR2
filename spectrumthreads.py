@@ -141,14 +141,27 @@ class ImageThread(MeasurementThread):
 
 
 class AutoFocusThread(MeasurementThread):
+    def __init__(self, spectrometer, settings, stage, parent=None):
+        self.stage = stage
+        self.settings = settings
+        super(AutoFocusThread, self).__init__(spectrometer)
+        print("Autofocus Thread initialized")
 
-    def focus(self):
-        def calc_f(dist=2):
+    def work(self):
+        def calc_f(dist=3):
             img = self.spectrometer.TakeSingleTrack(raw=True)
+            img = img[900:1050,:]
+            plt.imshow(img.T)
+            plt.savefig("search_max/autofocus_0.png")
+            plt.close()
+
             n, m = img.shape
             f = 0
             for i in range(n):
-                f += np.sum(np.square(np.subtract(img[n, :], np.roll(img[n, :], dist))))
+                f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+            return f
+            #grad = np.gradient(img)
+            #return np.sum(np.square(grad[0])+np.square(grad[1]))
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -156,31 +169,51 @@ class AutoFocusThread(MeasurementThread):
         pos = d * self.settings.zmult + startpos[2]
         focus = np.zeros(self.settings.rasterdim)
         for k in range(len(pos)):
-            self.stage.moveabs(z=startpos[2]+pos[k])
+            self.stage.moveabs(z=pos[k])
             focus[k] = calc_f()
+            print(str(k)+' '+str(focus[k]))
             if self.abort:
+                self.stage.moveabs(z=startpos[2])
+                self.finishSignal.emit(np.zeros(2000))
                 break
 
+        maxind = np.argmax(focus)
+        minval = np.min(focus)
+        maxval = np.max(focus)
+        initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
+        try:
+            popt, pcov = opt.curve_fit(gauss, pos, focus, p0=initial_guess)
+            perr = np.diag(pcov)
+            # if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
+            if perr[1] > 1:
+                print("Could not determine focus: Variance too big")
+                print(perr)
+            # elif popt[0] < *0.1:
+            #    print("Could not determine particle position: Peak too small")
+            elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
+                print("Could not determine focus: Peak outside bounds")
+            elif popt[2] < self.settings.sigma / 100:
+                print("Could not determine focus: Peak to narrow")
+            #else:
+                #return popt, perr, measured, maxwl
+        except RuntimeError as e:
+            print(e)
+            print("Could not determine particle position: Fit error")
+
+        x = np.linspace(min(pos), max(pos))
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(pos, focus, 'bo')
+        ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
+                transform=ax.transAxes)
+        ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+        ax.set_title("Focus")
+        ax.plot(pos, focus, 'o')
         plt.savefig("search_max/autofocus.png")
         plt.close()
 
-    @QtCore.Slot()
-    def process(self):
-        while not self.abort:
-            try:
-                if not self.abort:
-                    self.focus()
-                else:
-                    print("Autofocus Thread aborted")
-                    print(self.spec)
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
-
-
+        self.stage.moveabs(z=popt[1])
+        self.finishSignal.emit(np.zeros(2000))
+        self.stop()
 
 
 class FullImageThread(MeasurementThread):
