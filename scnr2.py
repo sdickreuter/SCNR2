@@ -187,6 +187,7 @@ class SCNR(QtWidgets.QMainWindow):
                     self.ui.addpos_button.setEnabled(True)
                     self.ui.scanning_tab.setEnabled(True)
                     self.ui.searchmax_button.setEnabled(True)
+                    self.ui.autofocus_button.setEnabled(True)
                     self.ui.stage_frame.setEnabled(True)
                     self.ui.search_checkBox.setEnabled(True)
                     self.ui.lockin_button.setEnabled(True)
@@ -410,6 +411,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.right_tab.setDisabled(True)
         self.ui.stage_frame.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
+        self.ui.autofocus_button.setDisabled(True)
         self.ui.stepup_button.setDisabled(True)
         self.ui.stepdown_button.setDisabled(True)
         self.ui.temp_button.setDisabled(True)
@@ -424,6 +426,7 @@ class SCNR(QtWidgets.QMainWindow):
         if not self.stage is None:
             self.ui.stage_frame.setDisabled(False)
             self.ui.searchmax_button.setDisabled(False)
+            self.ui.autofocus_button.setDisabled(False)
             self.ui.stepup_button.setDisabled(False)
             self.ui.stepdown_button.setDisabled(False)
             self.ui.addpos_button.setDisabled(False)
@@ -849,6 +852,12 @@ class SCNR(QtWidgets.QMainWindow):
             pos = self.slitmarker.pos()
             self.settings.slitmarker_x = pos.x()
         self.settings.save()
+
+    @QtCore.Slot()
+    def on_bg_img_clicked(self):
+        self.on_disableButtons()
+        self.spectrum.take_bg_img()
+        self.on_enableButtons()
 
     def _load_spectrum_from_file(self):
         save_dir = QtWidgets.QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')

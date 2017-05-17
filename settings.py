@@ -50,6 +50,9 @@ class Settings(object):
         self.slitmarker_x = float(self.config['slitmarker']['x'])
         self.slitmarker_y = float(self.config['slitmarker']['y'])
 
+        self.min_ind_img = int(self.config['autofocus']['min_ind_img'])
+        self.max_ind_img = int(self.config['autofocus']['max_ind_img'])
+
 
     def save(self):
         self.config.set('spectrum', 'integration_time', str(self.integration_time))
@@ -80,6 +83,9 @@ class Settings(object):
 
         self.config.set('slitmarker', 'x', str(self.slitmarker_x))
         self.config.set('slitmarker', 'y', str(self.slitmarker_y))
+
+        self.config.set('autofocus', 'min_ind_img', str(self.min_ind_img))
+        self.config.set('autofocus', 'max_ind_img', str(self.max_ind_img))
 
         try:
             with open(self._filename, 'w') as configfile:

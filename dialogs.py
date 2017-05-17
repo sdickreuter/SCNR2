@@ -102,7 +102,7 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
         def iter_all_ascii():
             size = 1
             while True:
-                for s in itertools.product(string.ascii_uppercase[1:10], repeat=size):
+                for s in itertools.product(string.ascii_uppercase, repeat=size):
                     yield "".join(s)
                 size += 1
 
@@ -140,17 +140,17 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
         #     labelsy = np.array(list(string.ascii_uppercase))[:yl]
         #     labelsx = np.array(list(string.digits))[1:xl + 1]
         if not self.transpose:
-            labelsx = self.get_letters(xl)
-            labelsy = self.get_numbers(yl)
-        else:
-            labelsy = self.get_letters(yl)
             labelsx = self.get_numbers(xl)
+            labelsy = self.get_letters(yl)
+        else:
+            labelsy = self.get_numbers(yl)
+            labelsx = self.get_letters(xl)
 
         labelsy = labelsy[::-1]
 
         if self.flip_x:
             labelsx = labelsx[::-1]
-        if self.flip_y:
+        if not self.flip_y:
             labelsy = labelsy[::-1]
 
         i = 0

@@ -7,6 +7,11 @@ import scipy.optimize as opt
 from scipy import signal
 from qtpy import QtCore
 from scipy.signal import savgol_filter
+from skimage import img_as_float,img_as_int
+from skimage import restoration
+from skimage import filters
+from skimage import morphology
+from scipy.ndimage import uniform_filter
 import time
 
 #  modified from: http://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m#comment33999040_21566831
@@ -141,18 +146,25 @@ class ImageThread(MeasurementThread):
 
 
 class AutoFocusThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, parent=None):
+    def __init__(self, spectrometer, settings, stage, bg_img,parent=None):
         self.stage = stage
         self.settings = settings
+        self.bg_img = bg_img
         super(AutoFocusThread, self).__init__(spectrometer)
-        print("Autofocus Thread initialized")
 
     def focus(self):
-        def calc_f(dist=3):
+        def calc_f(dist=2):
             img = self.spectrometer.TakeSingleTrack(raw=True)
-            img = img[900:1050,:]
+            img = img[self.settings.min_ind_img:self.settings.max_ind_img,:]
+            if self.bg_img is not None:
+                img -= self.bg_img
+                img = restoration.denoise_tv_bregman(img_as_float(img),0.1)
+                img = uniform_filter(img, 2)
+
+
+            #img = exposure.equalize_hist(img)
             plt.imshow(img.T)
-            plt.savefig("search_max/autofocus_0.png")
+            plt.savefig("search_max/autofocus_image.png")
             plt.close()
 
             n, m = img.shape
@@ -164,8 +176,9 @@ class AutoFocusThread(MeasurementThread):
             #grad = np.gradient(img)
             #return np.sum(np.square(grad[0])+np.square(grad[1]))
 
-        self.spectrometer.SetCentreWavelength(0.0)
         self.spectrometer.SetSlitWidth(500)
+        self.spectrometer.SetCentreWavelength(0.0)
+        time.sleep(0.5)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -175,18 +188,24 @@ class AutoFocusThread(MeasurementThread):
         for k in range(len(pos)):
             self.stage.moveabs(z=pos[k])
             focus[k] = calc_f()
-            print(str(k)+' '+str(focus[k]))
+            #print(str(k)+' '+str(focus[k]))
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
                 self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
                 self.spectrometer.SetSlitWidth(self.settings.slit_width)
-                self.finishSignal.emit(np.zeros(2000))
-                break
+                self.finishSignal.emit(np.array([]))
+                self.stop()
+                return
 
+        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+
+        focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)
         initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
+        popt = None
         try:
             popt, pcov = opt.curve_fit(gauss, pos, focus, p0=initial_guess)
             perr = np.diag(pcov)
@@ -194,32 +213,39 @@ class AutoFocusThread(MeasurementThread):
             if perr[1] > 1:
                 print("Could not determine focus: Variance too big")
                 print(perr)
+                popt = None
             # elif popt[0] < *0.1:
             #    print("Could not determine particle position: Peak too small")
             elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                 print("Could not determine focus: Peak outside bounds")
+                popt = None
             elif popt[2] < self.settings.sigma / 100:
                 print("Could not determine focus: Peak to narrow")
+                popt = None
             #else:
                 #return popt, perr, measured, maxwl
         except RuntimeError as e:
             print(e)
-            print("Could not determine particle position: Fit error")
+            print("Could not determine focus: Fit error")
+            popt = None
 
         x = np.linspace(min(pos), max(pos))
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
-                transform=ax.transAxes)
-        ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+        if popt is not None:
+            ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
+                    transform=ax.transAxes)
+            ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
         ax.set_title("Focus")
         ax.plot(pos, focus, 'o')
         plt.savefig("search_max/autofocus.png")
         plt.close()
 
-        self.stage.moveabs(z=popt[1])
-        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        if popt is not None:
+            self.stage.moveabs(z=popt[1])
+        else:
+            self.stage.moveabs(z=startpos[2])
+
         self.finishSignal.emit(np.array([]))
         self.stop()
 
@@ -477,7 +503,7 @@ class SearchThread(MeasurementThread):
             ax.plot(pos, measured, 'bo')
             x = np.linspace(min(pos), max(pos))
             if not popt is None:
-                ax.text(0.1, 0.9, str(round(popt[1],3)) + ' +- ' + str(round(perr[1],3)), ha='left', va='center', transform=ax.transAxes)
+                ax.text(0.1, 0.9, str(round(popt[1],3)) + ' +- ' + str(round(perr[1],6)), ha='left', va='center', transform=ax.transAxes)
                 ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
                 ax.set_title(title)
             if not maxwl is None:
@@ -485,7 +511,7 @@ class SearchThread(MeasurementThread):
                 ax2.plot(pos, maxwl, 'r.')
                 ax2.set_ylabel('maxwl', color='r')
                 ax2.tick_params('y', colors='r')
-            plt.savefig("search_max/search" + str(j) + ".png")
+            plt.savefig("search_max/search_"+title+'_'+ str(j) + ".png")
             plt.close()
 
 
@@ -496,17 +522,11 @@ class SearchThread(MeasurementThread):
             for k in range(len(pos)):
                 if direction == "x":
                     self.stage.moveabs(x=pos[k])
-                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
-                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
                 elif  direction == "y":
                     self.stage.moveabs(y=pos[k])
-                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
-                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
 
                 if self.abort:
                     self.stage.moveabs(x=startpos[0], y=startpos[1])
-                    self.spectrometer.SetWavelength(self.settings.centre_wavelength)
-                    self.spectrometer.SetSlitwidth(self.settings.slit_width)
                     return None, None, None, None
 
                 if self.settings.correct_search:
@@ -519,7 +539,7 @@ class SearchThread(MeasurementThread):
                 measured[k] = np.sum(spec[100:1900])
                 maxwl[k] = self.spectrometer.GetWavelength()[np.argmax(spec)]
 
-
+            measured = savgol_filter(measured, 3, 1)
             maxind = np.argmax(measured)
             minval = np.min(measured)
             maxval = np.max(measured)
@@ -720,7 +740,7 @@ class ScanThread(MeasurementThread):
             self.settings = settings
             self.stage = stage
             self.i = 0
-            self.n = scanning_points.shape[0]
+            self.n = scanning_points.shape[0]-1
             self.positions = np.zeros((self.n, 2))
             self.labels = labels
             self.progress = progress.Progress(max=self.n)
@@ -804,7 +824,8 @@ class ScanLockinThread(ScanThread):
 
     @QtCore.Slot()
     def stop(self):
-        self.meanthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
         #self.meanthread.thread.wait(self.settings.integration_time*1000+500)
         super(ScanThread, self).stop()
         self.meanthread = None
@@ -883,20 +904,34 @@ class ScanMeanThread(ScanThread):
 
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, bg_img=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
-        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec,self)
-        self.searchthread.specSignal.connect(self.specslot)
+        self.ref_spec = ref_spec
+        self.dark_spec = dark_spec
+        self.bg_spec = bg_spec
+        self.bg_img = bg_img
+        self.searchthread = None
+        self.meanthread = None
+        self.autofocusthread = None
+        #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+
 
     @QtCore.Slot()
     def stop(self):
-        self.meanthread.stop()
-        self.searchthread.stop()
+        if self.searchthread is not None:
+            self.searchthread.stop()
+        if self.autofocusthread is not None:
+            self.autofocusthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
         #self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
         #self.searchthread.thread.wait(self.settings.integration_time*1000+500)
-        super(ScanMeanThread, self).stop()
-        self.searchthread = None
-        self.meanthread = None
+        #super(ScanMeanThread, self).stop()
+        #self.autofocusthread = None
+        #self.searchthread = None
+        #self.meanthread = None
+        #super(ScanSearchMeanThread, self).stop()
+        self.abort = True
 
     # def __del__(self):
     #     self.stop()
@@ -905,11 +940,22 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     def intermediatework(self):
         if not self.abort:
+            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage,self.bg_img, self)
+            self.autofocusthread.focus()
+            self.autofocusthread.stop()
+            self.autofocusthread = None
+
+        if not self.abort:
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+            self.searchthread.specSignal.connect(self.specslot)
             self.searchthread.search()
+            self.searchthread.stop()
+            self.searchthread = None
+
         if not self.abort:
             self.meanthread.init()
-        if not self.abort:
             self.meanthread.process()
+            self.meanthread = None
         #self.searchthread.start()
         #self.searchthread.stop()
         #self.meanthread.init()

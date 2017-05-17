@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>925</width>
-    <height>955</height>
+    <width>1179</width>
+    <height>981</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -326,7 +326,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>with Search</string>
+             <string>with Search &amp; Autofocus</string>
             </property>
            </widget>
           </item>
@@ -1048,75 +1048,83 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="cube_width_label">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Scan Cube Width [um]:</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QLabel" name="cube_width_label">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Scan Cube Width [um]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="cube_width_spin">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="maximum">
+               <double>100.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>2.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="cube_width_spin">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>2.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_16">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Scan Steps along Axis:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="cube_steps_spin">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="value">
-             <number>10</number>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Scan Steps along Axis:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="cube_steps_spin">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QPushButton" name="scan3d_button">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>20</height>
+              <height>0</height>
              </size>
             </property>
             <property name="text">
@@ -1251,6 +1259,20 @@
             </property>
             <property name="text">
              <string>Take Lockin Spectrum</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_15">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bg_img_button">
+            <property name="text">
+             <string>Take Background Image (Autofocus)</string>
             </property>
            </widget>
           </item>
@@ -1880,8 +1902,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>155</y>
+     <x>797</x>
+     <y>193</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -1912,8 +1934,8 @@
    <slot>on_save_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>356</y>
+     <x>797</x>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
      <x>902</x>
@@ -1928,8 +1950,8 @@
    <slot>on_saveas_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>386</y>
+     <x>797</x>
+     <y>421</y>
     </hint>
     <hint type="destinationlabel">
      <x>877</x>
@@ -2008,8 +2030,8 @@
    <slot>on_series_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>316</y>
+     <x>797</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -2024,8 +2046,8 @@
    <slot>on_loaddark_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>426</y>
+     <x>797</x>
+     <y>464</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -2232,8 +2254,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>550</x>
-     <y>272</y>
+     <x>592</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2248,8 +2270,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>628</x>
-     <y>272</y>
+     <x>672</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2264,8 +2286,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>706</x>
-     <y>272</y>
+     <x>752</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2312,8 +2334,8 @@
    <slot>on_xup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>861</y>
+     <x>551</x>
+     <y>890</y>
     </hint>
     <hint type="destinationlabel">
      <x>842</x>
@@ -2328,8 +2350,8 @@
    <slot>on_xdown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>590</x>
-     <y>861</y>
+     <x>631</x>
+     <y>890</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -2344,8 +2366,8 @@
    <slot>on_yup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>550</x>
-     <y>833</y>
+     <x>591</x>
+     <y>863</y>
     </hint>
     <hint type="destinationlabel">
      <x>880</x>
@@ -2360,8 +2382,8 @@
    <slot>on_ydown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>550</x>
-     <y>888</y>
+     <x>591</x>
+     <y>917</y>
     </hint>
     <hint type="destinationlabel">
      <x>914</x>
@@ -2376,8 +2398,8 @@
    <slot>on_zup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>762</x>
-     <y>833</y>
+     <x>803</x>
+     <y>863</y>
     </hint>
     <hint type="destinationlabel">
      <x>864</x>
@@ -2392,8 +2414,8 @@
    <slot>on_zdown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>762</x>
-     <y>888</y>
+     <x>803</x>
+     <y>917</y>
     </hint>
     <hint type="destinationlabel">
      <x>968</x>
@@ -2440,8 +2462,8 @@
    <slot>on_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>675</x>
-     <y>106</y>
+     <x>796</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>921</x>
@@ -2460,7 +2482,7 @@
      <y>576</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1021</x>
+     <x>1006</x>
      <y>584</y>
     </hint>
    </hints>
@@ -2488,11 +2510,11 @@
    <slot>on_lockin_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>532</y>
+     <x>797</x>
+     <y>531</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1037</x>
+     <x>1006</x>
      <y>93</y>
     </hint>
    </hints>
@@ -2508,7 +2530,7 @@
      <y>390</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1065</x>
+     <x>1006</x>
      <y>295</y>
     </hint>
    </hints>
@@ -2520,8 +2542,8 @@
    <slot>on_scan3d_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>232</y>
+     <x>797</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>994</x>
@@ -2536,8 +2558,8 @@
    <slot>on_camreference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>299</y>
+     <x>797</x>
+     <y>295</y>
     </hint>
     <hint type="destinationlabel">
      <x>999</x>
@@ -2568,8 +2590,8 @@
    <slot>on_z_correction_angle_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>436</y>
+     <x>796</x>
+     <y>427</y>
     </hint>
     <hint type="destinationlabel">
      <x>976</x>
@@ -2584,8 +2606,8 @@
    <slot>on_z_correction_angle_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>405</y>
+     <x>797</x>
+     <y>389</y>
     </hint>
     <hint type="destinationlabel">
      <x>947</x>
@@ -2632,8 +2654,8 @@
    <slot>on_increase_minimum_readout_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>716</x>
-     <y>488</y>
+     <x>797</x>
+     <y>485</y>
     </hint>
     <hint type="destinationlabel">
      <x>924</x>
@@ -2648,12 +2670,28 @@
    <slot>on_autofocus_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>649</x>
-     <y>688</y>
+     <x>807</x>
+     <y>731</y>
     </hint>
     <hint type="destinationlabel">
      <x>806</x>
      <y>718</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bg_img_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_bg_img_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>721</x>
+     <y>568</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>919</x>
+     <y>637</y>
     </hint>
    </hints>
   </connection>
@@ -2714,5 +2752,6 @@
   <slot>on_search_corrected_toggled(bool)</slot>
   <slot>on_increase_minimum_readout_toggled(bool)</slot>
   <slot>on_autofocus_clicked()</slot>
+  <slot>on_bg_img_clicked()</slot>
  </slots>
 </ui>

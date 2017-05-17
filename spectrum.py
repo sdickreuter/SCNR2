@@ -40,6 +40,7 @@ class Spectrum(QtCore.QObject):
         self.mean = None
         self.bg = None
         self.lockin = None
+        self.bg_img = None
 
         self._spec = None
 
@@ -105,11 +106,19 @@ class Spectrum(QtCore.QObject):
 
     def start_autofocus(self):
 
-        self.worker = AutoFocusThread(self._spectrometer,self.settings,self.stage)
+        self.worker = AutoFocusThread(self._spectrometer,self.settings,self.stage,self.bg_img)
         self.worker.finishSignal.connect(self.finishedAutofocus)
         #self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
+    def take_bg_img(self):
+        self._spectrometer.SetSlitWidth(500)
+        self._spectrometer.SetCentreWavelength(0.0)
+        time.sleep(0.5)
+        self.bg_img = self._spectrometer.TakeSingleTrack(raw=True)
+        self.bg_img = self.bg_img[self.settings.min_ind_img:self.settings.max_ind_img, :]
+        self._spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self._spectrometer.SetSlitWidth(self.settings.slit_width)
 
     def take_live(self):
 
@@ -210,7 +219,7 @@ class Spectrum(QtCore.QObject):
         # pos = np.matrix([[x, y]])
         self.positions = pos
         self.save_path = "search_max/"
-        self.worker = ScanSearchThread(self._spectrometer, self.settings, pos, labels, self.stage,self.lamp,self.dark,self.bg)
+        self.worker = ScanSearchThread(self._spectrometer, self.settings, pos, labels, self.stage,self.lamp,self.dark,self.bg,self.bg_img)
         self.worker.specSignal.connect(self.specCallback)
         self.worker.progressSignal.connect(self.progressCallback)
         self.worker.finishSignal.connect(self.finishedScanSearch)
@@ -250,7 +259,7 @@ class Spectrum(QtCore.QObject):
         if with_lockin:
             return True
         elif with_search:
-            self.worker = ScanSearchMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
+            self.worker = ScanSearchMeanThread(self._spectrometer, self.settings, positions, labels,self.stage,self.lamp,self.dark,self.bg,self.bg_img)
         else:
             self.worker = ScanMeanThread(self._spectrometer, self.settings, positions, labels, self.stage)
             #self.workingthread = ScanThread(self._spectrometer, self.settings, positions, self.stage)
@@ -375,6 +384,7 @@ class Spectrum(QtCore.QObject):
         self.lockin = None
         self.mean = None
         self.bg = None
+        self.bg_img = None
 
     # def plot_last_mean(self):
     #     spec = self.correct_spectrum(self.mean)
