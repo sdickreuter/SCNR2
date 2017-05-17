@@ -577,10 +577,20 @@ class SCNR(QtWidgets.QMainWindow):
             # self.spectrometer.SetSlitWidth(500)
             # self.spectrum.start_autofocus()
 
-            self.ui.status.setText("Searching Max.")
+            self.ui.status.setText("Searching Max ...")
             self.spectrum.search_max()
         else:
             QtWidgets.QMessageBox.warning(self, 'Error', 'Search only possible in Spectrum Mode' ,QtWidgets.QMessageBox.Ok)
+
+    @QtCore.Slot()
+    def on_autofocus_clicked(self):
+        if self.spectrometer.mode == 'singletrack':
+            self.on_disableButtons()
+            self.ui.status.setText("Focussing ...")
+            self.spectrum.start_autofocus()
+        else:
+            QtWidgets.QMessageBox.warning(self, 'Error', 'Autofocus only possible in Spectrum Mode' ,QtWidgets.QMessageBox.Ok)
+
 
     @QtCore.Slot()
     def on_save_clicked(self):
