@@ -170,8 +170,16 @@ class AutoFocusThread(MeasurementThread):
             n, m = img.shape
             f = 0
             for i in range(n):
+                # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
-                f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+                #f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+
+                # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
+                k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
+                #k = np.array([[0, 0, 0], [-1, 0, -1], [0, 0, 0]])
+                conv = ndimage.convolve(img, k, mode='wrap')
+                f = np.sum(np.square(conv))/np.sum(np.square(img))
+
             return f
             #grad = np.gradient(img)
             #return np.sum(np.square(grad[0])+np.square(grad[1]))
