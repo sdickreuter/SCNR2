@@ -11,7 +11,7 @@ from skimage import img_as_float,img_as_int
 from skimage import restoration
 from skimage import filters
 from skimage import morphology
-from scipy.ndimage import uniform_filter
+from scipy import ndimage
 import time
 
 #  modified from: http://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m#comment33999040_21566831
@@ -159,8 +159,8 @@ class AutoFocusThread(MeasurementThread):
             if self.bg_img is not None:
                 img -= self.bg_img
                 img = restoration.denoise_tv_bregman(img_as_float(img),0.1)
-                img = uniform_filter(img, 2)
-
+                #img = ndimage.uniform_filter(img, 2)
+                img = ndimage.median_filter(img, 2)
 
             #img = exposure.equalize_hist(img)
             plt.imshow(img.T)
@@ -196,9 +196,6 @@ class AutoFocusThread(MeasurementThread):
                 self.finishSignal.emit(np.array([]))
                 self.stop()
                 return
-
-        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-        self.spectrometer.SetSlitWidth(self.settings.slit_width)
 
         focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
@@ -243,10 +240,15 @@ class AutoFocusThread(MeasurementThread):
 
         if popt is not None:
             self.stage.moveabs(z=popt[1])
+            calc_f()
+            self.finishSignal.emit(np.array([popt[1],perr[1]]))
         else:
             self.stage.moveabs(z=startpos[2])
+            self.finishSignal.emit(np.array([]))
 
-        self.finishSignal.emit(np.array([]))
+        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+
         self.stop()
 
     def work(self):
@@ -470,11 +472,6 @@ class SearchThread(MeasurementThread):
 
     def work(self):
         self.search()
-        if not self.abort:
-            x, y, z = self.stage.last_pos()
-            self.finishSignal.emit(np.array([x, y]))
-        else:
-            return
         self.stop()
 
     def get_spec(self):
@@ -614,6 +611,7 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(x=dx)
                         if perr[1] < 0.01:
                             ontargetx = True
+                            targetx = np.array([popt[1],perr[1]])
                 elif j in np.arange(1,repetitions,2):
                     dy = float(popt[1])
                     if dy-startpos[1] > self.settings.rasterwidth:
@@ -623,6 +621,7 @@ class SearchThread(MeasurementThread):
                         self.stage.moveabs(y=dy)
                         if perr[1] < 0.01:
                             ontargety = True
+                            targety = np.array([popt[1],perr[1]])
 
                 plot(dir,popt, perr, pos, measured, maxwl)
 
@@ -639,6 +638,11 @@ class SearchThread(MeasurementThread):
 
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+
+        if ontargetx and ontargety:
+            self.finishSignal.emit(np.hstack((targetx, targety)))
+        else:
+            self.finishSignal.emit(np.array([]))
 
         self.spectrometer.SetExposureTime(self.settings.integration_time)
 

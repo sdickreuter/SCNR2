@@ -21,6 +21,8 @@ class Spectrum(QtCore.QObject):
     updateProgress = QtCore.Signal(float)
     disableButtons = QtCore.Signal()
     enableButtons = QtCore.Signal()
+    set_autofocus_ontarget = QtCore.Signal(bool)
+    set_searchmax_ontarget = QtCore.Signal(bool)
 
     def __init__(self, spectrometer, stage, settings):
         super(Spectrum, self).__init__(None)
@@ -231,12 +233,16 @@ class Spectrum(QtCore.QObject):
         self._spectrometer.SetSlitWidth(self.settings.slit_width)
         self.stop_process()
         #self.enableButtons.emit()
+        if len(pos) > 0:
+            self.set_autofocus_ontarget.emit(True)
         self.updateStatus.emit('Autofocus finished')
 
     @QtCore.Slot(np.ndarray)
     def finishedSearch(self, pos):
         self.stop_process()
         #self.enableButtons.emit()
+        if len(pos) > 0:
+            self.set_searchmax_ontarget.emit(True)
         self.updateStatus.emit('Search finished')
 
     @QtCore.Slot(np.ndarray)

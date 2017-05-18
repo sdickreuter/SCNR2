@@ -3,12 +3,14 @@ import os
 import numpy as np
 import time
 #os.environ["QT_API"] = "pyside"
-from qtpy import QtCore,QtWidgets
+from qtpy import QtCore,QtWidgets,QtGui
 
 import pyqtgraph as pg
 from skimage import exposure
 
 # from PyQt5 import uic
+# Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
+# from qtpy import uic
 # Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 
 from gui.main import Ui_MainWindow
@@ -235,6 +237,8 @@ class SCNR(QtWidgets.QMainWindow):
         self.spectrum.disableButtons.connect(self.on_disableButtons)
         self.spectrum.enableButtons.connect(self.on_enableButtons)
         self.spectrum.specSignal.connect(self.on_update_spectrum)
+        self.spectrum.set_searchmax_ontarget.connect(self.set_searchmax_ontarget)
+        self.spectrum.set_autofocus_ontarget.connect(self.set_autofocus_ontarget)
 
         # init setting tab values
         self.ui.integration_time_spin.setValue(self.settings.integration_time)
@@ -470,7 +474,7 @@ class SCNR(QtWidgets.QMainWindow):
             elif abs(y_step) > 0.001:
                 self.stage.moverel(dy=y_step)
             self.show_pos()
-
+            self.set_searchmax_ontarget(False)
         # ----- END Slots for Gamepad
 
 
@@ -567,6 +571,7 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_searchgrid_clicked(self):
+        self.set_searchmax_ontarget(False)
         self.on_disableButtons()
         self.ui.status.setText("Searching Max.")
         self.spectrum.scan_search_max(self.posModel.getMatrix(), self.labels)
@@ -574,6 +579,9 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_search_clicked(self):
         if self.spectrometer.mode == 'singletrack':
+            self.set_autofocus_ontarget(False)
+            self.set_searchmax_ontarget(False)
+
             self.on_disableButtons()
 
             # self.spectrometer.SetCentreWavelength(0.0)
@@ -588,6 +596,7 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_autofocus_clicked(self):
         if self.spectrometer.mode == 'singletrack':
+            self.set_autofocus_ontarget(False)
             self.on_disableButtons()
             self.ui.status.setText("Focussing ...")
             self.spectrum.start_autofocus()
@@ -695,31 +704,37 @@ class SCNR(QtWidgets.QMainWindow):
     def on_xup_clicked(self):
         self.stage.moverel(dx=self.settings.stepsize)
         self.show_pos()
+        self.set_searchmax_ontarget(False)
 
     @QtCore.Slot()
     def on_xdown_clicked(self):
         self.stage.moverel(dx=-self.settings.stepsize)
         self.show_pos()
+        self.set_searchmax_ontarget(False)
 
     @QtCore.Slot()
     def on_yup_clicked(self):
         self.stage.moverel(dy=self.settings.stepsize)
         self.show_pos()
+        self.set_searchmax_ontarget(False)
 
     @QtCore.Slot()
     def on_ydown_clicked(self):
         self.stage.moverel(dy=-self.settings.stepsize)
         self.show_pos()
+        self.set_searchmax_ontarget(False)
 
     @QtCore.Slot()
     def on_zup_clicked(self):
         self.stage.moverel(dz=self.settings.stepsize)
         self.show_pos()
+        self.set_autofocus_ontarget(False)
 
     @QtCore.Slot()
     def on_zdown_clicked(self):
         self.stage.moverel(dz=-self.settings.stepsize)
         self.show_pos()
+        self.set_autofocus_ontarget(False)
 
     @QtCore.Slot()
     def on_stepup_clicked(self):
@@ -877,6 +892,20 @@ class SCNR(QtWidgets.QMainWindow):
         if self.ui.zcorrection_checkbox.isChecked():
             if self.stage is not None:
                 self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
+
+    @QtCore.Slot(bool)
+    def set_searchmax_ontarget(self, ontarget):
+        if ontarget:
+            self.ui.searchmax_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
+        else:
+            self.ui.searchmax_button.setIcon(None)
+
+    @QtCore.Slot(bool)
+    def set_autofocus_ontarget(self, ontarget):
+        if ontarget:
+            self.ui.autofocus_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
+        else:
+            self.ui.autofocus_button.setIcon(None)
 
 
 def sigint_handler(*args):

@@ -1327,22 +1327,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="searchmax_button">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Search Maximum x/y</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="autofocus_button">
         <property name="enabled">
          <bool>false</bool>
@@ -1355,6 +1339,22 @@
         </property>
         <property name="text">
          <string>Autofocus</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="searchmax_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Search Maximum x/y</string>
         </property>
        </widget>
       </item>
