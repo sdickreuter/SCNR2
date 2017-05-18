@@ -780,40 +780,40 @@ class ScanThread(MeasurementThread):
             # self.specSignal.emit(self.spec)
 
 
-class ScanSearchThread(ScanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
-        super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
-        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec, self)
-        self.searchthread.specSignal.connect(self.specslot)
-        self.searchthread.finishSignal.connect(self.searchfinishslot)
-        self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
-        self.autofocusthread.finishSignal.connect(self.focusfinishslot)
-
-    @QtCore.Slot()
-    def stop(self):
-        self.searchthread.stop()
-        super(ScanSearchThread, self).stop()
-        self.searchthread = None
-
-    def __del__(self):
-        #self.searchthread.specSignal.disconnect(self.specslot)
-        super(ScanSearchThread, self).__del__()
-
-    def intermediatework(self):
-        self.autofocusthread.focus()
-        self.searchthread.search()
-
-    @QtCore.Slot(np.ndarray)
-    def specslot(self, spec):
-        self.specSignal.emit(spec)
-
-    @QtCore.Slot(np.ndarray)
-    def searchfinishslot(self, pos):
-        print(pos)
-
-    @QtCore.Slot(np.ndarray)
-    def focusfinishslot(self, arr):
-        pass
+# class ScanSearchThread(ScanThread):
+#     def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
+#         super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
+#         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec, self)
+#         self.searchthread.specSignal.connect(self.specslot)
+#         self.searchthread.finishSignal.connect(self.searchfinishslot)
+#         self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+#         self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+#
+#     @QtCore.Slot()
+#     def stop(self):
+#         self.searchthread.stop()
+#         super(ScanSearchThread, self).stop()
+#         self.searchthread = None
+#
+#     def __del__(self):
+#         #self.searchthread.specSignal.disconnect(self.specslot)
+#         super(ScanSearchThread, self).__del__()
+#
+#     def intermediatework(self):
+#         self.autofocusthread.focus()
+#         self.searchthread.search()
+#
+#     @QtCore.Slot(np.ndarray)
+#     def specslot(self, spec):
+#         self.specSignal.emit(spec)
+#
+#     @QtCore.Slot(np.ndarray)
+#     def searchfinishslot(self, pos):
+#         print(pos)
+#
+#     @QtCore.Slot(np.ndarray)
+#     def focusfinishslot(self, arr):
+#         pass
 
 
 class ScanLockinThread(ScanThread):
@@ -920,6 +920,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
 
 
+
     @QtCore.Slot()
     def stop(self):
         if self.searchthread is not None:
@@ -941,6 +942,28 @@ class ScanSearchMeanThread(ScanMeanThread):
     #     self.stop()
     #     #self.searchthread.specSignal.disconnect()
     #     super(ScanMeanThread, self).__del__()
+
+    @QtCore.Slot(np.ndarray)
+    def autofocus_finished(self, pos):
+       with open("search_max/scan_status.txt", "a") as f:
+            f.write(self.labels[self.i]+': ')
+            if len(pos) == 2:
+                f.write("autofocus successful, ")
+                f.write(str(round(pos[0],3))+' +- '+str(round(pos[1],5)))
+            else:
+                f.write("autofocus failed")
+            f.write(' | ')
+
+    @QtCore.Slot(np.ndarray)
+    def search_finished(self, pos):
+        with open("search_max/scan_status.txt", "a") as f:
+            if len(pos) == 4:
+                f.write("search successful, ")
+                f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))
+                f.write(" y:" + str(round(pos[2], 3)) + ' +- ' + str(round(pos[3], 5)))
+            else:
+                f.write("search failed")
+            f.write('\n')
 
     def intermediatework(self):
         if not self.abort:
