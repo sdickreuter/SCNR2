@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1179</width>
-    <height>997</height>
+    <height>989</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -117,6 +117,18 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QPushButton" name="live_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Liveview</string>
             </property>
@@ -137,6 +149,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
            </widget>
           </item>
           <item>
@@ -148,6 +172,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="dark_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Dark Spectrum</string>
             </property>
@@ -155,6 +191,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="bg_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Background Spectrum</string>
             </property>
@@ -162,6 +210,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="ref_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Reference Spectrum</string>
             </property>
@@ -176,6 +236,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="mean_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Mean Spectrum</string>
             </property>
@@ -183,6 +255,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="series_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Time Series</string>
             </property>
@@ -197,6 +281,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="savespectra_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Save All Spectra</string>
             </property>
@@ -204,6 +300,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="save_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Save regular spectrum as</string>
             </property>
@@ -218,6 +326,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loaddark_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Dark Spectrum</string>
             </property>
@@ -225,6 +345,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loadlamp_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Lamp Spectrum</string>
             </property>
@@ -232,6 +364,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loadbg_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Background Spectrum</string>
             </property>
@@ -246,6 +390,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="reset_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Reset Internal Data</string>
             </property>
@@ -282,6 +438,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Add Position to List</string>
             </property>
@@ -295,6 +463,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Span Grid</string>
             </property>
@@ -304,6 +484,18 @@
            <widget class="QPushButton" name="searchgrid_button">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
             </property>
             <property name="text">
              <string>Search Max Grid</string>
@@ -476,6 +668,18 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
             </property>
             <property name="text">
              <string>Start Scan</string>
@@ -1124,7 +1328,13 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
              </size>
             </property>
             <property name="text">
@@ -1158,6 +1368,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="camreference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Camera Reference Image</string>
             </property>
@@ -1165,6 +1387,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="clear_reference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Clear Reference Image</string>
             </property>
@@ -1257,6 +1491,18 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Lockin Spectrum</string>
             </property>
@@ -1308,10 +1554,16 @@
       </item>
       <item>
        <widget class="QPushButton" name="temp_button">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -1443,13 +1695,13 @@
            <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>30</height>
+             <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>100</width>
-             <height>16777215</height>
+             <height>35</height>
             </size>
            </property>
            <property name="text">
@@ -1484,13 +1736,13 @@
            <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>30</height>
+             <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>100</width>
-             <height>16777215</height>
+             <height>35</height>
             </size>
            </property>
            <property name="text">
