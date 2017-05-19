@@ -884,9 +884,8 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_z_correction_angle_edited(self):
-        if self.ui.zcorrection_checkbox.isChecked():
-            if self.stage is not None:
-                self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
+        if self.stage is not None:
+            self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
 
     @QtCore.Slot(bool)
     def set_searchmax_ontarget(self, ontarget):

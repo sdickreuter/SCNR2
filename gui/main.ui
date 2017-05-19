@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1179</width>
-    <height>989</height>
+    <height>973</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -744,7 +744,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -786,7 +786,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -825,7 +825,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -867,7 +867,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -910,6 +910,12 @@
                <size>
                 <width>0</width>
                 <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>35</height>
                </size>
               </property>
              </widget>
@@ -959,7 +965,7 @@
               <property name="maximumSize">
                <size>
                 <width>100</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1030,7 +1036,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1072,7 +1078,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1111,7 +1117,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1153,7 +1159,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1189,7 +1195,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1213,11 +1219,17 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
              </size>
             </property>
             <property name="text">
-             <string>Use corrected spectra</string>
+             <string>Use Spectra Correction for Search</string>
             </property>
            </widget>
           </item>
@@ -1470,16 +1482,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>Increase Minimum Vertical Pixels</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="Line" name="line_14">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1583,10 +1585,16 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>10</width>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -1599,10 +1607,16 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -2880,38 +2894,6 @@
     <hint type="destinationlabel">
      <x>905</x>
      <y>493</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>search_correct_checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_search_corrected_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>691</x>
-     <y>116</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>887</x>
-     <y>530</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_increase_minimum_readout_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>797</x>
-     <y>485</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>924</x>
-     <y>570</y>
     </hint>
    </hints>
   </connection>
