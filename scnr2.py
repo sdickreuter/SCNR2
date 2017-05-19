@@ -869,12 +869,6 @@ class SCNR(QtWidgets.QMainWindow):
             self.settings.slitmarker_x = pos.x()
         self.settings.save()
 
-    @QtCore.Slot()
-    def on_bg_img_clicked(self):
-        self.on_disableButtons()
-        self.spectrum.take_bg_img()
-        self.on_enableButtons()
-
     def _load_spectrum_from_file(self):
         save_dir = QtWidgets.QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
 
@@ -907,6 +901,13 @@ class SCNR(QtWidgets.QMainWindow):
             self.ui.autofocus_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
         else:
             self.ui.autofocus_button.setIcon(QtGui.QIcon())
+
+    @QtCore.Slot(bool)
+    def on_af_bright_toggled(self, state):
+        if state:
+            self.settings.af_use_bright = True
+        else:
+            self.settings.af_use_bright = False
 
 
 def sigint_handler(*args):

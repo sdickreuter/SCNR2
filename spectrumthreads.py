@@ -146,86 +146,57 @@ class ImageThread(MeasurementThread):
 
 
 class AutoFocusThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, bg_img,parent=None):
+    def __init__(self, spectrometer, settings, stage ,parent=None):
         self.stage = stage
         self.settings = settings
-        self.bg_img = bg_img
         super(AutoFocusThread, self).__init__(spectrometer)
 
     def focus(self):
-        def calc_f(dist=3):
+        def calc_f(dist=3, plot = False):
 
-            # buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-            # for i in range(2):
-            #     buf += self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-            # img = buf
+            if self.settings.af_use_bright:
+                self.stage.moverel(dx=-0.5)
+                buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                self.stage.moverel(dx=+1.0)
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                self.stage.moverel(dx=-0.5)
+                img -= buf
+            else:
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
 
-            # img = self.spectrometer.TakeSingleTrack(raw=True)
-            # img = img[self.settings.min_ind_img:self.settings.max_ind_img,:]
-            # if self.bg_img is not None:
-            #     img -= self.bg_img
-            #     img -= img.min()
-            #     img = img.max() - img
-            #     img = ndimage.median_filter(img, footprint = morphology.disk(3),mode="mirror")
-            # else:
-            #     img = ndimage.median_filter(img, 2,mode="mirror")
-
-
-
-            self.stage.moverel(dx=-0.5)
-            buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-            self.stage.moverel(dx=+1.0)
-            img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-            self.stage.moverel(dx=-0.5)
-            img -= buf
             img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
 
-            # plt.imshow(img.T)
-            # plt.title(str(img.max()))
-            # plt.savefig("search_max/autofocus_nofilter.png")
-            # plt.close()
+            if plot:
+                plt.imshow(img.T)
+                plt.title(str(img.max()))
+                plt.savefig("search_max/autofocus_image.png")
+                plt.close()
+            else:
+                f = 0
 
-            #img = restoration.denoise_tv_bregman(img_as_float(img),0.5)
-            #img = ndimage.median_filter(img, 2)
+                # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
+                # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
+                conv = np.square( img - np.roll(img,dist,axis=0))
+                f = np.sum(conv)
 
-            #img = exposure.equalize_hist(img)
-            plt.imshow(img.T)
-            plt.title(str(img.max()))
-            plt.savefig("search_max/autofocus_image.png")
-            plt.close()
+                # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
+                # k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
+                # #k = np.array([[-1, 0, -2, 0, -1], [0, 0, 0, 0, 0] ,[-2, 0, 12, 0, -2], [0, 0, 0, 0, 0], [-1, 0, -2, 0, -1]])
+                # #k = np.array([[0, 0, -1, 0, 0], [0, 0, 0, 0, 0], [-1, 0, 1, 0, -1], [0, 0, 0, 0, 0], [0, 0, -1, 0, 0]])
+                # # k = np.array([[-1, -1, -1, -1, -1],
+                # #               [-1,  1,  2,  1, -1],
+                # #               [-1,  2,  4,  2, -1],
+                # #               [-1,  1,  2,  1, -1],
+                # #               [-1, -1, -1, -1, -1]])
+                # conv = ndimage.convolve(img, k, mode='mirror')
+                # f = np.sum(np.square(conv))/np.sum(np.square(img))
 
-            f = 0
+                # plt.imshow(conv.T)
+                # plt.title(str(conv.max()))
+                # plt.savefig("search_max/autofocus_conv.png")
+                # plt.close()
+                return f
 
-            # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
-            # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
-            conv = np.square( img - np.roll(img,dist,axis=0))
-            #conv -= int(np.mean(conv))
-            #conv = conv + np.roll(conv,-dist,axis=0)
-            f = np.sum(conv)
-
-            # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
-            # k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
-            # #k = np.array([[-1, 0, -2, 0, -1], [0, 0, 0, 0, 0] ,[-2, 0, 12, 0, -2], [0, 0, 0, 0, 0], [-1, 0, -2, 0, -1]])
-            # #k = np.array([[0, 0, -1, 0, 0], [0, 0, 0, 0, 0], [-1, 0, 1, 0, -1], [0, 0, 0, 0, 0], [0, 0, -1, 0, 0]])
-            # # k = np.array([[-1, -1, -1, -1, -1],
-            # #               [-1,  1,  2,  1, -1],
-            # #               [-1,  2,  4,  2, -1],
-            # #               [-1,  1,  2,  1, -1],
-            # #               [-1, -1, -1, -1, -1]])
-            # conv = ndimage.convolve(img, k, mode='mirror')
-            # f = np.sum(np.square(conv))/np.sum(np.square(img))
-
-            #filt = ndimage.gaussian_filter(img, 5)
-            #conv = img - filt
-            #f = np.sum(np.square(conv))/np.sum(np.square(img))
-
-            plt.imshow(conv.T)
-            plt.title(str(conv.max()))
-            plt.savefig("search_max/autofocus_conv.png")
-            plt.close()
-            return f
-            #grad = np.gradient(img)
-            #return np.sum(np.square(grad[0])+np.square(grad[1]))
 
         self.spectrometer.SetSlitWidth(500)
         self.spectrometer.SetCentreWavelength(0.0)
@@ -293,7 +264,7 @@ class AutoFocusThread(MeasurementThread):
 
         if popt is not None:
             self.stage.moveabs(z=popt[1])
-            calc_f()
+            calc_f(plot=True)
             self.finishSignal.emit(np.array([popt[1],perr[1]]))
         else:
             self.stage.moveabs(z=startpos[2])
@@ -962,12 +933,11 @@ class ScanMeanThread(ScanThread):
 
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, bg_img=None, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.ref_spec = ref_spec
         self.dark_spec = dark_spec
         self.bg_spec = bg_spec
-        self.bg_img = bg_img
         self.searchthread = None
         self.meanthread = None
         self.autofocusthread = None
@@ -1021,7 +991,7 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     def intermediatework(self):
         if not self.abort:
-            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage,self.bg_img, self)
+            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
             self.autofocusthread.focus()
             self.autofocusthread.stop()
             self.autofocusthread = None

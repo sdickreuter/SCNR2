@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.8.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1179, 981)
+        MainWindow.resize(1179, 997)
         MainWindow.setWindowTitle("SCRN2")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/gui/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -61,7 +61,6 @@ class Ui_MainWindow(object):
         self.spectra_tab.setEnabled(True)
         self.spectra_tab.setObjectName("spectra_tab")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.spectra_tab)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.live_button = QtWidgets.QPushButton(self.spectra_tab)
         self.live_button.setObjectName("live_button")
@@ -152,7 +151,6 @@ class Ui_MainWindow(object):
         self.scanning_tab.setSizePolicy(sizePolicy)
         self.scanning_tab.setObjectName("scanning_tab")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.scanning_tab)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.addpos_button = QtWidgets.QPushButton(self.scanning_tab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
@@ -274,7 +272,6 @@ class Ui_MainWindow(object):
         self.settings_tab = QtWidgets.QWidget()
         self.settings_tab.setObjectName("settings_tab")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.settings_tab)
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.label = QtWidgets.QLabel(self.settings_tab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -489,7 +486,6 @@ class Ui_MainWindow(object):
         self.scan3d_tab = QtWidgets.QWidget()
         self.scan3d_tab.setObjectName("scan3d_tab")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.scan3d_tab)
-        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.label_15 = QtWidgets.QLabel(self.scan3d_tab)
         self.label_15.setMinimumSize(QtCore.QSize(0, 20))
@@ -597,9 +593,9 @@ class Ui_MainWindow(object):
         self.line_15.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_15.setObjectName("line_15")
         self.verticalLayout_5.addWidget(self.line_15)
-        self.bg_img_button = QtWidgets.QPushButton(self.scan3d_tab)
-        self.bg_img_button.setObjectName("bg_img_button")
-        self.verticalLayout_5.addWidget(self.bg_img_button)
+        self.af_bright_checkbox = QtWidgets.QCheckBox(self.scan3d_tab)
+        self.af_bright_checkbox.setObjectName("af_bright_checkbox")
+        self.verticalLayout_5.addWidget(self.af_bright_checkbox)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem)
         self.right_tab.addTab(self.scan3d_tab, "")
@@ -772,7 +768,6 @@ class Ui_MainWindow(object):
         self.spec_tab.setSizePolicy(sizePolicy)
         self.spec_tab.setObjectName("spec_tab")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.spec_tab)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.specwidget = QtWidgets.QWidget(self.spec_tab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -792,7 +787,6 @@ class Ui_MainWindow(object):
         self.cam_tab.setSizePolicy(sizePolicy)
         self.cam_tab.setObjectName("cam_tab")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.cam_tab)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.camwidget = QtWidgets.QWidget(self.cam_tab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -806,7 +800,6 @@ class Ui_MainWindow(object):
         self.detector_tab = QtWidgets.QWidget()
         self.detector_tab.setObjectName("detector_tab")
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout(self.detector_tab)
-        self.horizontalLayout_15.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
         self.detectorwidget = QtWidgets.QWidget(self.detector_tab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -876,7 +869,7 @@ class Ui_MainWindow(object):
         self.search_correct_checkBox.toggled['bool'].connect(MainWindow.on_search_corrected_toggled)
         self.checkBox.toggled['bool'].connect(MainWindow.on_increase_minimum_readout_toggled)
         self.autofocus_button.clicked.connect(MainWindow.on_autofocus_clicked)
-        self.bg_img_button.clicked.connect(MainWindow.on_bg_img_clicked)
+        self.af_bright_checkbox.toggled['bool'].connect(MainWindow.on_af_bright_toggled)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -936,7 +929,7 @@ class Ui_MainWindow(object):
         self.label_21.setText(_translate("MainWindow", "Advanced Spectrometer Settings"))
         self.checkBox.setText(_translate("MainWindow", "Increase Minimum Vertical Pixels"))
         self.lockin_button.setText(_translate("MainWindow", "Take Lockin Spectrum"))
-        self.bg_img_button.setText(_translate("MainWindow", "Take Background Image (Autofocus)"))
+        self.af_bright_checkbox.setText(_translate("MainWindow", "Use Bright-Field Autofocus"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temperature:"))
