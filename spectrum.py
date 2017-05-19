@@ -106,9 +106,9 @@ class Spectrum(QtCore.QObject):
 
 
     def start_autofocus(self):
-
         self.worker = AutoFocusThread(self.spectrometer, self.settings, self.stage)
         self.worker.finishSignal.connect(self.finishedAutofocus)
+        self.worker.progressSignal.connect(self.progressCallback)
         #self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 

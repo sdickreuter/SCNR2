@@ -177,6 +177,7 @@ class AutoFocusThread(MeasurementThread):
                 # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
                 conv = np.square( img - np.roll(img,dist,axis=0))
+                conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
                 f = np.sum(conv)
 
                 # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
@@ -191,10 +192,10 @@ class AutoFocusThread(MeasurementThread):
                 # conv = ndimage.convolve(img, k, mode='mirror')
                 # f = np.sum(np.square(conv))/np.sum(np.square(img))
 
-                # plt.imshow(conv.T)
-                # plt.title(str(conv.max()))
-                # plt.savefig("search_max/autofocus_conv.png")
-                # plt.close()
+                plt.imshow(conv.T)
+                plt.title(str(conv.max()))
+                plt.savefig("search_max/autofocus_conv.png")
+                plt.close()
                 return f
 
 
@@ -208,10 +209,14 @@ class AutoFocusThread(MeasurementThread):
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
         pos = d * self.settings.zmult + startpos[2]
         focus = np.zeros(self.settings.rasterdim)
+        self.progress = progress.Progress(max=len(pos))
         for k in range(len(pos)):
             self.stage.moveabs(z=pos[k])
             focus[k] = calc_f()
-            #print(str(k)+' '+str(focus[k]))
+
+            self.progress.next()
+            self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
                 self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
@@ -220,6 +225,7 @@ class AutoFocusThread(MeasurementThread):
                 self.finishSignal.emit(np.array([]))
                 self.stop()
                 return
+
 
         focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
