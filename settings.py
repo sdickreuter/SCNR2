@@ -52,6 +52,7 @@ class Settings(object):
 
         self.min_ind_img = int(self.config['autofocus']['min_ind_img'])
         self.max_ind_img = int(self.config['autofocus']['max_ind_img'])
+        self.af_use_bright = False
 
 
     def save(self):

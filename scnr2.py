@@ -468,13 +468,15 @@ class SCNR(QtWidgets.QMainWindow):
 
             if abs(x_step) > 0.0001:
                 if abs(y_step) > 0.0001:
+                    self.set_searchmax_ontarget(False)
                     self.stage.moverel(dx=x_step, dy=y_step)
                 else:
+                    self.set_searchmax_ontarget(False)
                     self.stage.moverel(dx=x_step)
             elif abs(y_step) > 0.001:
+                self.set_searchmax_ontarget(False)
                 self.stage.moverel(dy=y_step)
             self.show_pos()
-            self.set_searchmax_ontarget(False)
         # ----- END Slots for Gamepad
 
 
@@ -579,7 +581,6 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_search_clicked(self):
         if self.spectrometer.mode == 'singletrack':
-            self.set_autofocus_ontarget(False)
             self.set_searchmax_ontarget(False)
 
             self.on_disableButtons()
