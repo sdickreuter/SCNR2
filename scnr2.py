@@ -898,14 +898,14 @@ class SCNR(QtWidgets.QMainWindow):
         if ontarget:
             self.ui.searchmax_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
         else:
-            self.ui.searchmax_button.setIcon(None)
+            self.ui.searchmax_button.setIcon(QtGui.QIcon())
 
     @QtCore.Slot(bool)
     def set_autofocus_ontarget(self, ontarget):
         if ontarget:
             self.ui.autofocus_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
         else:
-            self.ui.autofocus_button.setIcon(None)
+            self.ui.autofocus_button.setIcon(QtGui.QIcon())
 
 
 def sigint_handler(*args):
