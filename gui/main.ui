@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1179</width>
-    <height>981</height>
+    <height>973</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -117,6 +117,18 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <widget class="QPushButton" name="live_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Liveview</string>
             </property>
@@ -137,6 +149,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
            </widget>
           </item>
           <item>
@@ -148,6 +172,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="dark_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Dark Spectrum</string>
             </property>
@@ -155,6 +191,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="bg_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Background Spectrum</string>
             </property>
@@ -162,6 +210,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="ref_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Reference Spectrum</string>
             </property>
@@ -176,6 +236,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="mean_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Mean Spectrum</string>
             </property>
@@ -183,6 +255,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="series_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Time Series</string>
             </property>
@@ -197,6 +281,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="savespectra_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Save All Spectra</string>
             </property>
@@ -204,6 +300,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="save_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Save regular spectrum as</string>
             </property>
@@ -218,6 +326,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loaddark_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Dark Spectrum</string>
             </property>
@@ -225,6 +345,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loadlamp_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Lamp Spectrum</string>
             </property>
@@ -232,6 +364,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="loadbg_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Background Spectrum</string>
             </property>
@@ -246,6 +390,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="reset_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Reset Internal Data</string>
             </property>
@@ -282,6 +438,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Add Position to List</string>
             </property>
@@ -295,6 +463,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Span Grid</string>
             </property>
@@ -304,6 +484,18 @@
            <widget class="QPushButton" name="searchgrid_button">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
             </property>
             <property name="text">
              <string>Search Max Grid</string>
@@ -477,6 +669,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Start Scan</string>
             </property>
@@ -540,7 +744,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -582,7 +786,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -621,7 +825,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -663,7 +867,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -706,6 +910,12 @@
                <size>
                 <width>0</width>
                 <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>35</height>
                </size>
               </property>
              </widget>
@@ -755,7 +965,7 @@
               <property name="maximumSize">
                <size>
                 <width>100</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -826,7 +1036,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -868,7 +1078,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -907,7 +1117,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -949,7 +1159,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -985,7 +1195,7 @@
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>16777215</height>
+                <height>35</height>
                </size>
               </property>
               <property name="alignment">
@@ -1009,11 +1219,17 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
              </size>
             </property>
             <property name="text">
-             <string>Use corrected spectra</string>
+             <string>Use Spectra Correction for Search</string>
             </property>
            </widget>
           </item>
@@ -1124,7 +1340,13 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>0</height>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
              </size>
             </property>
             <property name="text">
@@ -1158,6 +1380,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="camreference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Take Camera Reference Image</string>
             </property>
@@ -1165,6 +1399,18 @@
           </item>
           <item>
            <widget class="QPushButton" name="clear_reference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="text">
              <string>Clear Reference Image</string>
             </property>
@@ -1236,16 +1482,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>Increase Minimum Vertical Pixels</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="Line" name="line_14">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1256,6 +1492,18 @@
            <widget class="QPushButton" name="lockin_button">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
             </property>
             <property name="text">
              <string>Take Lockin Spectrum</string>
@@ -1270,9 +1518,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="bg_img_button">
+           <widget class="QCheckBox" name="af_bright_checkbox">
             <property name="text">
-             <string>Take Background Image (Autofocus)</string>
+             <string>Use Bright-Field Autofocus</string>
             </property>
            </widget>
           </item>
@@ -1308,10 +1556,16 @@
       </item>
       <item>
        <widget class="QPushButton" name="temp_button">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -1331,10 +1585,16 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="maximumSize">
+        <property name="minimumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>10</width>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -1347,10 +1607,16 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>300</width>
-          <height>16777215</height>
+          <height>35</height>
          </size>
         </property>
         <property name="text">
@@ -1443,13 +1709,13 @@
            <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>30</height>
+             <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>100</width>
-             <height>16777215</height>
+             <height>35</height>
             </size>
            </property>
            <property name="text">
@@ -1484,13 +1750,13 @@
            <property name="minimumSize">
             <size>
              <width>30</width>
-             <height>30</height>
+             <height>25</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>100</width>
-             <height>16777215</height>
+             <height>35</height>
             </size>
            </property>
            <property name="text">
@@ -1838,8 +2104,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>577</y>
+     <x>691</x>
+     <y>115</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -1902,8 +2168,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>797</x>
-     <y>193</y>
+     <x>691</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -1918,8 +2184,8 @@
    <slot>on_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>766</x>
-     <y>673</y>
+     <x>893</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -1998,8 +2264,8 @@
    <slot>on_mean_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>286</y>
+     <x>883</x>
+     <y>314</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -2094,8 +2360,8 @@
    <slot>on_number_of_samples_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>158</y>
+     <x>703</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
@@ -2110,8 +2376,8 @@
    <slot>on_slit_width_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>190</y>
+     <x>703</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
      <x>838</x>
@@ -2126,8 +2392,8 @@
    <slot>on_grating_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>255</y>
+     <x>703</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
      <x>840</x>
@@ -2142,8 +2408,8 @@
    <slot>on_centre_wavelength_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>223</y>
+     <x>703</x>
+     <y>127</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
@@ -2158,8 +2424,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>323</y>
+     <x>703</x>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2174,8 +2440,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>422</y>
+     <x>703</x>
+     <y>139</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -2190,8 +2456,8 @@
    <slot>on_rasterwidth_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>455</y>
+     <x>703</x>
+     <y>141</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2206,8 +2472,8 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>487</y>
+     <x>703</x>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
@@ -2222,8 +2488,8 @@
    <slot>on_addpos_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>97</y>
+     <x>691</x>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
      <x>798</x>
@@ -2238,8 +2504,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>126</y>
+     <x>691</x>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -2254,8 +2520,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>592</x>
-     <y>316</y>
+     <x>703</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2270,8 +2536,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>672</x>
-     <y>316</y>
+     <x>703</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2286,8 +2552,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>752</x>
-     <y>316</y>
+     <x>703</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2302,8 +2568,8 @@
    <slot>on_stepup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>566</x>
-     <y>791</y>
+     <x>693</x>
+     <y>833</y>
     </hint>
     <hint type="destinationlabel">
      <x>845</x>
@@ -2318,8 +2584,8 @@
    <slot>on_stepdown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>766</x>
-     <y>791</y>
+     <x>893</x>
+     <y>833</y>
     </hint>
     <hint type="destinationlabel">
      <x>842</x>
@@ -2334,8 +2600,8 @@
    <slot>on_xup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>551</x>
-     <y>890</y>
+     <x>637</x>
+     <y>902</y>
     </hint>
     <hint type="destinationlabel">
      <x>842</x>
@@ -2350,8 +2616,8 @@
    <slot>on_xdown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>631</x>
-     <y>890</y>
+     <x>717</x>
+     <y>902</y>
     </hint>
     <hint type="destinationlabel">
      <x>844</x>
@@ -2366,8 +2632,8 @@
    <slot>on_yup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>591</x>
-     <y>863</y>
+     <x>677</x>
+     <y>875</y>
     </hint>
     <hint type="destinationlabel">
      <x>880</x>
@@ -2382,8 +2648,8 @@
    <slot>on_ydown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>591</x>
-     <y>917</y>
+     <x>677</x>
+     <y>929</y>
     </hint>
     <hint type="destinationlabel">
      <x>914</x>
@@ -2398,8 +2664,8 @@
    <slot>on_zup_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>803</x>
-     <y>863</y>
+     <x>889</x>
+     <y>875</y>
     </hint>
     <hint type="destinationlabel">
      <x>864</x>
@@ -2414,8 +2680,8 @@
    <slot>on_zdown_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>803</x>
-     <y>917</y>
+     <x>889</x>
+     <y>929</y>
     </hint>
     <hint type="destinationlabel">
      <x>968</x>
@@ -2462,8 +2728,8 @@
    <slot>on_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>796</x>
-     <y>138</y>
+     <x>703</x>
+     <y>122</y>
     </hint>
     <hint type="destinationlabel">
      <x>921</x>
@@ -2478,8 +2744,8 @@
    <slot>on_savesettings_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>576</y>
+     <x>691</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2526,8 +2792,8 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>390</y>
+     <x>703</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2622,44 +2888,12 @@
    <slot>on_search_zmult_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>754</x>
-     <y>519</y>
+     <x>703</x>
+     <y>144</y>
     </hint>
     <hint type="destinationlabel">
      <x>905</x>
      <y>493</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>search_correct_checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_search_corrected_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>755</x>
-     <y>547</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>887</x>
-     <y>530</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>on_increase_minimum_readout_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>797</x>
-     <y>485</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>924</x>
-     <y>570</y>
     </hint>
    </hints>
   </connection>
@@ -2670,8 +2904,8 @@
    <slot>on_autofocus_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>807</x>
-     <y>731</y>
+     <x>893</x>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>806</x>
@@ -2680,18 +2914,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>bg_img_button</sender>
-   <signal>clicked()</signal>
+   <sender>af_bright_checkbox</sender>
+   <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>on_bg_img_clicked()</slot>
+   <slot>on_af_bright_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>721</x>
-     <y>568</y>
+     <x>711</x>
+     <y>566</y>
     </hint>
     <hint type="destinationlabel">
-     <x>919</x>
-     <y>637</y>
+     <x>952</x>
+     <y>624</y>
     </hint>
    </hints>
   </connection>
@@ -2753,5 +2987,6 @@
   <slot>on_increase_minimum_readout_toggled(bool)</slot>
   <slot>on_autofocus_clicked()</slot>
   <slot>on_bg_img_clicked()</slot>
+  <slot>on_af_bright_toggled(bool)</slot>
  </slots>
 </ui>

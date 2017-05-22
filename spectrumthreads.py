@@ -146,64 +146,93 @@ class ImageThread(MeasurementThread):
 
 
 class AutoFocusThread(MeasurementThread):
-    def __init__(self, spectrometer, settings, stage, bg_img,parent=None):
+    def __init__(self, spectrometer, settings, stage ,parent=None):
         self.stage = stage
         self.settings = settings
-        self.bg_img = bg_img
         super(AutoFocusThread, self).__init__(spectrometer)
 
     def focus(self):
-        def calc_f(dist=2):
-            img = self.spectrometer.TakeSingleTrack(raw=True)
-            img = img[self.settings.min_ind_img:self.settings.max_ind_img,:]
-            if self.bg_img is not None:
-                img -= self.bg_img
-                img = restoration.denoise_tv_bregman(img_as_float(img),0.1)
-                #img = ndimage.uniform_filter(img, 2)
-                img = ndimage.median_filter(img, 2)
+        def calc_f(plot = False):
 
-            #img = exposure.equalize_hist(img)
-            plt.imshow(img.T)
-            plt.savefig("search_max/autofocus_image.png")
-            plt.close()
+            if self.settings.af_use_bright:
+                self.stage.moverel(dx=-0.5)
+                buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                self.stage.moverel(dx=+1.0)
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                self.stage.moverel(dx=-0.5)
+                img -= buf
+                dist = 7
+            else:
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                dist = 2
 
-            n, m = img.shape
-            f = 0
-            for i in range(n):
+            #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
+            img = ndimage.median_filter(img, 2)
+
+
+            if plot:
+                plt.imshow(img.T)
+                plt.title(str(img.max()))
+                plt.savefig("search_max/autofocus_image.png")
+                plt.close()
+            else:
+                f = 0
+
                 # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
-                #f += np.sum(np.square(np.subtract(img[i, :], np.roll(img[i, :], dist))))
+                #conv = np.square(img - np.roll(img, dist, axis=0))
+                conv = img - np.roll(img,dist,axis=0)
+                conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
+                conv = np.square(conv)
+                #conv = ndimage.median_filter(conv, 2)
+                f = np.sum(conv)
 
                 # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
-                k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
-                #k = np.array([[0, 0, 0], [-1, 0, -1], [0, 0, 0]])
-                conv = ndimage.convolve(img, k, mode='wrap')
-                f = np.sum(np.square(conv))/np.sum(np.square(img))
+                #k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
+                # #k = np.array([[-1, 0, -2, 0, -1], [0, 0, 0, 0, 0] ,[-2, 0, 12, 0, -2], [0, 0, 0, 0, 0], [-1, 0, -2, 0, -1]])
+                # #k = np.array([[0, 0, -1, 0, 0], [0, 0, 0, 0, 0], [-1, 0, 1, 0, -1], [0, 0, 0, 0, 0], [0, 0, -1, 0, 0]])
+                # # k = np.array([[-1, -1, -1, -1, -1],
+                # #               [-1,  1,  2,  1, -1],
+                # #               [-1,  2,  4,  2, -1],
+                # #               [-1,  1,  2,  1, -1],
+                # #               [-1, -1, -1, -1, -1]])
+                #conv = ndimage.convolve(img, k, mode='mirror')
+                #f = np.sum(np.square(conv))/np.sum(np.square(img))
 
-            return f
-            #grad = np.gradient(img)
-            #return np.sum(np.square(grad[0])+np.square(grad[1]))
+                # plt.imshow(conv.T)
+                # plt.title(str(conv.max()))
+                # plt.savefig("search_max/autofocus_conv.png")
+                # plt.close()
+                return f
+
 
         self.spectrometer.SetSlitWidth(500)
         self.spectrometer.SetCentreWavelength(0.0)
         time.sleep(0.5)
+        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
         pos = d * self.settings.zmult + startpos[2]
         focus = np.zeros(self.settings.rasterdim)
+        self.progress = progress.Progress(max=len(pos))
         for k in range(len(pos)):
             self.stage.moveabs(z=pos[k])
             focus[k] = calc_f()
-            #print(str(k)+' '+str(focus[k]))
+
+            self.progress.next()
+            self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
                 self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
                 self.spectrometer.SetSlitWidth(self.settings.slit_width)
+                self.spectrometer.SetExposureTime(self.settings.integration_time)
                 self.finishSignal.emit(np.array([]))
                 self.stop()
                 return
+
 
         focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
@@ -248,7 +277,7 @@ class AutoFocusThread(MeasurementThread):
 
         if popt is not None:
             self.stage.moveabs(z=popt[1])
-            calc_f()
+            calc_f(plot=True)
             self.finishSignal.emit(np.array([popt[1],perr[1]]))
         else:
             self.stage.moveabs(z=startpos[2])
@@ -256,6 +285,7 @@ class AutoFocusThread(MeasurementThread):
 
         self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        self.spectrometer.SetExposureTime(self.settings.integration_time)
 
         self.stop()
 
@@ -538,7 +568,8 @@ class SearchThread(MeasurementThread):
                     spec = self.get_spec()
                 else:
                     spec = self.spectrometer.TakeSingleTrack()
-                spec = smooth(self.wl, spec)
+                #spec = smooth(self.wl, spec)
+                spec = savgol_filter(spec, 51, 1)
                 self.specSignal.emit(spec)
                 #measured[k] = np.max(spec[100:1900])
                 measured[k] = np.sum(spec[100:1900])
@@ -648,7 +679,7 @@ class SearchThread(MeasurementThread):
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
 
         if ontargetx and ontargety:
-            self.finishSignal.emit(np.hstack((targetx, targety)))
+            self.finishSignal.emit(np.append(targetx, targety))
         else:
             self.finishSignal.emit(np.array([]))
 
@@ -788,40 +819,40 @@ class ScanThread(MeasurementThread):
             # self.specSignal.emit(self.spec)
 
 
-# class ScanSearchThread(ScanThread):
-#     def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
-#         super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
-#         self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec, self)
-#         self.searchthread.specSignal.connect(self.specslot)
-#         self.searchthread.finishSignal.connect(self.searchfinishslot)
-#         self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
-#         self.autofocusthread.finishSignal.connect(self.focusfinishslot)
-#
-#     @QtCore.Slot()
-#     def stop(self):
-#         self.searchthread.stop()
-#         super(ScanSearchThread, self).stop()
-#         self.searchthread = None
-#
-#     def __del__(self):
-#         #self.searchthread.specSignal.disconnect(self.specslot)
-#         super(ScanSearchThread, self).__del__()
-#
-#     def intermediatework(self):
-#         self.autofocusthread.focus()
-#         self.searchthread.search()
-#
-#     @QtCore.Slot(np.ndarray)
-#     def specslot(self, spec):
-#         self.specSignal.emit(spec)
-#
-#     @QtCore.Slot(np.ndarray)
-#     def searchfinishslot(self, pos):
-#         print(pos)
-#
-#     @QtCore.Slot(np.ndarray)
-#     def focusfinishslot(self, arr):
-#         pass
+class ScanSearchThread(ScanThread):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
+        super(ScanSearchThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
+        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,ref_spec,dark_spec,bg_spec, self)
+        self.searchthread.specSignal.connect(self.specslot)
+        self.searchthread.finishSignal.connect(self.searchfinishslot)
+        self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+        self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+
+    @QtCore.Slot()
+    def stop(self):
+        self.searchthread.stop()
+        super(ScanSearchThread, self).stop()
+        self.searchthread = None
+
+    def __del__(self):
+        #self.searchthread.specSignal.disconnect(self.specslot)
+        super(ScanSearchThread, self).__del__()
+
+    def intermediatework(self):
+        self.autofocusthread.focus()
+        self.searchthread.search()
+
+    @QtCore.Slot(np.ndarray)
+    def specslot(self, spec):
+        self.specSignal.emit(spec)
+
+    @QtCore.Slot(np.ndarray)
+    def searchfinishslot(self, pos):
+        print(pos)
+
+    @QtCore.Slot(np.ndarray)
+    def focusfinishslot(self, arr):
+        pass
 
 
 class ScanLockinThread(ScanThread):
@@ -916,12 +947,11 @@ class ScanMeanThread(ScanThread):
 
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, bg_img=None, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.ref_spec = ref_spec
         self.dark_spec = dark_spec
         self.bg_spec = bg_spec
-        self.bg_img = bg_img
         self.searchthread = None
         self.meanthread = None
         self.autofocusthread = None
@@ -975,7 +1005,7 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     def intermediatework(self):
         if not self.abort:
-            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage,self.bg_img, self)
+            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
             self.autofocusthread.focus()
             self.autofocusthread.stop()
             self.autofocusthread = None

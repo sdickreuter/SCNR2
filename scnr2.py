@@ -85,6 +85,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.rasterwidth_spin.setValue(self.settings.rasterwidth)
         self.ui.search_int_time_spin.setValue(self.settings.search_integration_time)
         self.ui.sigma_spin.setValue(self.settings.sigma)
+        self.ui.search_zmult_spin.setValue(self.settings.zmult)
         self.ui.exposure_time_spin.setValue(self.settings.cam_exposure_time)
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
 
@@ -468,13 +469,15 @@ class SCNR(QtWidgets.QMainWindow):
 
             if abs(x_step) > 0.0001:
                 if abs(y_step) > 0.0001:
+                    self.set_searchmax_ontarget(False)
                     self.stage.moverel(dx=x_step, dy=y_step)
                 else:
+                    self.set_searchmax_ontarget(False)
                     self.stage.moverel(dx=x_step)
             elif abs(y_step) > 0.001:
+                self.set_searchmax_ontarget(False)
                 self.stage.moverel(dy=y_step)
             self.show_pos()
-            self.set_searchmax_ontarget(False)
         # ----- END Slots for Gamepad
 
 
@@ -579,7 +582,6 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_search_clicked(self):
         if self.spectrometer.mode == 'singletrack':
-            self.set_autofocus_ontarget(False)
             self.set_searchmax_ontarget(False)
 
             self.on_disableButtons()
@@ -868,12 +870,6 @@ class SCNR(QtWidgets.QMainWindow):
             self.settings.slitmarker_x = pos.x()
         self.settings.save()
 
-    @QtCore.Slot()
-    def on_bg_img_clicked(self):
-        self.on_disableButtons()
-        self.spectrum.take_bg_img()
-        self.on_enableButtons()
-
     def _load_spectrum_from_file(self):
         save_dir = QtWidgets.QFileDialog.getOpenFileName(self, "Load Spectrum from CSV", './spectra/', 'CSV Files (*.csv)')
 
@@ -889,23 +885,29 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_z_correction_angle_edited(self):
-        if self.ui.zcorrection_checkbox.isChecked():
-            if self.stage is not None:
-                self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
+        if self.stage is not None:
+            self.stage.set_z_correction_angle(self.ui.zcorrection_spinbox.value())
 
     @QtCore.Slot(bool)
     def set_searchmax_ontarget(self, ontarget):
         if ontarget:
             self.ui.searchmax_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
         else:
-            self.ui.searchmax_button.setIcon(None)
+            self.ui.searchmax_button.setIcon(QtGui.QIcon())
 
     @QtCore.Slot(bool)
     def set_autofocus_ontarget(self, ontarget):
         if ontarget:
             self.ui.autofocus_button.setIcon(QtGui.QIcon('./gui/ontarget.png'))
         else:
-            self.ui.autofocus_button.setIcon(None)
+            self.ui.autofocus_button.setIcon(QtGui.QIcon())
+
+    @QtCore.Slot(bool)
+    def on_af_bright_toggled(self, state):
+        if state:
+            self.settings.af_use_bright = True
+        else:
+            self.settings.af_use_bright = False
 
 
 def sigint_handler(*args):
