@@ -85,6 +85,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.rasterwidth_spin.setValue(self.settings.rasterwidth)
         self.ui.search_int_time_spin.setValue(self.settings.search_integration_time)
         self.ui.sigma_spin.setValue(self.settings.sigma)
+        self.ui.search_zmult_spin.setValue(self.settings.zmult)
         self.ui.exposure_time_spin.setValue(self.settings.cam_exposure_time)
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
 
