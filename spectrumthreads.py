@@ -594,10 +594,10 @@ class SearchThread(MeasurementThread):
             self.stage.query_pos()
             origin = self.stage.last_pos()
 
-            if j in np.arange(0,repetitions,3):
+            if j in np.arange(0,repetitions,2):
                 pos = d + origin[0]
                 dir = "x"
-            elif j in np.arange(1,repetitions,3):
+            elif j in np.arange(1,repetitions,2):
                 pos = d + origin[1]
                 dir = "y"
 
