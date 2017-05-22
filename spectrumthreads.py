@@ -11,6 +11,7 @@ from skimage import img_as_float,img_as_int
 from skimage import restoration
 from skimage import filters
 from skimage import morphology
+from skimage import feature
 from scipy import ndimage
 import time
 
@@ -21,6 +22,16 @@ def gauss2D(pos, amplitude, xo, yo, fwhm, offset):
     yo = float(yo)
     g = offset + amplitude * np.exp(
         -(np.power(pos[0] - xo, 2.) + np.power(pos[1] - yo, 2.)) / (2 * np.power(sigma, 2.)))
+    return g.ravel()
+
+
+def Airy2D(xdata_tuple, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    (x, y) = xdata_tuple
+    a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
+    b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
+    c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
+    g = offset + amplitude * (
+        np.exp(- (a * ((x - xo) ** 2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo) ** 2))) ** 2)
     return g.ravel()
 
 
@@ -152,6 +163,7 @@ class AutoFocusThread(MeasurementThread):
         super(AutoFocusThread, self).__init__(spectrometer)
 
     def focus(self):
+
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
@@ -178,14 +190,24 @@ class AutoFocusThread(MeasurementThread):
             else:
                 f = 0
 
+                coordinates = feature.peak_local_max(img, min_distance=20,exclude_border=2)
+                x = np.arange(img.shape[0])
+                y = np.arange(img.shape[1])
+                x,y = np.meshgrid((x,y))
+                xdata = (x.ravel(),y.ravel())
+                ydata = img.ravel()
+                initial_guess = (np.max(img), coordinates[0][0], coordinates[0][1], 1, 1, 0, np.min(img))
+                popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess)
+                f = np.mean([popt[3],popt[4]])
+
                 # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
                 #conv = np.square(img - np.roll(img, dist, axis=0))
-                conv = img - np.roll(img,dist,axis=0)
-                conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
-                conv = np.square(conv)
-                #conv = ndimage.median_filter(conv, 2)
-                f = np.sum(conv)
+                # conv = img - np.roll(img,dist,axis=0)
+                # conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
+                # conv = np.square(conv)
+                # #conv = ndimage.median_filter(conv, 2)
+                # f = np.sum(conv)
 
                 # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
                 #k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
