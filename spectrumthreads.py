@@ -163,7 +163,6 @@ class AutoFocusThread(MeasurementThread):
         super(AutoFocusThread, self).__init__(spectrometer)
 
     def focus(self):
-
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
@@ -182,23 +181,34 @@ class AutoFocusThread(MeasurementThread):
             img = ndimage.median_filter(img, 2)
 
 
-            if plot:
+            if True:
+            #if plot:
                 plt.imshow(img.T)
                 plt.title(str(img.max()))
                 plt.savefig("search_max/autofocus_image.png")
                 plt.close()
-            else:
+            #else:
                 f = 0
 
                 coordinates = feature.peak_local_max(img, min_distance=20,exclude_border=2)
-                x = np.arange(img.shape[0])
-                y = np.arange(img.shape[1])
-                x,y = np.meshgrid((x,y))
-                xdata = (x.ravel(),y.ravel())
-                ydata = img.ravel()
-                initial_guess = (np.max(img), coordinates[0][0], coordinates[0][1], 1, 1, 0, np.min(img))
-                popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess)
-                f = np.mean([popt[3],popt[4]])
+
+                if len(coordinates) > 0:
+                    x = np.arange(img.shape[0])
+                    y = np.arange(img.shape[1])
+                    x,y = np.meshgrid(x,y)
+                    xdata = (x.ravel(),y.ravel())
+                    ydata = img.ravel()
+                    print((coordinates[0][0],coordinates[0][1]))
+                    initial_guess = (np.max(img), coordinates[0][0], coordinates[0][1], 3, 3, 0, np.min(img))
+
+                    try:
+                        popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess)
+                    except RuntimeError as e:
+                        print(e)
+                        return 0.0
+
+                    print(popt)
+                    f = np.mean([popt[3],popt[4]])
 
                 # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
@@ -207,6 +217,11 @@ class AutoFocusThread(MeasurementThread):
                 # conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
                 # conv = np.square(conv)
                 # #conv = ndimage.median_filter(conv, 2)
+                # f = np.sum(conv)
+                # conv = img - np.roll(img,dist,axis=0)
+                # conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
+                # conv = np.square(conv)
+                #conv = ndimage.median_filter(conv, 2)
                 # f = np.sum(conv)
 
                 # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
