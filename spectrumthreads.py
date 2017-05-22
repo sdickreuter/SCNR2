@@ -1,6 +1,7 @@
 import sys
 
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 import numpy as np
 import progress
 import scipy.optimize as opt
@@ -12,26 +13,43 @@ from skimage import restoration
 from skimage import filters
 from skimage import morphology
 from skimage import feature
-from scipy import ndimage
+from scipy import ndimage, special
 import time
 
 #  modified from: http://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m#comment33999040_21566831
 def gauss2D(pos, amplitude, xo, yo, fwhm, offset):
     sigma = fwhm / 2.3548
-    xo = float(xo)
-    yo = float(yo)
     g = offset + amplitude * np.exp(
         -(np.power(pos[0] - xo, 2.) + np.power(pos[1] - yo, 2.)) / (2 * np.power(sigma, 2.)))
     return g.ravel()
 
 
-def Airy2D(xdata_tuple, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+# def Airy2D(xdata_tuple, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+#     (x, y) = xdata_tuple
+#     a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
+#     b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
+#     c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
+#     g = offset + amplitude * (
+#         np.exp(- (a * ((x - xo) ** 2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo) ** 2))) ** 2)
+#     return g.ravel()
+
+def Airy2D(xdata_tuple, amplitude, xo, yo, sigma,offset):
     (x, y) = xdata_tuple
-    a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
-    b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
-    c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
-    g = offset + amplitude * (
-        np.exp(- (a * ((x - xo) ** 2) + 2 * b * (x - xo) * (y - yo) + c * ((y - yo) ** 2))) ** 2)
+    r = np.sqrt(np.square(x-xo)+np.square(y-yo))
+    g = amplitude*np.square(np.pi*np.square(sigma)*special.j0(np.pi*sigma*r)/(np.pi*sigma))+offset
+    return g.ravel()
+
+
+def twoAiry2D(xdata_tuple, amplitude, xo1, yo1, xo2, yo2, sigma,offset):
+    g1 = Airy2D(xdata_tuple,amplitude,xo1,yo1,sigma,offset)
+    g2 = Airy2D(xdata_tuple, amplitude, xo2, yo2, sigma, offset)
+    g = g1-g2
+    return g.ravel()
+
+def twoGauss2D(xdata_tuple, amplitude, xo1, yo1, xo2, yo2, sigma,offset):
+    g1 = gauss2D(xdata_tuple,amplitude,xo1,yo1,sigma,offset)
+    g2 = gauss2D(xdata_tuple, amplitude, xo2, yo2, sigma, offset)
+    g = g1-g2
     return g.ravel()
 
 
@@ -166,13 +184,16 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
-                self.stage.moverel(dx=-0.5)
+                self.stage.moverel(dx=-1.5)
+                time.sleep(0.3)
                 buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                self.stage.moverel(dx=+1.0)
+                self.stage.moverel(dx=+3.0)
+                time.sleep(0.3)
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                self.stage.moverel(dx=-0.5)
+                self.stage.moverel(dx=-1.5)
                 img -= buf
                 dist = 7
+                img = ndimage.median_filter(img, 3)
             else:
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 dist = 2
@@ -181,34 +202,95 @@ class AutoFocusThread(MeasurementThread):
             img = ndimage.median_filter(img, 2)
 
 
-            if True:
-            #if plot:
+            #if True:
+            if plot:
                 plt.imshow(img.T)
                 plt.title(str(img.max()))
                 plt.savefig("search_max/autofocus_image.png")
                 plt.close()
-            #else:
-                f = 0
+            else:
+                amp = 0
+                sigma = 1
+
+                # plt.imshow(img.T)
+                # plt.savefig("search_max/autofocus_image.png")
+                # plt.close()
 
                 coordinates = feature.peak_local_max(img, min_distance=20,exclude_border=2)
+                #print(coordinates)
+                #coordinates= [img.shape[1]/2,img.shape[0]/2]
+                if len(coordinates) > 0:
+                    coordinates = coordinates[0]
+                    coordinates2 = feature.peak_local_max(~img, min_distance=20, exclude_border=2)
+                    if len(coordinates2) > 0:
+                        coordinates2 = coordinates2[0]
+                    else:
+                        coordinates2 = [coordinates[0]+20, coordinates[1]]
+                else:
+                    coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+                    coordinates2 = [img.shape[1] / 2-4, img.shape[0] / 2]
 
                 if len(coordinates) > 0:
+
+                    #print(coordinates2)
+
                     x = np.arange(img.shape[0])
                     y = np.arange(img.shape[1])
                     x,y = np.meshgrid(x,y)
                     xdata = (x.ravel(),y.ravel())
-                    ydata = img.ravel()
-                    print((coordinates[0][0],coordinates[0][1]))
-                    initial_guess = (np.max(img), coordinates[0][0], coordinates[0][1], 3, 3, 0, np.min(img))
+                    ydata = img.T.ravel()
 
-                    try:
-                        popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess)
-                    except RuntimeError as e:
-                        print(e)
-                        return 0.0
+                    if self.settings.af_use_bright:
+                        initial_guess = (np.max(img)-np.min(img), coordinates[0], coordinates[1], coordinates2[0],coordinates2[1], 4, np.mean(img))
+
+                        bounds = ((0,0,0,0,0,0,-np.inf),
+                                  (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
+                        try:
+                            popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
+
+                            # plt.imshow(img.T)
+                            # x = np.linspace(0, img.shape[0], 200)
+                            # y = np.linspace(0, img.shape[1], 200)
+                            # x, y = np.meshgrid(x, y)
+                            # Z = twoGauss2D((x, y), initial_guess[0], initial_guess[1], initial_guess[2],
+                            #               initial_guess[3], initial_guess[4], initial_guess[5])
+                            # plt.contour(x, y, Z.reshape(x.shape))
+                            # # plt.imshow(Z.reshape(x.shape))
+                            # plt.title(str(img.max()))
+                            # plt.savefig("search_max/autofocus_image.png")
+                            # plt.close()
+                        except (RuntimeError, ValueError) as e:
+                            print(e)
+                            return 0, 1
+                    else:
+                        initial_guess = (np.max(img)-np.min(img), coordinates[0], coordinates[1], 4, np.min(img))
+                        #bounds = ((0,initial_guess[1]-4,initial_guess[2]-4,0,0),
+                        #          (np.inf, initial_guess[1] + 4, initial_guess[2] + 4, np.inf, np.inf))
+                        bounds = ((0,0, 0, 0, 0),
+                                  (np.inf, x.max(), y.max(), np.inf, np.inf))
+                        try:
+                            popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
+
+                            # plt.imshow(img.T)
+                            # x = np.linspace(0,img.shape[0],200)
+                            # y = np.linspace(0,img.shape[1],200)
+                            # x,y = np.meshgrid(x,y)
+                            # Z = Airy2D((x,y),popt[0],popt[1],popt[2],popt[3],popt[4])
+                            # plt.contour(x, y, Z.reshape(x.shape))
+                            # plt.title(str(img.max()))
+                            # plt.savefig("search_max/autofocus_image.png")
+                            # plt.close()
+
+                        except RuntimeError as e:
+                            print(e)
+                            return 0, 1
 
                     print(popt)
-                    f = np.mean([popt[3],popt[4]])
+                    #f = np.mean([popt[3],popt[4]])
+                    amp = popt[0]
+                    sigma = popt[3]
+
+
 
                 # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
                 # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
@@ -240,7 +322,7 @@ class AutoFocusThread(MeasurementThread):
                 # plt.title(str(conv.max()))
                 # plt.savefig("search_max/autofocus_conv.png")
                 # plt.close()
-                return f
+                return amp, sigma
 
 
         self.spectrometer.SetSlitWidth(500)
@@ -253,10 +335,13 @@ class AutoFocusThread(MeasurementThread):
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
         pos = d * self.settings.zmult + startpos[2]
         focus = np.zeros(self.settings.rasterdim)
+        amp = np.zeros(self.settings.rasterdim)
+        sigma = np.zeros(self.settings.rasterdim)
+
         self.progress = progress.Progress(max=len(pos))
         for k in range(len(pos)):
             self.stage.moveabs(z=pos[k])
-            focus[k] = calc_f()
+            amp[k], sigma[k] = calc_f()
 
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
@@ -270,8 +355,9 @@ class AutoFocusThread(MeasurementThread):
                 self.stop()
                 return
 
-
-        focus = savgol_filter(focus,5,1)
+        #focus = amp/amp.max() * 1/(sigma/sigma.max())
+        focus = amp  / sigma
+        #focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)
