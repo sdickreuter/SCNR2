@@ -355,6 +355,7 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
                 #self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.integration_time)
+                self.spectrometer.SetMinVertReadout(7)
                 self.finishSignal.emit(np.array([]))
                 self.stop()
                 return
@@ -413,6 +414,8 @@ class AutoFocusThread(MeasurementThread):
         #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
         #self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetExposureTime(self.settings.integration_time)
+        self.spectrometer.SetMinVertReadout(7)
+
 
         self.stop()
 
