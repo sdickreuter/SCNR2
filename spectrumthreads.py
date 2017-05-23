@@ -189,13 +189,13 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
-                self.stage.moverel(dx=-1.5)
+                self.stage.moverel(dy=-1.0)
                 time.sleep(0.5)
-                buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                self.stage.moverel(dx=+3.0)
+                buf = self.spectrometer.TakeSingleTrack(raw=True)
+                self.stage.moverel(dy=+2.0)
                 time.sleep(0.5)
-                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                self.stage.moverel(dx=-1.5)
+                img = self.spectrometer.TakeSingleTrack(raw=True)
+                self.stage.moverel(dy=-1.0)
                 time.sleep(0.5)
                 img -= buf
                 dist = 7
@@ -224,7 +224,7 @@ class AutoFocusThread(MeasurementThread):
                 # plt.imshow(img.T)
                 # plt.savefig("search_max/autofocus_image.png")
                 # plt.close()
-                img = np.sum(img,axis=1)
+                img = np.sum(img,axis=0)
 
                 x = np.arange(img.shape[0])
 
@@ -327,10 +327,11 @@ class AutoFocusThread(MeasurementThread):
                 return amp, sigma
 
 
-        self.spectrometer.SetSlitWidth(500)
-        self.spectrometer.SetCentreWavelength(0.0)
-        time.sleep(0.5)
+        #self.spectrometer.SetSlitWidth(500)
+        #self.spectrometer.SetCentreWavelength(0.0)
+        #time.sleep(0.5)
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+        self.spectrometer.SetMinVertReadout(30)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -351,8 +352,8 @@ class AutoFocusThread(MeasurementThread):
 
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
-                self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-                self.spectrometer.SetSlitWidth(self.settings.slit_width)
+                #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+                #self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.integration_time)
                 self.finishSignal.emit(np.array([]))
                 self.stop()
@@ -409,8 +410,8 @@ class AutoFocusThread(MeasurementThread):
             self.stage.moveabs(z=startpos[2])
             self.finishSignal.emit(np.array([]))
 
-        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        #self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetExposureTime(self.settings.integration_time)
 
         self.stop()
