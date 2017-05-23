@@ -193,8 +193,9 @@ class AutoFocusThread(MeasurementThread):
                 self.stage.moverel(dx=-1.5)
                 img -= buf
                 dist = 7
-                #img = ndimage.median_filter(img, 3)
-                img = ndimage.gaussian_filter(img, 2)
+                img = ndimage.median_filter(img, 3)
+                #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
+                #img = ndimage.gaussian_filter(img, 2)
 
             else:
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
@@ -247,7 +248,7 @@ class AutoFocusThread(MeasurementThread):
 
                         #bounds = ((0,0,0,0,0,0,-np.inf),
                         #          (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
-                        bounds = [(0,np.inf),(0,x.max()),(0,y.max()),(0,x.max()),(0,y.max()),(0,np.inf),(-np.inf,np.inf)]
+                        bounds = [(0,np.max(img)*1.5),(0,x.max()),(0,y.max()),(0,x.max()),(0,y.max()),(0,np.inf),(np.min(img),np.max(img))]
                         try:
                             def fun(p):
                                 return np.sum(np.square(np.subtract(ydata,twoGauss2D(xdata,p[0],p[1],p[2],p[3],p[4],p[5],p[6]))))
@@ -275,10 +276,19 @@ class AutoFocusThread(MeasurementThread):
                         initial_guess = (np.max(img)-np.min(img), coordinates[0], coordinates[1], 4, np.min(img))
                         #bounds = ((0,initial_guess[1]-4,initial_guess[2]-4,0,0),
                         #          (np.inf, initial_guess[1] + 4, initial_guess[2] + 4, np.inf, np.inf))
-                        bounds = ((0,0, 0, 0, 0),
-                                  (np.inf, x.max(), y.max(), np.inf, np.inf))
+                        # bounds = ((0,0, 0, 0, 0),
+                        #           (np.inf, x.max(), y.max(), np.inf, np.inf))
+                        bounds = (((0,img.max()),(0,x.max()), (0,y.max()), (0,np.inf), (0,img.max())))
                         try:
-                            popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
+                            def fun(p):
+                                return np.sum(np.square(np.subtract(ydata,Airy2D(xdata,p[0],p[1],p[2],p[3],p[4]))))
+
+                            res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
+                            popt = res.x
+
+
+                            #popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
+
 
                             # plt.imshow(img.T)
                             # x = np.linspace(0,img.shape[0],200)
@@ -343,6 +353,7 @@ class AutoFocusThread(MeasurementThread):
         startpos = self.stage.last_pos()
         d = np.linspace(-self.settings.rasterwidth, self.settings.rasterwidth, self.settings.rasterdim)
         pos = d * self.settings.zmult + startpos[2]
+
         focus = np.zeros(self.settings.rasterdim)
         amp = np.zeros(self.settings.rasterdim)
         sigma = np.zeros(self.settings.rasterdim)
@@ -365,8 +376,8 @@ class AutoFocusThread(MeasurementThread):
                 return
 
         #focus = amp/amp.max() * 1/(sigma/sigma.max())
-        focus = amp  / sigma
-        #focus = savgol_filter(focus,5,1)
+        focus = amp / sigma
+        focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)
