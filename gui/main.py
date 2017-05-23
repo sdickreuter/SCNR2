@@ -443,7 +443,7 @@ class Ui_MainWindow(object):
         self.search_int_time_spin.setMaximumSize(QtCore.QSize(120, 35))
         self.search_int_time_spin.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.search_int_time_spin.setMinimum(0.05)
-        self.search_int_time_spin.setMaximum(1.0)
+        self.search_int_time_spin.setMaximum(100.0)
         self.search_int_time_spin.setSingleStep(0.1)
         self.search_int_time_spin.setProperty("value", 0.1)
         self.search_int_time_spin.setObjectName("search_int_time_spin")
@@ -910,6 +910,7 @@ class Ui_MainWindow(object):
         self.search_zmult_spin.editingFinished.connect(MainWindow.on_search_zmult_edited)
         self.autofocus_button.clicked.connect(MainWindow.on_autofocus_clicked)
         self.af_bright_checkbox.toggled['bool'].connect(MainWindow.on_af_bright_toggled)
+        self.search_correct_checkBox.toggled['bool'].connect(MainWindow.on_search_corrected_toggled)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

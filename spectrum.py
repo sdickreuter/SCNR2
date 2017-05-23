@@ -336,7 +336,7 @@ class Spectrum(QtCore.QObject):
             datetime.now().year) + eol)
         f.write(str(datetime.now().hour).zfill(2) + ":" + str(datetime.now().minute).zfill(2) + ":" + str(
             datetime.now().second).zfill(2) + ":" + str(datetime.now().microsecond).zfill(2) + eol)
-        f.write("integration time [ms]" + eol)
+        f.write("integration time [s]" + eol)
         f.write(str(self.settings.integration_time) + eol)
         f.write("number of samples" + eol)
         f.write(str(self.settings.number_of_samples) + eol)
