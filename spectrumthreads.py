@@ -52,6 +52,11 @@ def twoGauss2D(xdata_tuple, amplitude, xo1, yo1, xo2, yo2, sigma,offset):
     g = g1-g2
     return g.ravel()
 
+def twoGauss(xdata_tuple, amplitude1,amplitude2, xo1, xo2, sigma,offset):
+    g1 = gauss(xdata_tuple,amplitude1,xo1,sigma,offset)
+    g2 = gauss(xdata_tuple, amplitude2, xo2, sigma, offset)
+    g = g1+g2
+    return g.ravel()
 
 def gauss(x, amplitude, xo, fwhm, offset):
     sigma = fwhm / 2.3548
@@ -185,16 +190,17 @@ class AutoFocusThread(MeasurementThread):
 
             if self.settings.af_use_bright:
                 self.stage.moverel(dx=-1.5)
-                time.sleep(0.3)
+                time.sleep(0.5)
                 buf = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 self.stage.moverel(dx=+3.0)
-                time.sleep(0.3)
+                time.sleep(0.5)
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 self.stage.moverel(dx=-1.5)
+                time.sleep(0.5)
                 img -= buf
                 dist = 7
-                img = ndimage.median_filter(img, 3)
-                #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
+                #img = ndimage.median_filter(img, 3)
+                img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
                 #img = ndimage.gaussian_filter(img, 2)
 
             else:
@@ -223,31 +229,29 @@ class AutoFocusThread(MeasurementThread):
                 x = np.arange(img.shape[0])
 
                 if self.settings.af_use_bright:
-                    initial_guess = (np.max(img)-np.min(img), x[np.argmax(img)], x[np.argmin(img)], 4, np.mean(img))
+                    initial_guess = (np.max(img)-np.mean(img), np.min(img)-np.mean(img), x[np.argmax(img)], x[np.argmax(img)+7], 10, np.mean(img))
 
                     #bounds = ((0,0,0,0,0,0,-np.inf),
                     #          (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
-                    bounds = [(0,np.max(img)*1.5),(0,x.max()),(0,x.max()),(0,np.inf),(np.min(img),np.max(img))]
+                    bounds = [(0,initial_guess[0]*1.5),(0,initial_guess[1]*1.5),(0,x.max()),(0,x.min()),(0,np.inf),(np.min(img),np.max(img))]
                     try:
                         def fun(p):
-                            return np.sum(np.square(np.subtract(img,twoGauss2D(x,p[0],0,p[1],0,p[2],p[3],p[4]))))
+                            return np.sum(np.square(np.subtract(img,twoGauss(x,p[0],p[1],p[2],p[3],p[4],p[5]))))
 
                         res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
                         popt = res.x
 
                         #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
 
-                        plt.imshow(img.T)
+                        #plt.imshow(img.T)
+                        plt.plot(x,img)
                         x = np.linspace(0, img.shape[0], 200)
-                        y = np.linspace(0, img.shape[1], 200)
-                        x, y = np.meshgrid(x, y)
-                        Z = twoGauss2D((x, y), popt[0], popt[1], popt[2],
-                                       popt[3], popt[4], popt[5],popt[6])
-                        plt.contour(x, y, Z.reshape(x.shape))
-                        # plt.imshow(Z.reshape(x.shape))
+                        Z = twoGauss(x, popt[0], popt[1], popt[2], popt[3],popt[4],popt[5])
+                        plt.plot(x,Z)
                         plt.title(str(img.max()))
                         plt.savefig("search_max/autofocus_image.png")
                         plt.close()
+                        popt[0] = popt[0]-popt[1]
                     except (RuntimeError, ValueError) as e:
                         print(e)
                         return 0, 1
