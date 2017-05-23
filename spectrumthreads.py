@@ -218,96 +218,75 @@ class AutoFocusThread(MeasurementThread):
                 # plt.imshow(img.T)
                 # plt.savefig("search_max/autofocus_image.png")
                 # plt.close()
+                img = np.sum(img,axis=1)
 
-                coordinates = feature.peak_local_max(img, min_distance=20,exclude_border=2)
-                #print(coordinates)
-                #coordinates= [img.shape[1]/2,img.shape[0]/2]
-                if len(coordinates) > 0:
-                    coordinates = coordinates[0]
-                    coordinates2 = feature.peak_local_max(~img, min_distance=20, exclude_border=2)
-                    if len(coordinates2) > 0:
-                        coordinates2 = coordinates2[0]
-                    else:
-                        coordinates2 = [coordinates[0]+20, coordinates[1]]
+                x = np.arange(img.shape[0])
+
+                if self.settings.af_use_bright:
+                    initial_guess = (np.max(img)-np.min(img), x[np.argmax(img)], x[np.argmin(img)], 4, np.mean(img))
+
+                    #bounds = ((0,0,0,0,0,0,-np.inf),
+                    #          (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
+                    bounds = [(0,np.max(img)*1.5),(0,x.max()),(0,x.max()),(0,np.inf),(np.min(img),np.max(img))]
+                    try:
+                        def fun(p):
+                            return np.sum(np.square(np.subtract(img,twoGauss2D(x,p[0],0,p[1],0,p[2],p[3],p[4]))))
+
+                        res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
+                        popt = res.x
+
+                        #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
+
+                        plt.imshow(img.T)
+                        x = np.linspace(0, img.shape[0], 200)
+                        y = np.linspace(0, img.shape[1], 200)
+                        x, y = np.meshgrid(x, y)
+                        Z = twoGauss2D((x, y), popt[0], popt[1], popt[2],
+                                       popt[3], popt[4], popt[5],popt[6])
+                        plt.contour(x, y, Z.reshape(x.shape))
+                        # plt.imshow(Z.reshape(x.shape))
+                        plt.title(str(img.max()))
+                        plt.savefig("search_max/autofocus_image.png")
+                        plt.close()
+                    except (RuntimeError, ValueError) as e:
+                        print(e)
+                        return 0, 1
                 else:
-                    coordinates = [img.shape[1] / 2, img.shape[0] / 2]
-                    coordinates2 = [img.shape[1] / 2-4, img.shape[0] / 2]
+                    initial_guess = (np.max(img)-np.min(img), x[np.argmax(img)], 4, np.min(img))
+                    #bounds = ((0,initial_guess[1]-4,initial_guess[2]-4,0,0),
+                    #          (np.inf, initial_guess[1] + 4, initial_guess[2] + 4, np.inf, np.inf))
+                    # bounds = ((0,0, 0, 0, 0),
+                    #           (np.inf, x.max(), y.max(), np.inf, np.inf))
+                    bounds = (((0,img.max()),(0,x.max()), (0,np.inf), (0,img.max())))
+                    try:
+                        def fun(p):
+                            return np.sum(np.square(np.subtract(img,gauss2D(x,p[0],p[1],0,p[2],p[3]))))
 
-                if len(coordinates) > 0:
-
-                    #print(coordinates2)
-
-                    x = np.arange(img.shape[0])
-                    y = np.arange(img.shape[1])
-                    x,y = np.meshgrid(x,y)
-                    xdata = (x.ravel(),y.ravel())
-                    ydata = img.T.ravel()
-
-                    if self.settings.af_use_bright:
-                        initial_guess = (np.max(img)-np.min(img), coordinates[0], coordinates[1], coordinates2[0],coordinates2[1], 4, np.mean(img))
-
-                        #bounds = ((0,0,0,0,0,0,-np.inf),
-                        #          (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
-                        bounds = [(0,np.max(img)*1.5),(0,x.max()),(0,y.max()),(0,x.max()),(0,y.max()),(0,np.inf),(np.min(img),np.max(img))]
-                        try:
-                            def fun(p):
-                                return np.sum(np.square(np.subtract(ydata,twoGauss2D(xdata,p[0],p[1],p[2],p[3],p[4],p[5],p[6]))))
-
-                            res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
-                            popt = res.x
-
-                            #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
-
-                            plt.imshow(img.T)
-                            x = np.linspace(0, img.shape[0], 200)
-                            y = np.linspace(0, img.shape[1], 200)
-                            x, y = np.meshgrid(x, y)
-                            Z = twoGauss2D((x, y), popt[0], popt[1], popt[2],
-                                           popt[3], popt[4], popt[5],popt[6])
-                            plt.contour(x, y, Z.reshape(x.shape))
-                            # plt.imshow(Z.reshape(x.shape))
-                            plt.title(str(img.max()))
-                            plt.savefig("search_max/autofocus_image.png")
-                            plt.close()
-                        except (RuntimeError, ValueError) as e:
-                            print(e)
-                            return 0, 1
-                    else:
-                        initial_guess = (np.max(img)-np.min(img), coordinates[0], coordinates[1], 4, np.min(img))
-                        #bounds = ((0,initial_guess[1]-4,initial_guess[2]-4,0,0),
-                        #          (np.inf, initial_guess[1] + 4, initial_guess[2] + 4, np.inf, np.inf))
-                        # bounds = ((0,0, 0, 0, 0),
-                        #           (np.inf, x.max(), y.max(), np.inf, np.inf))
-                        bounds = (((0,img.max()),(0,x.max()), (0,y.max()), (0,np.inf), (0,img.max())))
-                        try:
-                            def fun(p):
-                                return np.sum(np.square(np.subtract(ydata,Airy2D(xdata,p[0],p[1],p[2],p[3],p[4]))))
-
-                            res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
-                            popt = res.x
+                        res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
+                        popt = res.x
 
 
-                            #popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
+                        #popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
 
 
-                            # plt.imshow(img.T)
-                            # x = np.linspace(0,img.shape[0],200)
-                            # y = np.linspace(0,img.shape[1],200)
-                            # x,y = np.meshgrid(x,y)
-                            # Z = Airy2D((x,y),popt[0],popt[1],popt[2],popt[3],popt[4])
-                            # plt.contour(x, y, Z.reshape(x.shape))
-                            # plt.title(str(img.max()))
-                            # plt.savefig("search_max/autofocus_image.png")
-                            # plt.close()
+                        # plt.imshow(img.T)
+                        # x = np.linspace(0,img.shape[0],200)
+                        # y = np.linspace(0,img.shape[1],200)
+                        # x,y = np.meshgrid(x,y)
+                        # Z = Airy2D((x,y),popt[0],popt[1],popt[2],popt[3],popt[4])
+                        # plt.contour(x, y, Z.reshape(x.shape))
+                        # plt.title(str(img.max()))
+                        # plt.savefig("search_max/autofocus_image.png")
+                        # plt.close()
 
-                        except RuntimeError as e:
-                            print(e)
-                            return 0, 1
+                    except RuntimeError as e:
+                        print(e)
+                        return 0, 1
 
-                    #print(popt)
-                    #f = np.mean([popt[3],popt[4]])
-                    amp = popt[0]
-                    sigma = popt[3]
+                #print(popt)
+                #f = np.mean([popt[3],popt[4]])
+                amp = popt[0]
+                sigma = popt[3]
 
 
 
