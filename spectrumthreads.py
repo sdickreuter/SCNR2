@@ -485,13 +485,17 @@ class TimeSeriesThread(MeasurementThread):
         self.progress = progress.Progress(max=self.number_of_samples)
         self.i = 0
         self.abort = False
+        self.series = np.zeros((self.spectrometer._width+1, self.number_of_samples), dtype=np.float)
+        self.starttime = time.perf_counter()
 
     def work(self):
         spec = self.spectrometer.TakeSingleTrack()
         if spec is not None:
+            self.series[0,self.i] = time.perf_counter() - self.starttime
+            self.series[1:,self.i] = spec
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-            self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", np.array([]), False, False)
+            #self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", np.array([]), False, False)
             self.i += 1
             if not self.abort:
                 self.specSignal.emit(spec)
@@ -501,6 +505,7 @@ class TimeSeriesThread(MeasurementThread):
         if self.i >= (self.number_of_samples):
             if not self.abort:
                 self.progressSignal.emit(100, str(self.progress.eta_td))
+                self.saveSignal.emit(spec, "timeseries.csv")
                 self.finishSignal.emit(spec)
                 self.stop()
 
