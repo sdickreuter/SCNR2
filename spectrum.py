@@ -139,6 +139,12 @@ class Spectrum(QtCore.QObject):
         self.updateStatus.emit('Lockin Spectrum acquired')
 
     @QtCore.Slot(np.ndarray)
+    def finishedTimeSeriesCallback(self, spec):
+        self.stop_process()
+        # self.enableButtons.emit()
+        self.updateStatus.emit('Lockin Spectrum acquired')
+
+    @QtCore.Slot(np.ndarray)
     def finishedDarkCallback(self, spec):
         self.stop_process()
         self.dark = spec
@@ -197,6 +203,19 @@ class Spectrum(QtCore.QObject):
         self.worker.progressSignal.connect(self.progressCallback)
         self.worker.finishSignal.connect(self.finishedLockinCallback)
         self.start_process(self.worker)
+
+    def take_series(self, savedir):
+        self.save_path = savedir
+        self.save_data(savedir)
+
+        self.worker = TimeSeriesThread(self.spectrometer, self.settings.number_of_samples)
+
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.saveSignal.connect(self.save_spectrum)
+        self.worker.finishSignal.connect(self.finishedTimeSeriesCallback)
+        self.start_process(self.worker)
+
 
     def search_max(self):
         print(self.settings.search_integration_time)
@@ -296,13 +315,6 @@ class Spectrum(QtCore.QObject):
         #self.enableButtons.emit()
         self.stop_process()
         self.updateStatus.emit('Scan Mean finished')
-
-    def take_series(self, path):
-        self.series_path = path
-        self.save_data(self.series_path)
-        self.worker_mode = "series"
-        self.series_count = 0
-        self.start_process(self.worker)
 
     def save_data(self, prefix):
         self.save_path = prefix
