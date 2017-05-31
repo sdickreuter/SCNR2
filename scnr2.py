@@ -126,6 +126,7 @@ class SCNR(QtWidgets.QMainWindow):
             self.setSpectrumMode()
             self.spectrometer.SetExposureTime(self.settings.integration_time)
             # print('Spectrometer initialized')
+            self.spectrometer.SetMinVertReadout(1)
 
         # init detector mode combobox
         self.ui.mode_combobox.addItem("Spectrum")
@@ -667,9 +668,9 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_series_clicked(self):
-        self.ui.status.setText('Taking Time Series')
-        prefix = self.prefix_dialog.rundialog()
-        if prefix is not None:
+        prefix, ok = QtWidgets.QInputDialog.getText(self, 'Save Folder',
+                                          'Enter Folder to save spectra to:')
+        if ok:
             try:
                 # os.path.exists(prefix)
                 os.mkdir(self.savedir + prefix)
@@ -677,12 +678,14 @@ class SCNR(QtWidgets.QMainWindow):
                 # print("Error creating directory ."+path.sep + prefix)
                 print("Error creating directory ./" + prefix)
                 QtWidgets.QMessageBox.warning(self, 'Error', "Error creating directory ./" + prefix + "", QtWidgets.QMessageBox.Ok)
+
             # path = self.savedir + prefix + path.sep
             path = self.savedir + prefix + "/"
+            self.ui.status.setText("Time Series ...")
+            # self.spectrum.make_scan(self.scan_store, path, self.button_searchonoff.get_active(), self.button_lockinonoff.get_active())
+            self.on_disableButtons()
             self.spectrum.take_series(path)
-        else:
-            self.ui.status.setText("Error")
-            # self.on_disableButtons()
+
 
     @QtCore.Slot()
     def on_loaddark_clicked(self):
@@ -855,7 +858,7 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot(bool)
     def on_increase_minimum_readout_toggled(self,state):
         if state:
-            self.spectrometer.SetMinVertReadout(8)
+            self.spectrometer.SetMinVertReadout(7)
         else:
             self.spectrometer.SetMinVertReadout(1)
 

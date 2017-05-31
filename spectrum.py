@@ -364,10 +364,16 @@ class Spectrum(QtCore.QObject):
             f.write(eol)
 
         if pos is not None:
-            f.write("x" + eol)
-            f.write(str(pos[0]) + eol)
-            f.write("y" + eol)
-            f.write(str(pos[1]) + eol)
+            if len(pos) > 0:
+                f.write("x" + eol)
+                f.write(str(pos[0]) + eol)
+                f.write("y" + eol)
+                f.write(str(pos[1]) + eol)
+            else:
+                f.write(eol)
+                f.write(eol)
+                f.write(eol)
+                f.write(eol)
         else:
             f.write(eol)
             f.write(eol)

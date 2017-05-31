@@ -139,16 +139,16 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
         # else:
         #     labelsy = np.array(list(string.ascii_uppercase))[:yl]
         #     labelsx = np.array(list(string.digits))[1:xl + 1]
-        if not self.transpose:
-            labelsx = self.get_numbers(xl)
-            labelsy = self.get_letters(yl)
-        else:
-            labelsy = self.get_numbers(yl)
+        if self.transpose:
             labelsx = self.get_letters(xl)
+            labelsy = self.get_numbers(yl)
+        else:
+            labelsy = self.get_letters(yl)
+            labelsx = self.get_numbers(xl)
 
         labelsy = labelsy[::-1]
 
-        if self.flip_x:
+        if not self.flip_x:
             labelsx = labelsx[::-1]
         if not self.flip_y:
             labelsy = labelsy[::-1]
@@ -160,7 +160,7 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
                 vec_y = a[1] + grid_vec_1[1] * x + grid_vec_2[1] * y
                 grid[i, 0] = vec_x
                 grid[i, 1] = vec_y
-                if not self.transpose:
+                if self.transpose:
                     labels.append(labelsx[x]+labelsy[y])
                 else:
                     labels.append(labelsy[y]+labelsx[x])

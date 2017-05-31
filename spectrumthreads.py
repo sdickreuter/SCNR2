@@ -180,14 +180,14 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
-                self.stage.moverel(dy=-1.0)
-                time.sleep(0.5)
+                self.stage.moverel(dy=-1.5)
+                time.sleep(0.3)
                 buf = self.spectrometer.TakeSingleTrack(raw=True)
-                self.stage.moverel(dy=+2.0)
-                time.sleep(0.5)
+                self.stage.moverel(dy=+3.0)
+                time.sleep(0.3)
                 img = self.spectrometer.TakeSingleTrack(raw=True)
-                self.stage.moverel(dy=-1.0)
-                time.sleep(0.5)
+                self.stage.moverel(dy=-1.5)
+                #time.sleep(0.5)
                 img -= buf
                 dist = 7
                 #img = ndimage.median_filter(img, 3)
@@ -220,38 +220,36 @@ class AutoFocusThread(MeasurementThread):
                 x = np.arange(img.shape[0])
 
                 if self.settings.af_use_bright:
-                    initial_guess = (np.max(img)-np.mean(img), np.min(img)-np.mean(img), x[np.argmax(img)], x[np.argmax(img)+7], 10, np.mean(img))
-
-                    #bounds = ((0,0,0,0,0,0,-np.inf),
-                    #          (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
-                    bounds = [(0,initial_guess[0]*1.5),(0,initial_guess[1]*1.5),(0,x.max()),(0,x.min()),(0,np.inf),(np.min(img),np.max(img))]
+                    #initial_guess = (np.max(img)-np.mean(img), np.min(img)-np.mean(img), x[np.argmax(img)], x[np.argmax(img)]+7, 10, np.mean(img))
+                    #bounds = [(0,initial_guess[0]*1.5),(0,initial_guess[1]*1.5),(0,x.max()),(0,x.min()),(0,np.inf),(np.min(img),np.max(img))]
                     try:
-                        def fun(p):
-                            return np.sum(np.square(np.subtract(img,twoGauss(x,p[0],p[1],p[2],p[3],p[4],p[5]))))
+                        # def fun(p):
+                        #     return np.sum(np.square(np.subtract(img,twoGauss(x,p[0],p[1],p[2],p[3],p[4],p[5]))))
+                        #
+                        # res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
+                        # popt = res.x
+                        #
+                        # #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
+                        #
+                        # #plt.imshow(img.T)
+                        #a = (img[0]-img[-1])/(x[0]-x[-1])
+                        #img = img - a*x
+                        img = img - (img[0]+img[-1])/2
+                        img = img / 2000
 
-                        res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
-                        popt = res.x
+                        amp = 1/np.abs((img.max()+img.min()))
+                        sigma = 1 #img.max()+img.min()
 
-                        #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
-
-                        #plt.imshow(img.T)
                         plt.plot(x,img)
-                        x = np.linspace(0, img.shape[0], 200)
-                        Z = twoGauss(x, popt[0], popt[1], popt[2], popt[3],popt[4],popt[5])
-                        plt.plot(x,Z)
-                        plt.title(str(img.max()))
+                        plt.title(amp/sigma)
                         plt.savefig("search_max/autofocus_image.png")
                         plt.close()
-                        popt[0] = popt[0]-popt[1]
+
                     except (RuntimeError, ValueError) as e:
                         print(e)
                         return 0, 1
                 else:
                     initial_guess = (np.max(img)-np.min(img), x[np.argmax(img)], 4, np.min(img))
-                    #bounds = ((0,initial_guess[1]-4,initial_guess[2]-4,0,0),
-                    #          (np.inf, initial_guess[1] + 4, initial_guess[2] + 4, np.inf, np.inf))
-                    # bounds = ((0,0, 0, 0, 0),
-                    #           (np.inf, x.max(), y.max(), np.inf, np.inf))
                     bounds = (((0,img.max()),(0,x.max()), (0,np.inf), (0,img.max())))
                     try:
                         def fun(p):
@@ -259,7 +257,8 @@ class AutoFocusThread(MeasurementThread):
 
                         res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
                         popt = res.x
-
+                        amp = popt[0]
+                        sigma = popt[3]
 
                         #popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
 
@@ -280,8 +279,7 @@ class AutoFocusThread(MeasurementThread):
 
                 #print(popt)
                 #f = np.mean([popt[3],popt[4]])
-                amp = popt[0]
-                sigma = popt[3]
+
 
 
 
@@ -322,7 +320,9 @@ class AutoFocusThread(MeasurementThread):
         #self.spectrometer.SetCentreWavelength(0.0)
         #time.sleep(0.5)
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-        self.spectrometer.SetMinVertReadout(30)
+        self.spectrometer.SetMinVertReadout(28)
+        #self.spectrometer.SetMinVertReadout(8)
+        self.spectrometer.SetSlitWidth(self.settings.slit_width)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -344,16 +344,16 @@ class AutoFocusThread(MeasurementThread):
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
                 #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-                #self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.integration_time)
-                self.spectrometer.SetMinVertReadout(7)
+                self.spectrometer.SetMinVertReadout(1)
+                self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.finishSignal.emit(np.array([]))
                 self.stop()
                 return
 
         #focus = amp/amp.max() * 1/(sigma/sigma.max())
         focus = amp / sigma
-        focus = savgol_filter(focus,5,1)
+        #focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)
@@ -403,9 +403,9 @@ class AutoFocusThread(MeasurementThread):
             self.finishSignal.emit(np.array([]))
 
         #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
-        #self.spectrometer.SetSlitWidth(self.settings.slit_width)
+        self.spectrometer.SetMinVertReadout(1)
+        self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetExposureTime(self.settings.integration_time)
-        self.spectrometer.SetMinVertReadout(7)
 
 
         self.stop()
@@ -491,7 +491,7 @@ class TimeSeriesThread(MeasurementThread):
         if spec is not None:
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-            self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", None, False, False)
+            self.saveSignal.emit(spec, str(self.i).zfill(5) + ".csv", np.array([]), False, False)
             self.i += 1
             if not self.abort:
                 self.specSignal.emit(spec)
@@ -936,7 +936,7 @@ class ScanThread(MeasurementThread):
             self.settings = settings
             self.stage = stage
             self.i = 0
-            self.n = scanning_points.shape[0]-1
+            self.n = scanning_points.shape[0]
             self.positions = np.zeros((self.n, 2))
             self.labels = labels
             self.progress = progress.Progress(max=self.n)
@@ -1171,6 +1171,7 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.searchthread = None
 
         if not self.abort:
+            self.initMeanThread()
             self.meanthread.init()
             self.meanthread.process()
             self.meanthread = None
