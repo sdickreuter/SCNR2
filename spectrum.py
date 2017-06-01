@@ -398,7 +398,8 @@ class Spectrum(QtCore.QObject):
     @QtCore.Slot(np.ndarray, str)
     def save_timeseries_data(self, spec, filename):
         wl = self.spectrometer.GetWavelength()
-        data = np.hstack((np.round(np.append(wl,0), 1).reshape(wl.shape[0], 1), spec))
+        wl = np.append([0.0],wl)
+        data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
         np.savetxt(self.save_path + filename, data, delimiter="\t")
 
 
