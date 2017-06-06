@@ -1164,6 +1164,7 @@ class ScanSearchMeanThread(ScanMeanThread):
     def intermediatework(self):
         if not self.abort:
             self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+            self.autofocusthread.finishSignal.connect(self.autofocus_finished)
             self.autofocusthread.focus()
             self.autofocusthread.stop()
             self.autofocusthread = None
@@ -1171,6 +1172,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         if not self.abort:
             self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
             self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread.finishSignal.connect(self.search_finished)
             self.searchthread.search()
             self.searchthread.stop()
             self.searchthread = None
