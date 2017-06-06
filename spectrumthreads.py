@@ -180,6 +180,7 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
+                self.spectrometer.SetExposureTime(self.settings.search_integration_time)
                 self.stage.moverel(dy=-1.5)
                 time.sleep(0.3)
                 buf = self.spectrometer.TakeSingleTrack(raw=True)
@@ -193,10 +194,15 @@ class AutoFocusThread(MeasurementThread):
                 #img = ndimage.median_filter(img, 3)
                 img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
                 #img = ndimage.gaussian_filter(img, 2)
-
+                img = np.sum(img,axis=0)
+                x = np.arange(img.shape[0])
             else:
-                #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                img = self.spectrometer.TakeSingleTrack(raw=True)
+                self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+                self.spectrometer.SetMinVertReadout(28)
+                self.spectrometer.SetSlitWidth(self.settings.slit_width)
+
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
 
             #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
@@ -216,25 +222,9 @@ class AutoFocusThread(MeasurementThread):
                 # plt.imshow(img.T)
                 # plt.savefig("search_max/autofocus_image.png")
                 # plt.close()
-                img = np.sum(img,axis=0)
-
-                x = np.arange(img.shape[0])
 
                 if self.settings.af_use_bright:
-                    #initial_guess = (np.max(img)-np.mean(img), np.min(img)-np.mean(img), x[np.argmax(img)], x[np.argmax(img)]+7, 10, np.mean(img))
-                    #bounds = [(0,initial_guess[0]*1.5),(0,initial_guess[1]*1.5),(0,x.max()),(0,x.min()),(0,np.inf),(np.min(img),np.max(img))]
                     try:
-                        # def fun(p):
-                        #     return np.sum(np.square(np.subtract(img,twoGauss(x,p[0],p[1],p[2],p[3],p[4],p[5]))))
-                        #
-                        # res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
-                        # popt = res.x
-                        #
-                        # #popt, pcov = opt.curve_fit(twoGauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
-                        #
-                        # #plt.imshow(img.T)
-                        #a = (img[0]-img[-1])/(x[0]-x[-1])
-                        #img = img - a*x
                         img = img - (img[0]+img[-1])/2
                         img = img / 2000
 
@@ -250,80 +240,29 @@ class AutoFocusThread(MeasurementThread):
                         print(e)
                         return 0, 1
                 else:
-                    initial_guess = (np.max(img)-np.min(img), x[np.argmax(img)], 4, np.min(img))
-                    bounds = (((0,img.max()),(0,x.max()), (0,np.inf), (0,img.max())))
+                    x = np.arange(img.shape[0])
+                    y = np.arange(img.shape[1])
+                    x, y = np.meshgrid(x, y)
+                    xdata = (x.ravel(), y.ravel())
+                    ydata = img.T.ravel()
+
+                    coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
+                    if len(coordinates) < 1:
+                        coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+
                     try:
-                        def fun(p):
-                            return np.sum(np.square(np.subtract(img,gauss2D(x,p[0],p[1],0,p[2],p[3]))))
-
-                        res = opt.minimize(fun, initial_guess, bounds=bounds,method='L-BFGS-B')#,options = {'gtol': 1e-6, 'disp': True})
-                        popt = res.x
+                        initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 4, np.mean(img))
+                        bounds = ((0, 0, 0, 0, 0, 0, -np.inf),
+                                  (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
+                        popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
                         amp = popt[0]
-                        sigma = popt[3]
 
-                        #popt, pcov = opt.curve_fit(Airy2D, xdata, ydata, p0=initial_guess, bounds=bounds)
-
-
-                        # plt.imshow(img.T)
-                        # x = np.linspace(0,img.shape[0],200)
-                        # y = np.linspace(0,img.shape[1],200)
-                        # x,y = np.meshgrid(x,y)
-                        # Z = Airy2D((x,y),popt[0],popt[1],popt[2],popt[3],popt[4])
-                        # plt.contour(x, y, Z.reshape(x.shape))
-                        # plt.title(str(img.max()))
-                        # plt.savefig("search_max/autofocus_image.png")
-                        # plt.close()
 
                     except RuntimeError as e:
                         print(e)
                         return 0, 1
 
-                #print(popt)
-                #f = np.mean([popt[3],popt[4]])
-
-
-
-
-                # review on autofocus stuff: http://onlinelibrary.wiley.com/doi/10.1002/cyto.990120302/pdf
-                # algorithm from http://journals.sagepub.com/doi/pdf/10.1177/24.1.1254907
-                #conv = np.square(img - np.roll(img, dist, axis=0))
-                # conv = img - np.roll(img,dist,axis=0)
-                # conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
-                # conv = np.square(conv)
-                # #conv = ndimage.median_filter(conv, 2)
-                # f = np.sum(conv)
-                # conv = img - np.roll(img,dist,axis=0)
-                # conv = ndimage.median_filter(conv, footprint=morphology.disk(3), mode="mirror")
-                # conv = np.square(conv)
-                #conv = ndimage.median_filter(conv, 2)
-                # f = np.sum(conv)
-
-                # algorithm from http://www.hahnlab.com/downloads/protocols/2006%20Methods%20Enzym-Shen%20414%20Chapter%2032-opt.pdf
-                #k = np.array([[-1, -2, -1], [-2, 12, -2], [-1, -2, -1]])
-                # #k = np.array([[-1, 0, -2, 0, -1], [0, 0, 0, 0, 0] ,[-2, 0, 12, 0, -2], [0, 0, 0, 0, 0], [-1, 0, -2, 0, -1]])
-                # #k = np.array([[0, 0, -1, 0, 0], [0, 0, 0, 0, 0], [-1, 0, 1, 0, -1], [0, 0, 0, 0, 0], [0, 0, -1, 0, 0]])
-                # # k = np.array([[-1, -1, -1, -1, -1],
-                # #               [-1,  1,  2,  1, -1],
-                # #               [-1,  2,  4,  2, -1],
-                # #               [-1,  1,  2,  1, -1],
-                # #               [-1, -1, -1, -1, -1]])
-                #conv = ndimage.convolve(img, k, mode='mirror')
-                #f = np.sum(np.square(conv))/np.sum(np.square(img))
-
-                # plt.imshow(conv.T)
-                # plt.title(str(conv.max()))
-                # plt.savefig("search_max/autofocus_conv.png")
-                # plt.close()
                 return amp, sigma
-
-
-        #self.spectrometer.SetSlitWidth(500)
-        #self.spectrometer.SetCentreWavelength(0.0)
-        #time.sleep(0.5)
-        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-        self.spectrometer.SetMinVertReadout(28)
-        #self.spectrometer.SetMinVertReadout(8)
-        self.spectrometer.SetSlitWidth(self.settings.slit_width)
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
