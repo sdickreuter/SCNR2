@@ -195,7 +195,8 @@ class AutoFocusThread(MeasurementThread):
                 #img = ndimage.gaussian_filter(img, 2)
 
             else:
-                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
 
             #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
@@ -474,7 +475,7 @@ class MeanThread(MeasurementThread):
                 self.stop()
 
 class TimeSeriesThread(MeasurementThread):
-    saveSignal = QtCore.Signal(np.ndarray, str, np.ndarray, bool, bool)
+    saveSignal = QtCore.Signal(np.ndarray, str)
 
     def __init__(self, spectrometer, number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
@@ -505,7 +506,7 @@ class TimeSeriesThread(MeasurementThread):
         if self.i >= (self.number_of_samples):
             if not self.abort:
                 self.progressSignal.emit(100, str(self.progress.eta_td))
-                self.saveSignal.emit(spec, "timeseries.csv")
+                self.saveSignal.emit(self.series, "timeseries.csv")
                 self.finishSignal.emit(spec)
                 self.stop()
 
