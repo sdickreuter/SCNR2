@@ -197,9 +197,10 @@ class AutoFocusThread(MeasurementThread):
                 img = np.sum(img,axis=0)
                 x = np.arange(img.shape[0])
             else:
+                self.spectrometer.SetCentreWavelength(0)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
                 self.spectrometer.SetMinVertReadout(28)
-                self.spectrometer.SetSlitWidth(self.settings.slit_width)
+                self.spectrometer.SetSlitWidth(500)
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
@@ -219,9 +220,9 @@ class AutoFocusThread(MeasurementThread):
                 amp = 0
                 sigma = 1
 
-                # plt.imshow(img.T)
-                # plt.savefig("search_max/autofocus_image.png")
-                # plt.close()
+                #plt.imshow(img.T)
+                #plt.savefig("search_max/autofocus_image.png")
+                #plt.close()
 
                 if self.settings.af_use_bright:
                     try:
@@ -249,11 +250,13 @@ class AutoFocusThread(MeasurementThread):
                     coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
                     if len(coordinates) < 1:
                         coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+                    else:
+                        coordinates = coordinates[0]
 
                     try:
                         initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 4, np.mean(img))
-                        bounds = ((0, 0, 0, 0, 0, 0, -np.inf),
-                                  (np.inf, x.max(), y.max(), x.max(), y.max(), np.inf, np.inf))
+                        bounds = ((0, 0, 0, 0, -np.inf),
+                                  (np.inf, x.max(), y.max(), np.inf, np.inf))
                         popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
                         amp = popt[0]
 
@@ -283,7 +286,7 @@ class AutoFocusThread(MeasurementThread):
 
             if self.abort:
                 self.stage.moveabs(z=startpos[2])
-                #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+                self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
                 self.spectrometer.SetExposureTime(self.settings.integration_time)
                 self.spectrometer.SetMinVertReadout(1)
                 self.spectrometer.SetSlitWidth(self.settings.slit_width)
@@ -342,7 +345,7 @@ class AutoFocusThread(MeasurementThread):
             self.stage.moveabs(z=startpos[2])
             self.finishSignal.emit(np.array([]))
 
-        #self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
         self.spectrometer.SetMinVertReadout(1)
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetExposureTime(self.settings.integration_time)
