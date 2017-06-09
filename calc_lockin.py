@@ -62,11 +62,8 @@ def plot_lockin(wl,series,savedir):
         return a*np.sin(2 * np.pi * x * f + p) + c
 
     res = np.zeros(width)
-    res_fit = np.zeros(width)
     res_phase = np.zeros(width)
-    res_fit_phase = np.zeros(width)
     freqs = np.zeros(width)
-    #for ind in np.arange(400,500):
     for ind in range(width):
         print(ind)
         fft = np.fft.rfft(ts[ind,:],norm="ortho")
