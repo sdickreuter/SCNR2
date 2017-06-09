@@ -7,6 +7,8 @@ from qtpy import QtCore
 import time
 from AndorSpectrometer import Spectrometer
 
+from calc_lockin import plot_lockin
+
 # eol={"win32":"\n", 'linux':"\n" }
 # platform=sys.platform
 # eol= eol[platform]
@@ -141,6 +143,7 @@ class Spectrum(QtCore.QObject):
     @QtCore.Slot(np.ndarray)
     def finishedTimeSeriesCallback(self, spec):
         self.stop_process()
+        plot_lockin(self.spectrometer.GetWavelength(),spec)
         # self.enableButtons.emit()
         self.updateStatus.emit('Lockin Spectrum acquired')
 
