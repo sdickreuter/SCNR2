@@ -143,7 +143,6 @@ class Spectrum(QtCore.QObject):
     @QtCore.Slot(np.ndarray)
     def finishedTimeSeriesCallback(self, spec):
         self.stop_process()
-        plot_lockin(self.spectrometer.GetWavelength(),spec)
         # self.enableButtons.emit()
         self.updateStatus.emit('Lockin Spectrum acquired')
 
@@ -404,6 +403,8 @@ class Spectrum(QtCore.QObject):
         wl = np.append([0.0],wl)
         data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
         np.savetxt(self.save_path + filename, data, delimiter="\t")
+        plot_lockin(wl,spec,self.save_path)
+
 
 
     def reset(self):
