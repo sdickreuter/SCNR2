@@ -403,8 +403,10 @@ class Spectrum(QtCore.QObject):
         wl = np.append([0.0],wl)
         data = np.hstack((np.round(wl, 1).reshape(wl.shape[0], 1), spec))
         np.savetxt(self.save_path + filename, data, delimiter="\t")
-        plot_lockin(wl,spec,self.save_path)
-
+        try:
+            plot_lockin(data,self.save_path)
+        except Exception as e:
+            print(e)
 
 
     def reset(self):

@@ -14,9 +14,12 @@ from scipy import ndimage
 @jit(nopython=True)
 def lockin_filter(signal, reference):
     width = signal.shape[0]
+    n = signal.shape[1]
     y = np.zeros(width)
-    for ind in range(width):
-        y[ind] = np.sum(signal[ind,:] * reference) / len(reference)
+    for i in range(width):
+        for j in range(n):
+            y[i] += signal[i,j]*reference[j]
+        y[i] /= len(reference)
 
     return y
 
@@ -30,9 +33,12 @@ def interpolate_data(x,x_new,signal):
     return res
 
 
-def plot_lockin(wl,series,savedir):
-    ts = series[1:, :]
-    t = series[0, :]
+def plot_lockin(series,savedir):
+    ts = series[1:, 1:]
+    t = series[0, 1:]
+    wl = series[1:,0]
+    t -= t.min()
+
 
     maxwl = 1000
     minwl = 400
@@ -65,7 +71,6 @@ def plot_lockin(wl,series,savedir):
     res_phase = np.zeros(width)
     freqs = np.zeros(width)
     for ind in range(width):
-        print(ind)
         fft = np.fft.rfft(ts[ind,:],norm="ortho")
         d = np.absolute(fft)
         p = np.angle(fft)
@@ -79,7 +84,6 @@ def plot_lockin(wl,series,savedir):
     freqs = freqs[np.argwhere(res > np.max(res)*0.9)]
     freqs = freqs[:,0]
     freqs = freqs[np.argwhere(freqs > 0)]
-    print(freqs.shape)
 
     res_phase += np.pi
     phase = res_phase[np.argmax(res)]
@@ -234,3 +238,8 @@ def plot_lockin(wl,series,savedir):
 
     plt.savefig(savedir + "lockin_psd.png", dpi=300)
     plt.close()
+
+
+if __name__ == '__main__':
+    data = np.loadtxt("./Spectra/C3/timeseries.csv")
+    plot_lockin(data, "./Spectra/C3/")
