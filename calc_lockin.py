@@ -11,7 +11,7 @@ from numba import jit
 from scipy import ndimage
 
 
-@jit(nopython=True)
+#@jit(nopython=True)
 def lockin_filter(signal, reference):
     width = signal.shape[0]
     n = signal.shape[1]
@@ -23,7 +23,7 @@ def lockin_filter(signal, reference):
 
     return y
 
-@jit()
+#@jit()
 def interpolate_data(x,x_new,signal):
     width = signal.shape[0]
     res = np.zeros((signal.shape[0],len(x_new)))
@@ -89,7 +89,7 @@ def plot_lockin(series,savedir):
     phase = res_phase[np.argmax(res)]
 
     f = freqs[0]
-    print(f)
+    print("f1: "+str(f))
 
     maxind = np.argmax(res)
     y = ts[maxind, :]
@@ -98,20 +98,37 @@ def plot_lockin(series,savedir):
     d = np.absolute(fft)
     p = np.angle(fft)
     f_buf = np.fft.rfftfreq(t2.shape[0], d=t2[1] - t2[0])
-    print(f_buf[d[1:].argmax()])
+    print("f fft: "+str(f_buf[d[1:].argmax()]))
 
     initial_guess = [y.max() - y.min(), f, 0, np.mean(y)]
     popt, pcov = curve_fit(func, t2, y, p0=initial_guess)
 
+    y2 = func(t2,popt[0],popt[1],popt[2],popt[3])
+    indexes = peakutils.indexes(y2, thres=np.mean(y2), min_dist=30)
+    min_ind = indexes.min()
+    #indexes = peakutils.indexes(-y2, thres=np.mean(y2), min_dist=30)
+    max_ind = indexes.max()
+    print((min_ind,max_ind))
+
+
+    t2 = t2[min_ind:max_ind]
+    ts = ts[:,min_ind:max_ind]
+    n = ts.shape[1]
+    width = ts.shape[0]
+
+
+
     fig = plt.figure()
+    y = y[min_ind:max_ind]
     plt.plot(t2,y)
-    plt.plot(t2,func(t2,popt[0],popt[1],popt[2],popt[3]))
+    y2 = y2[min_ind:max_ind]
+    plt.plot(t2,y2)
     plt.savefig(savedir + "fit.png",dpi=300)
     plt.close()
 
     f = popt[1]
     phase = popt[2]
-    print(f)
+    print("f2: "+str(f))
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
