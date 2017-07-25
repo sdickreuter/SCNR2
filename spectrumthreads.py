@@ -180,6 +180,8 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
+                self.spectrometer.SetMinVertReadout(28)
+                self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
                 self.stage.moverel(dy=-1.5)
                 time.sleep(0.3)
@@ -194,13 +196,21 @@ class AutoFocusThread(MeasurementThread):
                 #img = ndimage.median_filter(img, 3)
                 img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
                 #img = ndimage.gaussian_filter(img, 2)
-                img = np.sum(img,axis=0)
-                x = np.arange(img.shape[0])
+
             else:
                 self.spectrometer.SetCentreWavelength(0)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-                self.spectrometer.SetMinVertReadout(28)
-                self.spectrometer.SetSlitWidth(500)
+                #self.spectrometer.SetMinVertReadout(28)
+                #self.spectrometer.SetSlitWidth(500)
+
+                # nikon arthur
+                self.spectrometer.SetMinVertReadout(12)
+                self.spectrometer.SetSlitWidth(120)
+
+                #freespace arthur
+                #self.spectrometer.SetMinVertReadout(15)
+                #self.spectrometer.SetSlitWidth(150)
+
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
@@ -220,16 +230,19 @@ class AutoFocusThread(MeasurementThread):
                 amp = 0
                 sigma = 1
 
-                #plt.imshow(img.T)
-                #plt.savefig("search_max/autofocus_image.png")
-                #plt.close()
+                plt.imshow(img.T)
+                plt.savefig("search_max/autofocus_image.png")
+                plt.close()
 
                 if self.settings.af_use_bright:
                     try:
-                        img = img - (img[0]+img[-1])/2
-                        img = img / 2000
 
-                        amp = 1/np.abs((img.max()+img.min()))
+                        img = np.sum(img, axis=0)
+                        x = np.arange(img.shape[0])
+                        #img = img - (img[0]+img[-1])/2
+                        #img = img / 2000
+
+                        amp = np.abs((img.max()-img.min()))
                         sigma = 1 #img.max()+img.min()
 
                         plt.plot(x,img)
@@ -261,7 +274,7 @@ class AutoFocusThread(MeasurementThread):
                         amp = popt[0]
 
 
-                    except RuntimeError as e:
+                    except (RuntimeError,ValueError) as e:
                         print(e)
                         return 0, 1
 
