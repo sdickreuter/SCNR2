@@ -32,14 +32,28 @@
     </item>
     <item>
      <widget class="QComboBox" name="setup_combobox">
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <property name="currentText">
+       <string notr="true">Freespace</string>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <item>
        <property name="text">
-        <string>Microscope Setup</string>
+        <string>Freespace</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Freespace Setup</string>
+        <string>Nikon</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Zeiss</string>
        </property>
       </item>
      </widget>

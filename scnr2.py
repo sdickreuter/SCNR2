@@ -61,13 +61,15 @@ class SCNR(QtWidgets.QMainWindow):
         if ok:
             init_cam = cam_ok
             init_stage = stage_ok
-            if setup == 0: # Microscope Setup
-                coord_mapping = {"x":"x","y":"y","z":"z"}
-            elif setup == 1: #Freespace Setup
-                coord_mapping = {"x":"z","y":"y","z":"x"}
+            if setup == 'Nikon' :
+                self.settings = settings.Settings('config_nikon.ini')
+            elif setup == 'Zeiss':
+                self.settings = settings.Settings('config_zeiss.ini')
+            elif setup == 'Freespace': #Freespace Setup
+                self.settings = settings.Settings('config_freespace.ini')
             else:
-                #raise RuntimeError("Setup not specified!")
-                print("Setup not specified, quitting.")
+                raise RuntimeError("Setup not specified!")
+                #print("Setup not specified, quitting.")
                 super(SCNR, self).close()
         else:
             super(SCNR, self).close()
@@ -75,7 +77,6 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
         # init settings
-        self.settings = settings.Settings()
         self.ui.search_correct_checkBox.setChecked(False)
 
         self.ui.slitwidth_spin.setValue(self.settings.slit_width)

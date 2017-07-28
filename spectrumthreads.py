@@ -1060,6 +1060,66 @@ class ScanMeanThread(ScanThread):
             self.saveSignal.emit(spec,str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
 
 
+class ScanTimeSeriesThread(ScanThread):
+    saveSignal = QtCore.Signal(np.ndarray, str, np.ndarray, bool, bool)
+
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, parent=None):
+        super(ScanTimeSeriesThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
+        self.initMeanThread()
+
+    @QtCore.Slot()
+    def stop(self):
+        self.meanthread.stop()
+        #self.meanthread.wait(self.settings.integration_time*1000+500)
+        super(ScanMeanThread, self).stop()
+        self.meanthread = None
+
+    # def __del__(self):
+    #     #self.meanthread.finishSignal.disconnect()
+    #     #self.meanthread.specSignal.disconnect()
+    #     #self.saveSignal.disconnect()
+    #     super(ScanMeanThread, self).__del__()
+
+    def initMeanThread(self):
+        self.meanthread = MeanThread(self.spectrometer, self.settings.number_of_samples, self)
+        self.meanthread.finishSignal.connect(self.meanfinished)
+        self.meanthread.specSignal.connect(self.specslot)
+        self.meanthread.init()
+
+    def intermediatework(self):
+        if not self.abort:
+            self.meanthread.init()
+        if not self.abort:
+            self.meanthread.process()
+        # self.initMeanThread()
+        # self.meanthread.start()
+        #self.meanthread.thread.wait()
+        # while not self.meanthread.thread.isFinished():
+        #     time.sleep(0.1)
+        # try:
+        #     self.meanthread.stop()
+        #     self.meanthread = None
+        # except Exception as e:
+        #     print(e)
+        #while not self.proceed:
+        #    time.sleep(0.1)
+        #self.meanthread.process()
+
+    @QtCore.Slot(np.ndarray)
+    def specslot(self, spec):
+        self.specSignal.emit(spec)
+
+    @QtCore.Slot(np.ndarray)
+    def meanfinished(self, spec):
+        if self.labels is not None:
+            self.saveSignal.emit(spec, self.labels[self.i] + ".csv", self.positions[self.i, :], False, False)
+        else:
+            self.saveSignal.emit(spec,str(self.i).zfill(5) + ".csv", self.positions[self.i, :], False, False)
+
+
+
+
+
 class ScanSearchMeanThread(ScanMeanThread):
     def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
@@ -1143,3 +1203,84 @@ class ScanSearchMeanThread(ScanMeanThread):
         #self.meanthread.init()
         #self.meanthread.start()
         #self.meanthread.stop()
+
+
+
+class ScanSearchTimeSeriesThread(ScanMeanThread):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
+        super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
+        self.ref_spec = ref_spec
+        self.dark_spec = dark_spec
+        self.bg_spec = bg_spec
+        self.searchthread = None
+        self.seriesthread = None
+        self.autofocusthread = None
+        #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+
+
+
+    @QtCore.Slot()
+    def stop(self):
+        if self.searchthread is not None:
+            self.searchthread.stop()
+        if self.autofocusthread is not None:
+            self.autofocusthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
+        #self.meanthread.thread.wait(self.settings.integration_time * 1000 + 500)
+        #self.searchthread.thread.wait(self.settings.integration_time*1000+500)
+        #super(ScanMeanThread, self).stop()
+        #self.autofocusthread = None
+        #self.searchthread = None
+        #self.meanthread = None
+        #super(ScanSearchMeanThread, self).stop()
+        self.abort = True
+
+    # def __del__(self):
+    #     self.stop()
+    #     #self.searchthread.specSignal.disconnect()
+    #     super(ScanMeanThread, self).__del__()
+
+    @QtCore.Slot(np.ndarray)
+    def autofocus_finished(self, pos):
+       with open("search_max/scan_status.txt", "a") as f:
+            f.write(self.labels[self.i]+': ')
+            if len(pos) == 2:
+                f.write("autofocus successful, ")
+                f.write(str(round(pos[0],3))+' +- '+str(round(pos[1],5)))
+            else:
+                f.write("autofocus failed")
+            f.write(' | ')
+
+    @QtCore.Slot(np.ndarray)
+    def search_finished(self, pos):
+        with open("search_max/scan_status.txt", "a") as f:
+            if len(pos) == 4:
+                f.write("search successful, ")
+                f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))
+                f.write(" y:" + str(round(pos[2], 3)) + ' +- ' + str(round(pos[3], 5)))
+            else:
+                f.write("search failed")
+            f.write('\n')
+
+    def intermediatework(self):
+        if not self.abort:
+            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+            self.autofocusthread.finishSignal.connect(self.autofocus_finished)
+            self.autofocusthread.focus()
+            self.autofocusthread.stop()
+            self.autofocusthread = None
+
+        if not self.abort:
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+            self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread.finishSignal.connect(self.search_finished)
+            self.searchthread.search()
+            self.searchthread.stop()
+            self.searchthread = None
+
+        if not self.abort:
+            self.initMeanThread()
+            self.meanthread.init()
+            self.meanthread.process()
+            self.meanthread = None

@@ -7,15 +7,25 @@ import os
 class Settings(object):
     _filename = "config.ini"
 
-    def __init__(self):
+    def __init__(self, filename = None):
         self.config = configparser.ConfigParser()
-        try:
-            self.config.read(self._filename)
 
-        except:
-            print("Error loading settings.")
-            RuntimeError("Error loading settings.")
-            return
+        if filename is not None:
+            try:
+                self.config.read(filename)
+                self._filename = filename
+            except:
+                print("Error loading settings.")
+                RuntimeError("Error loading settings.")
+                return
+        else:
+            try:
+                self.config.read(self._filename)
+
+            except:
+                print("Error loading settings.")
+                RuntimeError("Error loading settings.")
+                return
 
         self.correct_search = False
 
@@ -31,6 +41,7 @@ class Settings(object):
         self.stepsize = float(self.config['stage']['stepsize'])
         self.stage_ip = self.config['stage']['ip']
         self.stage_port = int(self.config['stage']['port'])
+        self.coord_mapping = self.str2coordmapping(self.config['stage']['coord_mapping'])
 
         self.sigma = float(self.config['searchmax']['sigma'])
         self.rasterdim = int(self.config['searchmax']['rasterdim'])
@@ -94,3 +105,6 @@ class Settings(object):
         except:
             print("Error saving settings.")
             print(os.getcwd())
+
+    def str2coordmapping(self, str):
+        return {str[0]: str[1], str[2]: str[3], str[4]: str[5]}
