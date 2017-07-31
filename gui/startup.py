@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'startup.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -22,7 +22,10 @@ class Ui_Startup_Dialog(object):
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
         self.setup_combobox = QtWidgets.QComboBox(self.verticalLayoutWidget)
+        self.setup_combobox.setEditable(False)
+        self.setup_combobox.setCurrentText("Freespace")
         self.setup_combobox.setObjectName("setup_combobox")
+        self.setup_combobox.addItem("")
         self.setup_combobox.addItem("")
         self.setup_combobox.addItem("")
         self.verticalLayout.addWidget(self.setup_combobox)
@@ -41,6 +44,7 @@ class Ui_Startup_Dialog(object):
         self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(Startup_Dialog)
+        self.setup_combobox.setCurrentIndex(0)
         self.buttonBox.accepted.connect(Startup_Dialog.accept)
         self.buttonBox.rejected.connect(Startup_Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Startup_Dialog)
@@ -49,8 +53,9 @@ class Ui_Startup_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Startup_Dialog.setWindowTitle(_translate("Startup_Dialog", "Choose start up options"))
         self.label.setText(_translate("Startup_Dialog", "Choose the Setup you want to use:"))
-        self.setup_combobox.setItemText(0, _translate("Startup_Dialog", "Microscope Setup"))
-        self.setup_combobox.setItemText(1, _translate("Startup_Dialog", "Freespace Setup"))
+        self.setup_combobox.setItemText(0, _translate("Startup_Dialog", "Freespace"))
+        self.setup_combobox.setItemText(1, _translate("Startup_Dialog", "Nikon"))
+        self.setup_combobox.setItemText(2, _translate("Startup_Dialog", "Zeiss"))
         self.stage_checkbox.setText(_translate("Startup_Dialog", "Use Piezo-Stage"))
         self.cam_checkbox.setText(_translate("Startup_Dialog", "Use Camera"))
 

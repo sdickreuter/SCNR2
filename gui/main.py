@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.8.2
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -635,6 +635,14 @@ class Ui_MainWindow(object):
         self.af_bright_checkbox = QtWidgets.QCheckBox(self.scan3d_tab)
         self.af_bright_checkbox.setObjectName("af_bright_checkbox")
         self.verticalLayout_5.addWidget(self.af_bright_checkbox)
+        self.label_22 = QtWidgets.QLabel(self.scan3d_tab)
+        self.label_22.setObjectName("label_22")
+        self.verticalLayout_5.addWidget(self.label_22)
+        self.autofocus_combobox = QtWidgets.QComboBox(self.scan3d_tab)
+        self.autofocus_combobox.setObjectName("autofocus_combobox")
+        self.autofocus_combobox.addItem("")
+        self.autofocus_combobox.addItem("")
+        self.verticalLayout_5.addWidget(self.autofocus_combobox)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem)
         self.right_tab.addTab(self.scan3d_tab, "")
@@ -911,6 +919,7 @@ class Ui_MainWindow(object):
         self.autofocus_button.clicked.connect(MainWindow.on_autofocus_clicked)
         self.af_bright_checkbox.toggled['bool'].connect(MainWindow.on_af_bright_toggled)
         self.search_correct_checkBox.toggled['bool'].connect(MainWindow.on_search_corrected_toggled)
+        self.autofocus_combobox.currentIndexChanged['int'].connect(MainWindow.on_af_mode_changed)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -970,6 +979,9 @@ class Ui_MainWindow(object):
         self.label_21.setText(_translate("MainWindow", "Advanced Spectrometer Settings"))
         self.lockin_button.setText(_translate("MainWindow", "Take Lockin Spectrum"))
         self.af_bright_checkbox.setText(_translate("MainWindow", "Use Bright-Field Autofocus"))
+        self.label_22.setText(_translate("MainWindow", "Autofocus Mode:"))
+        self.autofocus_combobox.setItemText(0, _translate("MainWindow", "Gauss-Fit"))
+        self.autofocus_combobox.setItemText(1, _translate("MainWindow", "Maximum"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temperature:"))

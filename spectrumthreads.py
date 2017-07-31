@@ -254,30 +254,34 @@ class AutoFocusThread(MeasurementThread):
                         print(e)
                         return 0, 1
                 else:
-                    x = np.arange(img.shape[0])
-                    y = np.arange(img.shape[1])
-                    x, y = np.meshgrid(x, y)
-                    xdata = (x.ravel(), y.ravel())
-                    ydata = img.T.ravel()
+                    if self.settings.autofocus_mode == 'gauss':
+                        x = np.arange(img.shape[0])
+                        y = np.arange(img.shape[1])
+                        x, y = np.meshgrid(x, y)
+                        xdata = (x.ravel(), y.ravel())
+                        ydata = img.T.ravel()
 
-                    coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
-                    if len(coordinates) < 1:
-                        coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+                        coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
+                        if len(coordinates) < 1:
+                            coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+                        else:
+                            coordinates = coordinates[0]
+
+                        try:
+                            initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 4, np.mean(img))
+                            bounds = ((0, 0, 0, 0, -np.inf),
+                                      (np.inf, x.max(), y.max(), np.inf, np.inf))
+                            popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
+                            amp = popt[0]
+                        except (RuntimeError,ValueError) as e:
+                            print(e)
+                            return 0, 1
+                    elif self.settings.autofocus_mode == 'maximum':
+                        img = ndimage.median_filter(img, 2)
+                        amp = np.abs((img.max() - img.min()))
+                        return amp, 1
                     else:
-                        coordinates = coordinates[0]
-
-                    try:
-                        initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 4, np.mean(img))
-                        bounds = ((0, 0, 0, 0, -np.inf),
-                                  (np.inf, x.max(), y.max(), np.inf, np.inf))
-                        popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
-                        amp = popt[0]
-
-
-                    except (RuntimeError,ValueError) as e:
-                        print(e)
-                        return 0, 1
-
+                        print('Error setting Autofocus Mode !!!')
                 return amp, sigma
 
         self.stage.query_pos()

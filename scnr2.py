@@ -917,6 +917,16 @@ class SCNR(QtWidgets.QMainWindow):
             self.settings.af_use_bright = False
 
 
+    @QtCore.Slot(int)
+    def on_mode_changed(self, index):
+         if index == 0:
+            self.settings.autofocus_mode = 'gauss'
+         elif index == 1:
+            self.settings.autofocus_mode = 'maximum'
+
+
+
+
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
     # sys.stderr.write('\r')
