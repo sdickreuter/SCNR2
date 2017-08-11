@@ -204,15 +204,17 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetSlitWidth(500)
 
                 # nikon arthur
-                self.spectrometer.SetMinVertReadout(12)
-                self.spectrometer.SetSlitWidth(120)
+                self.spectrometer.SetMinVertReadout(15)
+                self.spectrometer.SetSlitWidth(150)
 
                 #freespace arthur
                 #self.spectrometer.SetMinVertReadout(15)
                 #self.spectrometer.SetSlitWidth(150)
 
 
-                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                img = self.spectrometer.TakeSingleTrack(raw=True)[975:987,:]
+
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
 
@@ -313,6 +315,10 @@ class AutoFocusThread(MeasurementThread):
 
         #focus = amp/amp.max() * 1/(sigma/sigma.max())
         focus = amp / sigma
+        valid_indices = focus > 0
+        focus = focus[valid_indices]
+        pos = pos[valid_indices]
+
         #focus = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
@@ -332,7 +338,7 @@ class AutoFocusThread(MeasurementThread):
             elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                 print("Could not determine focus: Peak outside bounds")
                 popt = None
-            elif popt[2] < self.settings.sigma / 100:
+            elif popt[2] < self.settings.sigma / 10000:
                 print("Could not determine focus: Peak to narrow")
                 popt = None
             #else:

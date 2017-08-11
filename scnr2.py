@@ -154,9 +154,9 @@ class SCNR(QtWidgets.QMainWindow):
             w.setImageItem(self.img)
 
             try:
-                if setup == 0:  # Microscope Setup
+                if setup == 'Nikon' or setup == 'Zeiss':  # Microscope Setup
                     self.cam = camerathread.CameraThread(flip=False)
-                elif setup == 1:  # Freespace Setup
+                elif setup == 'Freespace':  # Freespace Setup
                     self.cam = camerathread.CameraThread(flip=True)
 
                 img = self.cam.get_image()
@@ -180,7 +180,7 @@ class SCNR(QtWidgets.QMainWindow):
         # init stage
         if init_stage:
             try:
-                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = coord_mapping)
+                self.stage = PIStage.E545(self.settings.stage_ip, self.settings.stage_port, coordinate_mapping = self.settings.coord_mapping)
                 # self.stage = PIStage.E545('127.0.0.1', self.settings.stage_port)
             except Exception as e:
                 print(e)
@@ -918,7 +918,7 @@ class SCNR(QtWidgets.QMainWindow):
 
 
     @QtCore.Slot(int)
-    def on_mode_changed(self, index):
+    def on_af_mode_changed(self, index):
          if index == 0:
             self.settings.autofocus_mode = 'gauss'
          elif index == 1:
