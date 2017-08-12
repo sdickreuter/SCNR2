@@ -213,7 +213,7 @@ class AutoFocusThread(MeasurementThread):
 
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                img = self.spectrometer.TakeSingleTrack(raw=True)[975:987,:]
+                img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
@@ -338,7 +338,7 @@ class AutoFocusThread(MeasurementThread):
             elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                 print("Could not determine focus: Peak outside bounds")
                 popt = None
-            elif popt[2] < self.settings.sigma / 10000:
+            elif np.abs(popt[2]) < self.settings.sigma / 10000:
                 print("Could not determine focus: Peak to narrow")
                 popt = None
             #else:
@@ -716,8 +716,10 @@ class SearchThread(MeasurementThread):
                 #    print("Could not determine particle position: Peak too small")
                 elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
                     print("Could not determine particle position: Peak outside bounds")
-                elif popt[2] < self.settings.sigma/100:
-                    print("Could not determine particle position: Peak to narrow")
+                    print(popt)
+                elif np.abs(popt[2]) < self.settings.sigma/100:
+                    print("Could not determine particle position: Peak to narrow ")
+                    print(popt)
                 else:
                     return popt, perr, measured, maxwl
             except RuntimeError as e:
