@@ -204,16 +204,17 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetSlitWidth(500)
 
                 # nikon arthur
-                self.spectrometer.SetMinVertReadout(15)
-                self.spectrometer.SetSlitWidth(150)
-
-                #freespace arthur
-                #self.spectrometer.SetMinVertReadout(15)
+                #self.spectrometer.SetMinVertReadout(16)
                 #self.spectrometer.SetSlitWidth(150)
+
+                #freespace
+                self.spectrometer.SetMinVertReadout(20)
+                self.spectrometer.SetSlitWidth(300)
 
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
+                #img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
+                img = self.spectrometer.TakeSingleTrack(raw=True)[973+6:990+7,:]
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
