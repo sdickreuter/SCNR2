@@ -15,6 +15,7 @@ from skimage import morphology
 from skimage import feature
 from scipy import ndimage, special
 import time
+import peakutils
 
 #  modified from: http://stackoverflow.com/questions/21566379/fitting-a-2d-gaussian-function-using-scipy-optimize-curve-fit-valueerror-and-m#comment33999040_21566831
 def gauss2D(pos, amplitude, xo, yo, fwhm, offset):
@@ -180,16 +181,16 @@ class AutoFocusThread(MeasurementThread):
         def calc_f(plot = False):
 
             if self.settings.af_use_bright:
-                self.spectrometer.SetMinVertReadout(28)
+                self.spectrometer.SetMinVertReadout(32)
                 self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-                self.stage.moverel(dy=-1.5)
+                self.stage.moverel(dy=-1.0)
                 time.sleep(0.3)
                 buf = self.spectrometer.TakeSingleTrack(raw=True)
-                self.stage.moverel(dy=+3.0)
+                self.stage.moverel(dy=+2.0)
                 time.sleep(0.3)
                 img = self.spectrometer.TakeSingleTrack(raw=True)
-                self.stage.moverel(dy=-1.5)
+                self.stage.moverel(dy=-1.0)
                 #time.sleep(0.5)
                 img -= buf
                 dist = 7
@@ -220,22 +221,19 @@ class AutoFocusThread(MeasurementThread):
                 dist = 2
 
             #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
-            img = ndimage.median_filter(img, 2)
+            #img = ndimage.median_filter(img, 2)
+            img = ndimage.gaussian_filter(img, 1)
 
 
             #if True:
             if plot:
                 plt.imshow(img.T)
-                plt.title(str(img.max()))
+                plt.title(str(np.abs((img.max()-img.mean()))))
                 plt.savefig("search_max/autofocus_image.png")
                 plt.close()
             else:
                 amp = 0
                 sigma = 1
-
-                plt.imshow(img.T)
-                plt.savefig("search_max/autofocus_image.png")
-                plt.close()
 
                 if self.settings.af_use_bright:
                     try:
@@ -257,6 +255,7 @@ class AutoFocusThread(MeasurementThread):
                         print(e)
                         return 0, 1
                 else:
+
                     if self.settings.autofocus_mode == 'gauss':
                         x = np.arange(img.shape[0])
                         y = np.arange(img.shape[1])
@@ -271,17 +270,35 @@ class AutoFocusThread(MeasurementThread):
                             coordinates = coordinates[0]
 
                         try:
-                            initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 4, np.mean(img))
+                            initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 1, np.mean(img))
                             bounds = ((0, 0, 0, 0, -np.inf),
                                       (np.inf, x.max(), y.max(), np.inf, np.inf))
-                            popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds, method='dogbox')
+                            popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
                             amp = popt[0]
+                            sigma = popt[3]
+
+                            plt.imshow(img.T)
+                            plt.title('amp: '+str(amp)+' | sigma: ' +str(sigma))
+                            plt.savefig("search_max/autofocus_image.png")
+                            plt.close()
+
                         except (RuntimeError,ValueError) as e:
                             print(e)
+                            plt.imshow(img.T)
+                            plt.title('no fit')
+                            plt.savefig("search_max/autofocus_image.png")
+                            plt.close()
+
                             return 0, 1
                     elif self.settings.autofocus_mode == 'maximum':
                         img = ndimage.median_filter(img, 2)
                         amp = np.abs((img.max() - img.min()))
+
+                        plt.imshow(img.T)
+                        plt.title(str(np.abs((img.max() - img.mean()))))
+                        plt.savefig("search_max/autofocus_image.png")
+                        plt.close()
+
                         return amp, 1
                     else:
                         print('Error setting Autofocus Mode !!!')
@@ -315,56 +332,94 @@ class AutoFocusThread(MeasurementThread):
                 return
 
         #focus = amp/amp.max() * 1/(sigma/sigma.max())
-        focus = amp / sigma
+
+        if self.settings.autofocus_mode == 'gauss' and self.settings.af_use_bright == False:
+            amp = amp - amp.min() + 1
+            amp = amp/amp.max()
+            sigma = sigma - sigma.min() + 1
+            sigma = sigma/sigma.max()
+            focus = amp / sigma
+        else:
+            focus = amp / 1
+
+
         valid_indices = focus > 0
         focus = focus[valid_indices]
         pos = pos[valid_indices]
 
-        #focus = savgol_filter(focus,5,1)
+        focus_filt = savgol_filter(focus,5,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)
-        initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
-        popt = None
-        try:
-            popt, pcov = opt.curve_fit(gauss, pos, focus, p0=initial_guess)
-            perr = np.diag(pcov)
-            # if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
-            if perr[1] > 1:
-                print("Could not determine focus: Variance too big")
-                print(perr)
-                popt = None
-            # elif popt[0] < *0.1:
-            #    print("Could not determine particle position: Peak too small")
-            elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
-                print("Could not determine focus: Peak outside bounds")
-                popt = None
-            elif np.abs(popt[2]) < self.settings.sigma / 10000:
-                print("Could not determine focus: Peak to narrow")
-                popt = None
-            #else:
-                #return popt, perr, measured, maxwl
-        except RuntimeError as e:
-            print(e)
-            print("Could not determine focus: Fit error")
-            popt = None
+
+
+        # initial_guess = (maxval - minval, pos[maxind], 2.0, minval)
+        # popt = None
+        # try:
+        #     popt, pcov = opt.curve_fit(gauss, pos, focus_filt, p0=initial_guess)
+        #     perr = np.diag(pcov)
+        #     # if perr[0] > 1e10 or perr[1] > 1 or perr[2] > 50:
+        #     if perr[1] > 1:
+        #         print("Could not determine focus: Variance too big")
+        #         print(perr)
+        #         popt = None
+        #     # elif popt[0] < *0.1:
+        #     #    print("Could not determine particle position: Peak too small")
+        #     elif popt[1] < (min(pos) - 2.0) or popt[1] > (max(pos) + 2.0):
+        #         print("Could not determine focus: Peak outside bounds")
+        #         popt = None
+        #     elif np.abs(popt[2]) < self.settings.sigma / 10000:
+        #         print("Could not determine focus: Peak to narrow")
+        #         popt = None
+        #     #else:
+        #         #return popt, perr, measured, maxwl
+        # except RuntimeError as e:
+        #     print(e)
+        #     print("Could not determine focus: Fit error")
+        #     popt = None
+
+        indexes = peakutils.indexes(focus_filt, thres=0.5, min_dist=5)
+        print(pos[indexes])
+        if len(indexes)>0:
+            peakx = peakutils.interpolate(pos, focus_filt, ind=indexes,width=2)
+            peaky = focus_filt[indexes]
+            sorted_ind = np.argsort(peaky)
+            peakx = peakx[sorted_ind[0]]
+            peaky = peaky[sorted_ind[0]]
+
 
         x = np.linspace(min(pos), max(pos))
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        if popt is not None:
-            ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
-                    transform=ax.transAxes)
-            ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+
+        # if popt is not None:
+        #     ax.text(0.1, 0.9, str(round(popt[1], 3)) + ' +- ' + str(round(perr[1], 3)), ha='left', va='center',
+        #             transform=ax.transAxes)
+        #     ax.plot(x, gauss(x, popt[0], popt[1], popt[2], popt[3]), 'g-')
+
+        if len(indexes) > 0:
+            print(peakx)
+            ax.text(peakx, peaky, str(round(peakx, 3)), ha='left', va='center')
+            ax.scatter(peakx,peaky,s=100,c="Red")
+
         ax.set_title("Focus")
         ax.plot(pos, focus, 'o')
+        ax.plot(pos, focus_filt, 'x')
         plt.savefig("search_max/autofocus.png")
         plt.close()
 
-        if popt is not None:
-            self.stage.moveabs(z=popt[1])
+        # if popt is not None:
+        #     self.stage.moveabs(z=popt[1])
+        #     calc_f(plot=True)
+        #     self.finishSignal.emit(np.array([popt[1],perr[1]]))
+        # else:
+        #     self.stage.moveabs(z=startpos[2])
+        #     self.finishSignal.emit(np.array([]))
+
+        if len(indexes) > 0:
+            self.stage.moveabs(z=peakx)
             calc_f(plot=True)
-            self.finishSignal.emit(np.array([popt[1],perr[1]]))
+            self.finishSignal.emit(np.array([peakx,0.0]))
         else:
             self.stage.moveabs(z=startpos[2])
             self.finishSignal.emit(np.array([]))
