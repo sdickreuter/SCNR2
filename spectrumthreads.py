@@ -966,6 +966,8 @@ class ScanThread(MeasurementThread):
             self.scanning_points = scanning_points
             self.settings = settings
             self.stage = stage
+            self.stage.query_pos()
+            x, y, self.start_z = self.stage.last_pos()
             self.i = 0
             self.n = scanning_points.shape[0]
             self.positions = np.zeros((self.n, 2))
@@ -983,6 +985,7 @@ class ScanThread(MeasurementThread):
         self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1])
         if not self.abort:
             self.intermediatework()
+            self.stage.moveabs(z=self.start_z)
         else:
             return False
         x, y, z = self.stage.last_pos()
@@ -1200,8 +1203,6 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.meanthread = None
         self.autofocusthread = None
         #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
-        self.stage.query_pos()
-        x,y,self.start_z = self.stage.last_pos()
 
 
     @QtCore.Slot()
@@ -1270,8 +1271,8 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.meanthread.process()
             self.meanthread = None
 
-        print('move z back to '+str(self.start_z))
-        self.stage.moveabs(z=self.start_z)
+            self.stage.moveabs(z=self.start_z)
+
         #self.searchthread.start()
         #self.searchthread.stop()
         #self.meanthread.init()
