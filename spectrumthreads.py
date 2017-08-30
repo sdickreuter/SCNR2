@@ -403,6 +403,8 @@ class AutoFocusThread(MeasurementThread):
             ax.scatter(peakx,peaky,s=100,c="Red")
 
         ax.set_title("Focus")
+        ax.plot(pos, sigma, '.')
+        ax.plot(pos, amp, '.')
         ax.plot(pos, focus, 'o')
         ax.plot(pos, focus_filt, 'x')
         plt.savefig("search_max/autofocus.png")
