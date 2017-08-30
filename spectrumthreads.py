@@ -1200,6 +1200,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.meanthread = None
         self.autofocusthread = None
         #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+        self.stage.query_pos()
         x,y,self.start_z = self.stage.last_pos()
 
 
@@ -1269,6 +1270,7 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.meanthread.process()
             self.meanthread = None
 
+        print('move z back to '+str(self.start_z))
         self.stage.moveabs(z=self.start_z)
         #self.searchthread.start()
         #self.searchthread.stop()
