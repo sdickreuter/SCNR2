@@ -985,7 +985,6 @@ class ScanThread(MeasurementThread):
         self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1])
         if not self.abort:
             self.intermediatework()
-            self.stage.moveabs(z=self.start_z)
         else:
             return False
         x, y, z = self.stage.last_pos()
@@ -993,6 +992,7 @@ class ScanThread(MeasurementThread):
         self.positions[self.i, 1] = y
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+        self.stage.moveabs(z=self.start_z)
         self.i += 1
         if self.i >= self.n:
             # plt.plot(self.scanning_points[:, 0], self.scanning_points[:, 1], "r.")
@@ -1270,8 +1270,6 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.meanthread.init()
             self.meanthread.process()
             self.meanthread = None
-
-            self.stage.moveabs(z=self.start_z)
 
         #self.searchthread.start()
         #self.searchthread.stop()
