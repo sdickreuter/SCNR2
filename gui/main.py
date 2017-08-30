@@ -505,7 +505,7 @@ class Ui_MainWindow(object):
         self.search_zmult_spin.setMaximumSize(QtCore.QSize(120, 35))
         self.search_zmult_spin.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.search_zmult_spin.setMinimum(1)
-        self.search_zmult_spin.setMaximum(5)
+        self.search_zmult_spin.setMaximum(10)
         self.search_zmult_spin.setProperty("value", 3)
         self.search_zmult_spin.setObjectName("search_zmult_spin")
         self.horizontalLayout_17.addWidget(self.search_zmult_spin)
