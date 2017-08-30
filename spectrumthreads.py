@@ -982,7 +982,7 @@ class ScanThread(MeasurementThread):
         pass
 
     def work(self):
-        self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1])
+        self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1],z=self.self.starting_position[2])
         if not self.abort:
             self.intermediatework()
         else:
@@ -992,7 +992,6 @@ class ScanThread(MeasurementThread):
         self.positions[self.i, 1] = y
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        self.stage.moveabs(z=self.self.starting_position[2])
         self.i += 1
         if self.i >= self.n:
             # plt.plot(self.scanning_points[:, 0], self.scanning_points[:, 1], "r.")
