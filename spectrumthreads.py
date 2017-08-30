@@ -1200,7 +1200,7 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.meanthread = None
         self.autofocusthread = None
         #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
-
+        x,y,self.start_z = self.stage.last_pos()
 
 
     @QtCore.Slot()
@@ -1268,6 +1268,8 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.meanthread.init()
             self.meanthread.process()
             self.meanthread = None
+
+        self.stage.moveabs(z=self.start_z)
         #self.searchthread.start()
         #self.searchthread.stop()
         #self.meanthread.init()
