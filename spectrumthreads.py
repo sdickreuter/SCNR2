@@ -821,7 +821,7 @@ class SearchThread(MeasurementThread):
             popt, perr, measured, maxwl = search_direction(dir, pos)
 
             if self.abort:
-                self.stage.moveabs(x=startpos[0], y=startpos[1],z=startpos[2])
+                self.stage.moveabs(x=startpos[0], y=startpos[1])
                 return False
 
             if popt is not None:
@@ -967,7 +967,7 @@ class ScanThread(MeasurementThread):
             self.settings = settings
             self.stage = stage
             self.stage.query_pos()
-            x, y, self.start_z = self.stage.last_pos()
+            self.starting_position = self.stage.last_pos()
             self.i = 0
             self.n = scanning_points.shape[0]
             self.positions = np.zeros((self.n, 2))
@@ -992,7 +992,7 @@ class ScanThread(MeasurementThread):
         self.positions[self.i, 1] = y
         self.progress.next()
         self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
-        self.stage.moveabs(z=self.start_z)
+        self.stage.moveabs(z=self.self.starting_position[2])
         self.i += 1
         if self.i >= self.n:
             # plt.plot(self.scanning_points[:, 0], self.scanning_points[:, 1], "r.")
