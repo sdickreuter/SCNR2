@@ -527,8 +527,8 @@ class SCNR(QtWidgets.QMainWindow):
                             self.ui.cube_steps_spin.value())
             y = np.linspace(y - self.ui.cube_width_spin.value() / 2, y + self.ui.cube_width_spin.value() / 2,
                             self.ui.cube_steps_spin.value())
-            z = np.linspace(z - self.ui.cube_width_spin.value() / 2, z + self.ui.cube_width_spin.value() / 2,
-                            self.ui.cube_steps_spin.value())
+            z = np.linspace(z - self.ui.cube_width_spin.value()*self.settings.zmult / 2, z + self.ui.cube_width_spin.value()*self.settings.zmult / 2,
+                            self.ui.cube_steps_spin.value()*self.settings.zmult)
 
             xx,yy,zz = np.meshgrid(x,y,z)
             xx = xx.ravel()
