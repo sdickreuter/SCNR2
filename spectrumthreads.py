@@ -209,13 +209,13 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetSlitWidth(150)
 
                 #freespace
-                self.spectrometer.SetMinVertReadout(20)
-                self.spectrometer.SetSlitWidth(300)
+                self.spectrometer.SetMinVertReadout(16)
+                self.spectrometer.SetSlitWidth(250)
 
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 #img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
-                img = self.spectrometer.TakeSingleTrack(raw=True)[973+6:990+7,:]
+                img = self.spectrometer.TakeSingleTrack(raw=True)[973+9:990+4,:]
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
@@ -399,14 +399,14 @@ class AutoFocusThread(MeasurementThread):
 
         if len(indexes) > 0:
             print(peakx)
-            ax.text(peakx, peaky, str(round(peakx, 3)), ha='left', va='center')
-            ax.scatter(peakx,peaky,s=100,c="Red")
+            ax.text(peakx, peaky/focus.max(), str(round(peakx, 3)), ha='left', va='center')
+            ax.scatter(peakx,peaky/focus.max(),s=100,c="Red")
 
         ax.set_title("Focus")
         ax.plot(pos, sigma, '.')
         ax.plot(pos, amp, '.')
-        ax.plot(pos, focus, 'o')
-        ax.plot(pos, focus_filt, 'x')
+        ax.plot(pos, focus/focus.max(), 'o')
+        ax.plot(pos, focus_filt/focus.max(), 'x')
         plt.savefig("search_max/autofocus.png")
         plt.close()
 
@@ -982,7 +982,7 @@ class ScanThread(MeasurementThread):
         pass
 
     def work(self):
-        self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1],z=self.self.starting_position[2])
+        self.stage.moveabs(x=self.scanning_points[self.i, 0], y=self.scanning_points[self.i, 1],z=self.starting_position[2])
         if not self.abort:
             self.intermediatework()
         else:
