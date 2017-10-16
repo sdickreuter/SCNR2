@@ -585,16 +585,12 @@ class EndlessSeriesThread(MeasurementThread):
             self.autofocusthread.stop()
             self.autofocusthread = None
 
-        print('bämm1')
-
         if not self.abort:
             self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None,self)
             self.searchthread.finishSignal.connect(self.search_finished)
             self.searchthread.search()
             self.searchthread.stop()
             self.searchthread = None
-
-        print('bämm2')
 
 
         if not self.abort:
