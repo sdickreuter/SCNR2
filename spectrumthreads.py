@@ -538,29 +538,57 @@ class TimeSeriesThread(MeasurementThread):
 class EndlessSeriesThread(MeasurementThread):
     saveSignal = QtCore.Signal(np.ndarray)
 
-    def __init__(self, spectrometer, number_of_samples, parent=None):
+    def __init__(self, spectrometer, stage, settings,number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
         super(EndlessSeriesThread, self).__init__(spectrometer)
-        self.init()
+        self.stage = stage
+        self.settings = settings
+        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None, self)
+        self.searchthread.specSignal.connect(self.specslot)
+        self.searchthread.finishSignal.connect(self.searchfinishslot)
+        self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+        self.autofocusthread.finishSignal.connect(self.focusfinishslot)
 
-    def init(self):
-        self.progress = progress.Progress(max=self.number_of_samples)
-        self.i = 0
-        self.abort = False
+    def stop(self):
+        self.abort = True
+        if self.searchthread is not None:
+            self.searchthread.stop()
+        if self.autofocusthread is not None:
+            self.autofocusthread.stop()
+        if self.meanthread is not None:
+            self.meanthread.stop()
+
+
 
     def work(self):
-        spec = self.spectrometer.TakeSingleTrack()
-        if spec is not None:
-            for i in range(self.number_of_samples - 1):
-                spec += self.spectrometer.TakeSingleTrack()
-            spec /= self.number_of_samples
+        if not self.abort:
+            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+            self.autofocusthread.finishSignal.connect(self.autofocus_finished)
+            self.autofocusthread.focus()
+            self.autofocusthread.stop()
+            self.autofocusthread = None
 
-            if not self.abort:
-                self.specSignal.emit(spec)
-                self.saveSignal.emit(spec)
-        else :
-            self.stop()
-            print("Communication out of sync, try again")
+        if not self.abort:
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+            self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread.finishSignal.connect(self.search_finished)
+            self.searchthread.search()
+            self.searchthread.stop()
+            self.searchthread = None
+
+        if not self.abort:
+            spec = self.spectrometer.TakeSingleTrack()
+            if spec is not None:
+                for i in range(self.number_of_samples - 1):
+                    spec += self.spectrometer.TakeSingleTrack()
+                spec /= self.number_of_samples
+
+                if not self.abort:
+                    self.specSignal.emit(spec)
+                    self.saveSignal.emit(spec)
+            else :
+                self.stop()
+                print("Communication out of sync, try again")
 
         if self.abort:
             self.stop()
@@ -990,7 +1018,6 @@ class Scan3DThread(MeasurementThread):
 
 
 
-
 class ScanThread(MeasurementThread):
     def __init__(self, spectrometer, settings, scanning_points, labels,stage, parent=None):
         try:
@@ -1238,6 +1265,7 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     @QtCore.Slot()
     def stop(self):
+        self.abort = True
         if self.searchthread is not None:
             self.searchthread.stop()
         if self.autofocusthread is not None:
@@ -1251,7 +1279,6 @@ class ScanSearchMeanThread(ScanMeanThread):
         #self.searchthread = None
         #self.meanthread = None
         #super(ScanSearchMeanThread, self).stop()
-        self.abort = True
 
     # def __del__(self):
     #     self.stop()
