@@ -538,8 +538,7 @@ class TimeSeriesThread(MeasurementThread):
 class EndlessSeriesThread(MeasurementThread):
     saveSignal = QtCore.Signal(np.ndarray)
 
-    def __init__(self, spectrometer, stage, settings,number_of_samples, parent=None):
-        self.number_of_samples = number_of_samples
+    def __init__(self, spectrometer, stage, settings,parent=None):
         super(EndlessSeriesThread, self).__init__(spectrometer)
         self.stage = stage
         self.settings = settings
@@ -600,9 +599,9 @@ class EndlessSeriesThread(MeasurementThread):
         if not self.abort:
             spec = self.spectrometer.TakeSingleTrack()
             if spec is not None:
-                for i in range(self.number_of_samples - 1):
+                for i in range(self.settings.number_of_samples - 1):
                     spec += self.spectrometer.TakeSingleTrack()
-                spec /= self.number_of_samples
+                spec /= self.settings.number_of_samples
 
                 if not self.abort:
                     self.specSignal.emit(spec)

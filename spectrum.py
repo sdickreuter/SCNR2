@@ -225,7 +225,8 @@ class Spectrum(QtCore.QObject):
         self.save_path = savedir
         self.save_data(savedir)
 
-        self.worker = EndlessSeriesThread(self.spectrometer, self.settings.number_of_samples)
+        #def __init__(self, spectrometer, stage, settings, number_of_samples, parent=None):
+        self.worker = EndlessSeriesThread(self.spectrometer,self.stage,self.settings)
         self.worker.specSignal.connect(self.specCallback)
         self.worker.saveSignal.connect(self.save_nameless_data)
         self.start_process(self.worker)
