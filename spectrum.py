@@ -429,8 +429,6 @@ class Spectrum(QtCore.QObject):
                     if re.fullmatch(r"([0-9]{9}(.csv))", entry.name) is not None:
                         files.append(entry.name[:-4])
 
-        print(files)
-
         if len(files) > 0:
             files = np.array(files,dtype=np.int)
             self.save_spectrum(spec, str(files.max()+1).zfill(9)+'.csv')
