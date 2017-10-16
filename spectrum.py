@@ -226,7 +226,6 @@ class Spectrum(QtCore.QObject):
         self.save_data(savedir)
 
         self.worker = EndlessSeriesThread(self.spectrometer, self.settings.number_of_samples)
-
         self.worker.specSignal.connect(self.specCallback)
         self.worker.saveSignal.connect(self.save_nameless_data)
         self.start_process(self.worker)
@@ -421,20 +420,22 @@ class Spectrum(QtCore.QObject):
             print(e)
 
 
-    @QtCore.Slot(np.ndarray, str)
+    @QtCore.Slot(np.ndarray)
     def save_nameless_data(self, spec):
         files = []
         with os.scandir(self.save_path) as it:
             for entry in it:
                 if not entry.name.startswith('.') and not entry.is_dir():
-                    if re.fullmatch(r"([0-9]{5}(.csv))", entry.name) is not None:
+                    if re.fullmatch(r"([0-9]{9}(.csv))", entry.name) is not None:
                         files.append(entry.name[:-4])
 
-        files = np.array(files,dtype=np.int)
         print(files)
 
-        self.save_spectrum(spec, str(files.max())+'.csv')
-
+        if len(files) > 0:
+            files = np.array(files,dtype=np.int)
+            self.save_spectrum(spec, str(files.max()+1).zfill(9)+'.csv')
+        else:
+            self.save_spectrum(spec, str(0).zfill(9) + '.csv')
 
     def reset(self):
         self.dark = None

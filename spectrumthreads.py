@@ -550,7 +550,6 @@ class EndlessSeriesThread(MeasurementThread):
 
     def work(self):
         spec = self.spectrometer.TakeSingleTrack()
-
         if spec is not None:
             for i in range(self.number_of_samples - 1):
                 spec += self.spectrometer.TakeSingleTrack()
