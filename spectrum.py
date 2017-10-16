@@ -6,6 +6,8 @@ from datetime import datetime
 from qtpy import QtCore
 import time
 from AndorSpectrometer import Spectrometer
+import os
+import re
 
 from calc_lockin import plot_lockin
 
@@ -206,17 +208,27 @@ class Spectrum(QtCore.QObject):
         self.worker.finishSignal.connect(self.finishedLockinCallback)
         self.start_process(self.worker)
 
+    # def take_series(self, savedir):
+    #     self.save_path = savedir
+    #     self.save_data(savedir)
+    #
+    #     self.worker = TimeSeriesThread(self.spectrometer, self.settings.number_of_samples)
+    #
+    #     self.worker.specSignal.connect(self.specCallback)
+    #     self.worker.progressSignal.connect(self.progressCallback)
+    #     #self.worker.saveSignal.connect(self.save_spectrum)
+    #     self.worker.saveSignal.connect(self.save_timeseries_data)
+    #     self.worker.finishSignal.connect(self.finishedTimeSeriesCallback)
+    #     self.start_process(self.worker)
+
     def take_series(self, savedir):
         self.save_path = savedir
         self.save_data(savedir)
 
-        self.worker = TimeSeriesThread(self.spectrometer, self.settings.number_of_samples)
+        self.worker = EndlessSeriesThread(self.spectrometer, self.settings.number_of_samples)
 
         self.worker.specSignal.connect(self.specCallback)
-        self.worker.progressSignal.connect(self.progressCallback)
-        #self.worker.saveSignal.connect(self.save_spectrum)
-        self.worker.saveSignal.connect(self.save_timeseries_data)
-        self.worker.finishSignal.connect(self.finishedTimeSeriesCallback)
+        self.worker.saveSignal.connect(self.save_nameless_data)
         self.start_process(self.worker)
 
 
@@ -339,7 +351,7 @@ class Spectrum(QtCore.QObject):
             self.save_lockin_data(self.lockin, 'lockin.csv')
 
     @QtCore.Slot(np.ndarray, str, np.ndarray, bool, bool)
-    def save_spectrum(self, spec, filename, pos, islockin, isfullPath):
+    def save_spectrum(self, spec, filename, pos=None, islockin=False, isfullPath=False):
         wl = self.spectrometer.GetWavelength()
         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
         if isfullPath:
@@ -407,6 +419,21 @@ class Spectrum(QtCore.QObject):
             plot_lockin(data,self.save_path)
         except Exception as e:
             print(e)
+
+
+    @QtCore.Slot(np.ndarray, str)
+    def save_nameless_data(self, spec):
+        files = []
+        with os.scandir(self.save_path) as it:
+            for entry in it:
+                if not entry.name.startswith('.') and not entry.is_dir():
+                    if re.fullmatch(r"([0-9]{5}(.csv))", entry.name) is not None:
+                        files.append(entry.name[:-4])
+
+        files = np.array(files,dtype=np.int)
+        print(files)
+
+        self.save_spectrum(spec, str(files.max())+'.csv')
 
 
     def reset(self):

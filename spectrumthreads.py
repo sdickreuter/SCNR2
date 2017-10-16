@@ -379,8 +379,9 @@ class AutoFocusThread(MeasurementThread):
         #     popt = None
 
         indexes = peakutils.indexes(focus_filt, thres=0.5, min_dist=5)
-        print(pos[indexes])
+        #print(pos[indexes])
         if len(indexes)>0:
+
             peakx = peakutils.interpolate(pos, focus_filt, ind=indexes,width=2)
             peaky = focus_filt[indexes]
             sorted_ind = np.argsort(peaky)
@@ -532,6 +533,38 @@ class TimeSeriesThread(MeasurementThread):
                 self.saveSignal.emit(self.series, "timeseries.csv")
                 self.finishSignal.emit(spec)
                 self.stop()
+
+
+class EndlessSeriesThread(MeasurementThread):
+    saveSignal = QtCore.Signal(np.ndarray)
+
+    def __init__(self, spectrometer, number_of_samples, parent=None):
+        self.number_of_samples = number_of_samples
+        super(EndlessSeriesThread, self).__init__(spectrometer)
+        self.init()
+
+    def init(self):
+        self.progress = progress.Progress(max=self.number_of_samples)
+        self.i = 0
+        self.abort = False
+
+    def work(self):
+        spec = self.spectrometer.TakeSingleTrack()
+
+        if spec is not None:
+            for i in range(self.number_of_samples - 1):
+                spec += self.spectrometer.TakeSingleTrack()
+            spec /= self.number_of_samples
+
+            if not self.abort:
+                self.specSignal.emit(spec)
+                self.saveSignal.emit(spec)
+        else :
+            self.stop()
+            print("Communication out of sync, try again")
+
+        if self.abort:
+            self.stop()
 
 
 class LockinThread(MeasurementThread):

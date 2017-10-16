@@ -115,7 +115,7 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
         def iter_all_numbers():
             size = 1
             while True:
-                for s in itertools.product(string.digits[1:10], repeat=size):
+                for s in itertools.product(string.digits[0:10], repeat=size):
                     yield "".join(s)
                 size += 1
         numbers = np.array([])
