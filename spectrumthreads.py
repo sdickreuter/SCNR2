@@ -558,6 +558,27 @@ class EndlessSeriesThread(MeasurementThread):
         if self.meanthread is not None:
             self.meanthread.stop()
 
+    @QtCore.Slot(np.ndarray)
+    def autofocus_finished(self, pos):
+       with open("search_max/scan_status.txt", "a") as f:
+            f.write(self.labels[self.i]+': ')
+            if len(pos) == 2:
+                f.write("autofocus successful, ")
+                f.write(str(round(pos[0],3))+' +- '+str(round(pos[1],5)))
+            else:
+                f.write("autofocus failed")
+            f.write(' | ')
+
+    @QtCore.Slot(np.ndarray)
+    def search_finished(self, pos):
+        with open("search_max/scan_status.txt", "a") as f:
+            if len(pos) == 4:
+                f.write("search successful, ")
+                f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))
+                f.write(" y:" + str(round(pos[2], 3)) + ' +- ' + str(round(pos[3], 5)))
+            else:
+                f.write("search failed")
+            f.write('\n')
 
 
     def work(self):
