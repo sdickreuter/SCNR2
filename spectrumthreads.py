@@ -542,11 +542,9 @@ class EndlessSeriesThread(MeasurementThread):
         super(EndlessSeriesThread, self).__init__(spectrometer)
         self.stage = stage
         self.settings = settings
-        self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None, self)
-        self.searchthread.specSignal.connect(self.specslot)
-        self.searchthread.finishSignal.connect(self.searchfinishslot)
-        self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
-        self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+        self.searchthread = None
+        self.autofocusthread = None
+        self.i = 0
 
     def stop(self):
         self.abort = True
@@ -554,13 +552,12 @@ class EndlessSeriesThread(MeasurementThread):
             self.searchthread.stop()
         if self.autofocusthread is not None:
             self.autofocusthread.stop()
-        if self.meanthread is not None:
-            self.meanthread.stop()
+
 
     @QtCore.Slot(np.ndarray)
     def autofocus_finished(self, pos):
        with open("search_max/scan_status.txt", "a") as f:
-            f.write(self.labels[self.i]+': ')
+            f.write(str(self.i)+': ')
             if len(pos) == 2:
                 f.write("autofocus successful, ")
                 f.write(str(round(pos[0],3))+' +- '+str(round(pos[1],5)))
@@ -589,16 +586,17 @@ class EndlessSeriesThread(MeasurementThread):
             self.autofocusthread = None
 
         if not self.abort:
-            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
-            self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None,self)
             self.searchthread.finishSignal.connect(self.search_finished)
             self.searchthread.search()
             self.searchthread.stop()
             self.searchthread = None
 
+
         if not self.abort:
             spec = self.spectrometer.TakeSingleTrack()
             if spec is not None:
+                self.i += 1
                 for i in range(self.settings.number_of_samples - 1):
                     spec += self.spectrometer.TakeSingleTrack()
                 spec /= self.settings.number_of_samples
