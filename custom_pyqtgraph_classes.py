@@ -69,7 +69,11 @@ class movableCrosshair(QtGui.QGraphicsRectItem):
         self.setAcceptHoverEvents(True)
         self.setPos(pos[0], pos[1])
         self.size = size
+        self.active = True
         #self.setFlag(self.ItemIgnoresTransformations)
+
+    def set_active(self, active=True):
+        self.active = active
 
     def paint(self, p, *args):
         p.setPen(pg.mkPen('y'))
@@ -93,7 +97,7 @@ class movableCrosshair(QtGui.QGraphicsRectItem):
         ev.ignore()
 
     def mousePressEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton:
+        if (ev.button() == QtCore.Qt.LeftButton) and (self.active):
             ev.accept()
             self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
         else:
@@ -128,7 +132,7 @@ if __name__ == '__main__':
     p1 = pg.PlotDataItem()
     vb.addItem(p1)
 
-    rect = xmovableCrosshair(pos=[1.5, 2],size=1)
+    rect = movableCrosshair(pos=[1.5, 2],size=1)
     rect.setPen(pg.mkPen(100, 200, 100))
     vb.addItem(rect)
 
