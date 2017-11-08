@@ -136,6 +136,20 @@ if __name__ == '__main__':
     rect.setPen(pg.mkPen(100, 200, 100))
     vb.addItem(rect)
 
+
+
+
+    # Custom ROI for selecting an image region
+    roi = pg.ROI([-8, 14], [6, 5])
+    roi.addScaleHandle([1, .0], [0.5, 0.5])
+    #roi.addScaleHandle([0, 0.5], [0.5, 0.5])
+    vb.addItem(roi)
+    roi.setZValue(10)  # make sure ROI is drawn above image
+
+
+
+
+
     l.addItem(vb, 0, 1)
     gv.centralWidget.setLayout(l)
 
