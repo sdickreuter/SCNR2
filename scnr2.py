@@ -154,10 +154,12 @@ class SCNR(QtWidgets.QMainWindow):
             w.setImageItem(self.img)
 
             try:
-                if setup == 'Nikon' or setup == 'Zeiss':  # Microscope Setup
-                    self.cam = camerathread.CameraThread(flip=False)
+                if setup == 'Nikon':
+                    self.cam = camerathread.CameraThread(xflip=False,yflip=False)
+                elif setup == 'Zeiss':  # Microscope Setup
+                    self.cam = camerathread.CameraThread(xflip=True,yflip=True)
                 elif setup == 'Freespace':  # Freespace Setup
-                    self.cam = camerathread.CameraThread(flip=True)
+                    self.cam = camerathread.CameraThread(xflip=True,yflip=False)
 
                 img = self.cam.get_image()
                 print(img.shape)

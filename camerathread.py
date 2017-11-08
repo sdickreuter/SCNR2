@@ -12,12 +12,13 @@ class CameraThread(QtCore.QObject):
     #mutex = QtCore.QMutex()
     enabled = False
 
-    def __init__(self,flip = False, parent=None):
+    def __init__(self,xflip = False,yflip = False, parent=None):
         if getattr(self.__class__, '_has_instance', False):
             RuntimeError('Cannot create another instance of Camera')
         self.__class__._has_instance = True
 
-        self.flip = flip
+        self.yflip = yflip
+        self.xflip = xflip
 
         self.isinitialized = False
         super(CameraThread, self).__init__(parent)
@@ -93,8 +94,10 @@ class CameraThread(QtCore.QObject):
         img = np.array(self._cam.get_image(),dtype = np.int32)
         img = img[:,:,0] + np.left_shift(img[:,:,1],8)
 
-        if self.flip:
+        if self.xflip:
             img = np.flipud(img)
+        if self.yflip:
+            img = np.fliplr(img)
 
         return img
 
@@ -102,10 +105,12 @@ class CameraThread(QtCore.QObject):
         if self.enabled:
             img = np.array(self._cam.get_image(),dtype = np.int32)
             img = img[:,:,0] + np.left_shift(img[:,:,1],8)
-            if self.flip:
-                self.ImageReadySignal.emit(np.flipud(img))
-            else:
-                self.ImageReadySignal.emit(img)
+            if self.xflip:
+                img = np.flipud(img)
+            if self.yflip:
+                img= np.fliplr(img)
+
+            self.ImageReadySignal.emit(img)
 
     @QtCore.Slot()
     def process(self):
