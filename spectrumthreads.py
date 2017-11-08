@@ -578,19 +578,20 @@ class EndlessSeriesThread(MeasurementThread):
 
 
     def work(self):
-        if not self.abort:
-            self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
-            self.autofocusthread.finishSignal.connect(self.autofocus_finished)
-            self.autofocusthread.focus()
-            self.autofocusthread.stop()
-            self.autofocusthread = None
+        if self.i % 5 == 0:
+            if not self.abort:
+                self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
+                self.autofocusthread.finishSignal.connect(self.autofocus_finished)
+                self.autofocusthread.focus()
+                self.autofocusthread.stop()
+                self.autofocusthread = None
 
-        if not self.abort:
-            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None,self)
-            self.searchthread.finishSignal.connect(self.search_finished)
-            self.searchthread.search()
-            self.searchthread.stop()
-            self.searchthread = None
+            if not self.abort:
+                self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,None,None,None,self)
+                self.searchthread.finishSignal.connect(self.search_finished)
+                self.searchthread.search()
+                self.searchthread.stop()
+                self.searchthread = None
 
 
         if not self.abort:
