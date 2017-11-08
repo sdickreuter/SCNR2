@@ -213,9 +213,9 @@ class AutoFocusThread(MeasurementThread):
                 self.spectrometer.SetSlitWidth(250)
 
 
-                #img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
                 #img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
-                img = self.spectrometer.TakeSingleTrack(raw=True)[973+9:990+4,:]
+                #img = self.spectrometer.TakeSingleTrack(raw=True)[973+9:990+4,:]
 
                 #img = self.spectrometer.TakeSingleTrack(raw=True)
                 dist = 2
