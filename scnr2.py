@@ -814,7 +814,7 @@ class SCNR(QtWidgets.QMainWindow):
             save_as += ".csv"
 
         try:
-            img = np.hstack((img,self.spectrometer.GetWavelength()))
+            img = np.vstack((img.T,self.spectrometer.GetWavelength()))
             np.savetxt(save_as,img)
         except:
             print("Error Saving file " + save_as)

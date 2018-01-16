@@ -88,7 +88,7 @@ class Spectrum(QtCore.QObject):
         return self.spectrometer.GetWavelength()
 
     def stop_process(self):
-        if self.worker.isRunning:
+        if self.thread.isRunning():
             try:
                 self.worker.stop()
                 self.thread.quit()
@@ -123,19 +123,19 @@ class Spectrum(QtCore.QObject):
 
         self.worker = LiveThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
-        self.worker.finishSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.finishedSingleCallback)
         self.start_process(self.worker)
 
     def take_live_image(self,single=False):
         self.worker = ImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
-        self.worker.finishSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.finishedSingleCallback)
         self.start_process(self.worker)
 
     def take_live_fullimage(self,single=False):
         self.worker = FullImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
-        self.worker.finishSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.finishedSingleCallback)
         self.start_process(self.worker)
 
 
