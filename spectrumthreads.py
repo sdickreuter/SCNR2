@@ -142,7 +142,7 @@ class LiveThread(MeasurementThread):
                 self.work()
                 if self.single:
                     self.abort=True
-
+                    self.finishSignal.emit(None)
         except Exception as e:
             print(e)
             (type, value, traceback) = sys.exc_info()
@@ -179,8 +179,9 @@ class ImageThread(MeasurementThread):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-            if self.single: self.abort = True
-
+            if self.single:
+                self.abort = True
+                self.finishSignal.emit(None)
 
 class FullImageThread(MeasurementThread):
 
@@ -212,7 +213,9 @@ class FullImageThread(MeasurementThread):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
-            if self.single: self.abort = True
+            if self.single:
+                self.abort = True
+                self.finishSignal.emit(None)
 
 
 class AutoFocusThread(MeasurementThread):

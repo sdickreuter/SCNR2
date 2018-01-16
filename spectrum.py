@@ -88,18 +88,19 @@ class Spectrum(QtCore.QObject):
         return self.spectrometer.GetWavelength()
 
     def stop_process(self):
-        try:
-            self.worker.stop()
-            self.thread.quit()
-            # if  self.workingthread.thread.wait(self.settings.integration_time*1000+500):
-            #     self.workingthread = None
-            # else:
-            #     print("problem with thread")
-            print(self.thread.wait())
-            self.thread = None
-            #self._spectrometer.AbortAcquisition()
-        except Exception as e:
-            print(e)
+        if self.worker.isRunning:
+            try:
+                self.worker.stop()
+                self.thread.quit()
+                # if  self.workingthread.thread.wait(self.settings.integration_time*1000+500):
+                #     self.workingthread = None
+                # else:
+                #     print("problem with thread")
+                print(self.thread.wait())
+                self.thread = None
+                #self._spectrometer.AbortAcquisition()
+            except Exception as e:
+                print(e)
         self.enableButtons.emit()
 
     def start_process(self, worker):
@@ -122,19 +123,26 @@ class Spectrum(QtCore.QObject):
 
         self.worker = LiveThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
     def take_live_image(self,single=False):
-        # self.workingthread = LiveThread(self.getspecthread)
         self.worker = ImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
     def take_live_fullimage(self,single=False):
-        # self.workingthread = LiveThread(self.getspecthread)
         self.worker = FullImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
+        self.worker.finishSignal.connect(self.specCallback)
         self.start_process(self.worker)
+
+
+    @QtCore.Slot(np.ndarray)
+    def finishedSingleCallback(self, spec):
+        self.stop_process()
+        self.updateStatus.emit('Finished taking single')
 
     @QtCore.Slot(np.ndarray)
     def finishedLockinCallback(self, spec):
