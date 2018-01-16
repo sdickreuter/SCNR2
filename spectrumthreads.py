@@ -122,6 +122,9 @@ class MeasurementThread(QtCore.QObject):
             self.stop()
 
 class LiveThread(MeasurementThread):
+    def __init__(self, spectrometer, single = False, parent=None):
+        super(LiveThread, self).__init__(spectrometer,parent)
+        self.single = single
 
     @QtCore.Slot()
     def work(self):
@@ -137,6 +140,7 @@ class LiveThread(MeasurementThread):
             while not self.abort:
                 self.spec = self.spectrometer.TakeSingleTrack()
                 self.work()
+                if self.single: self.abort=True
         except Exception as e:
             print(e)
             (type, value, traceback) = sys.exc_info()
@@ -144,6 +148,10 @@ class LiveThread(MeasurementThread):
 
 
 class ImageThread(MeasurementThread):
+
+    def __init__(self, spectrometer, single = False, parent=None):
+        super(ImageThread, self).__init__(spectrometer,parent)
+        self.single = single
 
     def work(self):
         try:
@@ -169,6 +177,40 @@ class ImageThread(MeasurementThread):
             except:
                 (type, value, traceback) = sys.exc_info()
                 sys.excepthook(type, value, traceback)
+            if self.single: self.abort = True
+
+
+class FullImageThread(MeasurementThread):
+
+    def __init__(self, spectrometer, single = False, parent=None):
+        super(FullImageThread, self).__init__(spectrometer,parent)
+        self.single = single
+
+    def work(self):
+        try:
+            self.specSignal.emit(self.spec)
+        except TypeError as e:
+            print(e)
+            print("Communication out of sync, try again")
+
+    @QtCore.Slot()
+    def process(self):
+        while not self.abort:
+            try:
+                if not self.abort:
+                    self.spec = self.spectrometer.TakeFullImage()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
+                if not self.abort:
+                    self.work()
+                else:
+                    print("Image Thread aborted")
+                    print(self.spec)
+            except:
+                (type, value, traceback) = sys.exc_info()
+                sys.excepthook(type, value, traceback)
+            if self.single: self.abort = True
 
 
 class AutoFocusThread(MeasurementThread):
@@ -440,32 +482,6 @@ class AutoFocusThread(MeasurementThread):
         self.stop()
 
 
-class FullImageThread(MeasurementThread):
-
-    def work(self):
-        try:
-            self.specSignal.emit(self.spec)
-        except TypeError as e:
-            print(e)
-            print("Communication out of sync, try again")
-
-    @QtCore.Slot()
-    def process(self):
-        while not self.abort:
-            try:
-                if not self.abort:
-                    self.spec = self.spectrometer.TakeFullImage()
-                else:
-                    print("Image Thread aborted")
-                    print(self.spec)
-                if not self.abort:
-                    self.work()
-                else:
-                    print("Image Thread aborted")
-                    print(self.spec)
-            except:
-                (type, value, traceback) = sys.exc_info()
-                sys.excepthook(type, value, traceback)
 
 
 class MeanThread(MeasurementThread):

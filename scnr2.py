@@ -403,6 +403,10 @@ class SCNR(QtWidgets.QMainWindow):
             if not self.spectrum.dark is None and not self.spectrum.lamp is None:
                 for i in range(image.shape[1]):
                     image[:,i] = image[:,i] / (self.spectrum.lamp - self.spectrum.dark)
+                image -= image.min()
+                image /= image.max()
+                image *= 30000
+                image = np.array(image,dtype=np.int32)
 
         return image
 
@@ -589,6 +593,17 @@ class SCNR(QtWidgets.QMainWindow):
             self.spectrum.take_live_image()
         elif self.spectrometer.mode == 'fullimage':
             self.spectrum.take_live_fullimage()
+
+    @QtCore.Slot()
+    def on_single_clicked(self):
+        self.on_disableButtons()
+        self.ui.status.setText('Liveview')
+        if self.spectrometer.mode == 'singletrack':
+            self.spectrum.take_live(single=True)
+        elif self.spectrometer.mode == 'imageofslit':
+            self.spectrum.take_live_image(single=True)
+        elif self.spectrometer.mode == 'fullimage':
+            self.spectrum.take_live_fullimage(single=True)
 
 
     @QtCore.Slot()

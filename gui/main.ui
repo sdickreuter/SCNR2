@@ -116,23 +116,34 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QPushButton" name="live_button">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Liveview</string>
-            </property>
-           </widget>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="live_button">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Liveview</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="single_button">
+              <property name="text">
+               <string>Single</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="Line" name="line">
@@ -2155,8 +2166,8 @@
    <slot>on_live_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>100</y>
+     <x>740</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2996,6 +3007,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>single_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_single_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>812</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1015</x>
+     <y>24</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_lefttab_changed(int)</slot>
@@ -3059,5 +3086,6 @@
   <slot>on_correct_image_toggled(bool)</slot>
   <slot>on_use_image_background_clicked()</slot>
   <slot>on_save_detectorimage_clicked()</slot>
+  <slot>on_single_clicked()</slot>
  </slots>
 </ui>

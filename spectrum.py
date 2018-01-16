@@ -118,21 +118,21 @@ class Spectrum(QtCore.QObject):
         self.start_process(self.worker)
 
 
-    def take_live(self):
+    def take_live(self,single=False):
 
-        self.worker = LiveThread(self.spectrometer)
+        self.worker = LiveThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
-    def take_live_image(self):
+    def take_live_image(self,single=False):
         # self.workingthread = LiveThread(self.getspecthread)
-        self.worker = ImageThread(self.spectrometer)
+        self.worker = ImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
-    def take_live_fullimage(self):
+    def take_live_fullimage(self,single=False):
         # self.workingthread = LiveThread(self.getspecthread)
-        self.worker = FullImageThread(self.spectrometer)
+        self.worker = FullImageThread(self.spectrometer,single)
         self.worker.specSignal.connect(self.specCallback)
         self.start_process(self.worker)
 
