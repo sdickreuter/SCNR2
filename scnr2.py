@@ -399,8 +399,8 @@ class SCNR(QtWidgets.QMainWindow):
     def correct_image(self, image):
         if self.ui.correct_image_checkBox.isChecked():
             if self.background_image is not None:
-                image = image-self.background_image
-            if not self.dark is None and not self.lamp is None:
+                image = np.subtract(image,self.background_image)
+            if not self.spectrum.dark is None and not self.spectrum.lamp is None:
                 for i in range(image.shape[1]):
                     image[:,i] = image[:,i] / (self.spectrum.lamp - self.spectrum.dark)
 

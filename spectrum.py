@@ -61,7 +61,8 @@ class Spectrum(QtCore.QObject):
             return (spec - self.bg) / (self.lamp - self.dark)
 
         elif not self.dark is None and not self.lamp is None:
-            return 1 - ( (spec - self.dark) / (self.lamp - self.dark) )
+            #return 1 - ( (spec - self.dark) / (self.lamp - self.dark) )
+            return  ( (spec - self.dark) / (self.lamp - self.dark) )
 
         elif not self.dark is None:
             return spec - self.dark

@@ -112,19 +112,19 @@ class SpectrometerClient:
 
     def run(self):
             #while True:
-            for i in range(5):
-                data = self.make_request('Client to Server',None)
-                print(data)
-                time.sleep(0.5)
+            # for i in range(5):
+            #     data = self.make_request('Client to Server',None)
+            #     print(data)
+            #     time.sleep(0.5)
 
-            #self.SetExposureTime(0.1)
-            #self.SetCentreWavelength(0)
-            #self.SetSlitWidth(2500)
-            #self.SetImageofSlit()
-            #start = time.time()
-            #data = self.TakeImageofSlit()
-            #print(time.time()-start)
-            #print(data)
+            self.SetExposureTime(0.1)
+            self.SetCentreWavelength(0)
+            self.SetSlitWidth(2500)
+            self.SetImageofSlit()
+            start = time.time()
+            data = self.TakeImageofSlit()
+            print(time.time()-start)
+            print(data)
             #self.socket.send_pyobj(('quit',None))
             #time.sleep(2)
 

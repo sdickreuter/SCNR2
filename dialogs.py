@@ -174,10 +174,11 @@ class SpanGrid_Dialog(QtWidgets.QDialog):
         self.pw.clear()
         self.plot = self.pw.plot()
         self.plot.setData(self.grid[:, 0], self.grid[:, 1], pen=None, symbol='o')
-        for i in range(self.grid.shape[0]):
-            buf = pg.TextItem(text=self.labels[i])
-            buf.setPos(self.grid[i,0], self.grid[i,1])
-            self.pw.addItem(buf)
+        if self.grid.shape[0] < 100:
+            for i in range(self.grid.shape[0]):
+                buf = pg.TextItem(text=self.labels[i])
+                buf.setPos(self.grid[i,0], self.grid[i,1])
+                self.pw.addItem(buf)
 
 
     @QtCore.Slot()
