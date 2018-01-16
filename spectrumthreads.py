@@ -140,7 +140,9 @@ class LiveThread(MeasurementThread):
             while not self.abort:
                 self.spec = self.spectrometer.TakeSingleTrack()
                 self.work()
-                if self.single: self.abort=True
+                if self.single:
+                    self.abort=True
+
         except Exception as e:
             print(e)
             (type, value, traceback) = sys.exc_info()
@@ -198,7 +200,7 @@ class FullImageThread(MeasurementThread):
         while not self.abort:
             try:
                 if not self.abort:
-                    self.spec = self.spectrometer.TakeFullImage()
+                    self.spec = np.flipud(self.spectrometer.TakeFullImage())
                 else:
                     print("Image Thread aborted")
                     print(self.spec)

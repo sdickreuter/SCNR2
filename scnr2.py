@@ -401,12 +401,15 @@ class SCNR(QtWidgets.QMainWindow):
             if self.background_image is not None:
                 image = np.subtract(image,self.background_image)
             if not self.spectrum.dark is None and not self.spectrum.lamp is None:
+                image = np.array(image,dtype=np.float32)
+                print('correct_image '+ str(image.shape))
                 for i in range(image.shape[1]):
                     image[:,i] = image[:,i] / (self.spectrum.lamp - self.spectrum.dark)
-                image -= image.min()
-                image /= image.max()
-                image *= 30000
-                image = np.array(image,dtype=np.int32)
+                image = image - image.min()
+                image = image / image.max()
+                image = image * 1000
+                #image = np.array(image,dtype=np.int32)
+                print('correct_image finished')
 
         return image
 
@@ -415,7 +418,10 @@ class SCNR(QtWidgets.QMainWindow):
         if spec is not None:
             if self.spectrometer.mode == "imageofslit" or self.spectrometer.mode == "fullimage":
                 self.last_image = spec
-                self.detector_img.setImage(self.correct_image(self.last_image),autoLevels=False)
+                print('on_update_spectrum '+str(spec.shape))
+                # img = self.correct_image(self.last_image)
+                # self.detector_img.setImage(img,autoLevels=False)
+                self.detector_img.setImage(self.correct_image(self.last_image), autoLevels=False)
 
             elif self.spectrometer.mode == 'singletrack':
                 self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
@@ -808,7 +814,7 @@ class SCNR(QtWidgets.QMainWindow):
             save_as += ".csv"
 
         try:
-            np.savetxt(img,save_as)
+            np.savetxt(save_as,img)
         except:
             print("Error Saving file " + save_as)
             QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
