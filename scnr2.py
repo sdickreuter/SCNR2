@@ -603,7 +603,7 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_single_clicked(self):
         self.on_disableButtons()
-        self.ui.status.setText('Liveview')
+        self.ui.status.setText('Single')
         if self.spectrometer.mode == 'singletrack':
             self.spectrum.take_live(single=True)
         elif self.spectrometer.mode == 'imageofslit':
