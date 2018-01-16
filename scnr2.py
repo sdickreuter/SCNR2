@@ -46,6 +46,8 @@ class SCNR(QtWidgets.QMainWindow):
     spectrometer = None
     labels = None
     cam_reference_image = None
+    background_image = None
+    last_image = None
 
     savedir = "./Spectra/"
     path = "./"
@@ -175,9 +177,12 @@ class SCNR(QtWidgets.QMainWindow):
                 # self.ui.left_tab.setEnabled(False)
                 print("Could not initialize Camera")
                 QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize Camera.", QtWidgets.QMessageBox.Ok)
-                self.ui.left_tab.removeTab(1)
+                #self.ui.left_tab.removeTab(1)
+                self.ui.cam_tab.setDisabled(True)
         else:
-            self.ui.left_tab.removeTab(1)
+            #self.ui.left_tab.removeTab(1)
+            self.cam = None
+            self.ui.cam_tab.setDisabled(True)
 
         # init stage
         if init_stage:
@@ -391,13 +396,23 @@ class SCNR(QtWidgets.QMainWindow):
             return self.spectrum.correct_spectrum(spec)
         return spec
 
+    def correct_image(self, image):
+        if self.ui.correct_image_checkBox.isChecked():
+            if self.background_image is not None:
+                image = image-self.background_image
+            if not self.dark is None and not self.lamp is None:
+                for i in range(image.shape[1]):
+                    image[:,i] = image[:,i] / (self.spectrum.lamp - self.spectrum.dark)
+
+        return image
+
     @QtCore.Slot(np.ndarray)
     def on_update_spectrum(self, spec):
         if spec is not None:
             if self.spectrometer.mode == "imageofslit" or self.spectrometer.mode == "fullimage":
-                #plow, phigh = np.percentile(spec, (2, 98))
-                #spec = exposure.rescale_intensity(spec, in_range=(plow, phigh))
-                self.detector_img.setImage(spec,autoLevels=False)
+                self.last_image = spec
+                self.detector_img.setImage(self.correct_image(self.last_image),autoLevels=False)
+
             elif self.spectrometer.mode == 'singletrack':
                 self.plot.setData(self.spectrometer.GetWavelength(), self.correct_spec(spec))
         else:
@@ -482,10 +497,10 @@ class SCNR(QtWidgets.QMainWindow):
                 self.set_searchmax_ontarget(False)
                 self.stage.moverel(dy=y_step)
             self.show_pos()
-        # ----- END Slots for Gamepad
+    # ----- END Slots for Gamepad
 
 
-        # ----- Slots for Buttons
+    # ----- Slots for Buttons
 
     @QtCore.Slot()
     def on_start_scan_clicked(self):
@@ -763,6 +778,27 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_temp_clicked(self):
         self.ui.label_temp.setText('Detector Temperature: ' + str(round(self.spectrometer.GetTemperature(), 1)) + ' °C')
+
+    @QtCore.Slot()
+    def on_use_image_background_clicked(self):
+        self.background_image = self.last_image
+
+    @QtCore.Slot()
+    def on_save_detectorimage_clicked(self):
+        img = self.correct_image(self.last_image)
+        save_as = QtWidgets.QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
+                                              'CSV Files (*.csv)')
+        save_as = save_as[0]
+        if not save_as[-4:] == '.csv':
+            save_as += ".csv"
+
+        try:
+            np.savetxt(img,save_as)
+        except:
+            print("Error Saving file " + save_as)
+            QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
+
+
 
     # ----- END Slots for Buttons
 

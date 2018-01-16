@@ -930,71 +930,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_9">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Camera Settings</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Exposure time [ms]</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="exposure_time_spin">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>25</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>100</width>
-                <height>35</height>
-               </size>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="singleStep">
-               <number>10</number>
-              </property>
-              <property name="value">
-               <number>300</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="Line" name="line_9">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_8">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1362,68 +1297,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Advanced Camera Settings</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="autocontrast_checkBox">
-            <property name="text">
-             <string>Enable Auto Contrast</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="camreference_button">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Take Camera Reference Image</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="clear_reference_button">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Clear Reference Image</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="line_12">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_20">
             <property name="text">
              <string>Advanced Stage Settings</string>
@@ -1478,13 +1351,6 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="line_14">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -2079,8 +1945,8 @@
        <attribute name="title">
         <string>Camera</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
          <widget class="QWidget" name="camwidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -2090,14 +1956,105 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="camreference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Take Camera Reference Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Exposure time [ms]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="exposure_time_spin">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>300</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="clear_reference_button">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Clear Reference Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="autocontrast_checkBox">
+            <property name="text">
+             <string>Enable Auto Contrast</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="detector_tab">
        <attribute name="title">
         <string>Detector</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_15">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
          <widget class="QWidget" name="detectorwidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
@@ -2106,6 +2063,31 @@
            </sizepolicy>
           </property>
          </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="correct_image_checkBox">
+            <property name="text">
+             <string>Correct Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="use_background_image_button">
+            <property name="text">
+             <string>Use Last Image as Background</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="save_detectorimage_button">
+            <property name="text">
+             <string>Save</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -2125,8 +2107,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>123</y>
+     <x>882</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2157,8 +2139,8 @@
    <slot>on_reset_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>556</y>
+     <x>882</x>
+     <y>531</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
@@ -2189,8 +2171,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>108</y>
+     <x>882</x>
+     <y>165</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -2222,7 +2204,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>381</y>
+     <y>357</y>
     </hint>
     <hint type="destinationlabel">
      <x>902</x>
@@ -2238,7 +2220,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>415</y>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
      <x>877</x>
@@ -2253,8 +2235,8 @@
    <slot>on_dark_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>186</y>
+     <x>882</x>
+     <y>183</y>
     </hint>
     <hint type="destinationlabel">
      <x>857</x>
@@ -2286,7 +2268,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>304</y>
+     <y>286</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -2301,8 +2283,8 @@
    <slot>on_bg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>657</x>
-     <y>216</y>
+     <x>882</x>
+     <y>215</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -2318,7 +2300,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>338</y>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -2334,7 +2316,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>459</y>
+     <y>429</y>
     </hint>
     <hint type="destinationlabel">
      <x>892</x>
@@ -2349,8 +2331,8 @@
    <slot>on_loadlamp_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>480</y>
+     <x>882</x>
+     <y>460</y>
     </hint>
     <hint type="destinationlabel">
      <x>908</x>
@@ -2365,8 +2347,8 @@
    <slot>on_loadbg_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>512</y>
+     <x>882</x>
+     <y>491</y>
     </hint>
     <hint type="destinationlabel">
      <x>882</x>
@@ -2381,8 +2363,8 @@
    <slot>on_number_of_samples_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>111</y>
+     <x>881</x>
+     <y>169</y>
     </hint>
     <hint type="destinationlabel">
      <x>832</x>
@@ -2397,8 +2379,8 @@
    <slot>on_slit_width_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>112</y>
+     <x>881</x>
+     <y>203</y>
     </hint>
     <hint type="destinationlabel">
      <x>838</x>
@@ -2413,8 +2395,8 @@
    <slot>on_grating_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>115</y>
+     <x>881</x>
+     <y>270</y>
     </hint>
     <hint type="destinationlabel">
      <x>840</x>
@@ -2429,8 +2411,8 @@
    <slot>on_centre_wavelength_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>114</y>
+     <x>881</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
@@ -2445,8 +2427,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>119</y>
+     <x>293</x>
+     <y>888</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2461,8 +2443,8 @@
    <slot>on_rasterdim_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>124</y>
+     <x>881</x>
+     <y>376</y>
     </hint>
     <hint type="destinationlabel">
      <x>849</x>
@@ -2477,8 +2459,8 @@
    <slot>on_rasterwidth_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>125</y>
+     <x>881</x>
+     <y>410</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2493,8 +2475,8 @@
    <slot>on_sigma_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>126</y>
+     <x>881</x>
+     <y>444</y>
     </hint>
     <hint type="destinationlabel">
      <x>868</x>
@@ -2525,8 +2507,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>106</y>
+     <x>882</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -2541,8 +2523,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>124</y>
+     <x>677</x>
+     <y>288</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2557,8 +2539,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>124</y>
+     <x>755</x>
+     <y>288</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2573,8 +2555,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>124</y>
+     <x>833</x>
+     <y>288</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2717,8 +2699,8 @@
    <slot>on_mode_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>144</y>
+     <x>882</x>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>982</x>
@@ -2749,8 +2731,8 @@
    <slot>on_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>110</y>
+     <x>881</x>
+     <y>135</y>
     </hint>
     <hint type="destinationlabel">
      <x>921</x>
@@ -2765,8 +2747,8 @@
    <slot>on_savesettings_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>100</y>
+     <x>882</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2798,7 +2780,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>475</y>
+     <y>355</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2813,8 +2795,8 @@
    <slot>on_search_int_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>122</y>
+     <x>881</x>
+     <y>342</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2845,8 +2827,8 @@
    <slot>on_camreference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>277</y>
+     <x>294</x>
+     <y>920</y>
     </hint>
     <hint type="destinationlabel">
      <x>999</x>
@@ -2861,8 +2843,8 @@
    <slot>on_clear_reference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>308</y>
+     <x>574</x>
+     <y>920</y>
     </hint>
     <hint type="destinationlabel">
      <x>991</x>
@@ -2878,7 +2860,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>881</x>
-     <y>402</y>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
      <x>976</x>
@@ -2894,7 +2876,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>369</y>
+     <y>258</y>
     </hint>
     <hint type="destinationlabel">
      <x>947</x>
@@ -2909,8 +2891,8 @@
    <slot>on_search_zmult_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>704</x>
-     <y>127</y>
+     <x>881</x>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>905</x>
@@ -2942,7 +2924,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>513</y>
+     <y>393</y>
     </hint>
     <hint type="destinationlabel">
      <x>952</x>
@@ -2957,8 +2939,8 @@
    <slot>on_search_corrected_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>119</y>
+     <x>882</x>
+     <y>509</y>
     </hint>
     <hint type="destinationlabel">
      <x>971</x>
@@ -2973,12 +2955,44 @@
    <slot>on_af_mode_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>801</x>
-     <y>556</y>
+     <x>882</x>
+     <y>447</y>
     </hint>
     <hint type="destinationlabel">
      <x>1010</x>
      <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>use_background_image_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_use_image_background_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>913</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>618</x>
+     <y>932</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>save_detectorimage_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_save_detectorimage_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>511</x>
+     <y>914</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>610</x>
+     <y>917</y>
     </hint>
    </hints>
   </connection>
@@ -3042,5 +3056,8 @@
   <slot>on_bg_img_clicked()</slot>
   <slot>on_af_bright_toggled(bool)</slot>
   <slot>on_af_mode_changed(int)</slot>
+  <slot>on_correct_image_toggled(bool)</slot>
+  <slot>on_use_image_background_clicked()</slot>
+  <slot>on_save_detectorimage_clicked()</slot>
  </slots>
 </ui>
