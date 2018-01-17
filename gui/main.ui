@@ -2001,13 +2001,13 @@
              <widget class="QSpinBox" name="exposure_time_spin">
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>100</width>
                 <height>25</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
+                <width>200</width>
                 <height>35</height>
                </size>
               </property>
