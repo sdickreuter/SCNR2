@@ -513,7 +513,7 @@ class SCNR(QtWidgets.QMainWindow):
 
             z_step = self.ryaxis
             if abs(z_step) > 0.001:
-                z_step = z_step * 1.0
+                z_step = z_step * self.settings.stepsize/10
             else:
                 z_step = 0.0
 
