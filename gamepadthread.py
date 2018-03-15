@@ -84,6 +84,9 @@ class GamepadThread(QObject):
     xaxisSignal = pyqtSignal(float)
     yaxisSignal = pyqtSignal(float)
 
+    rxaxisSignal = pyqtSignal(float)
+    ryaxisSignal = pyqtSignal(float)
+
     axis_map = []
     button_map = []
 
@@ -194,6 +197,11 @@ class GamepadThread(QObject):
                             self.xaxisSignal.emit(fvalue)
                         if axis is 'y':
                             self.yaxisSignal.emit(fvalue)
+                        if axis is 'rx':
+                            self.rxaxisSignal.emit(fvalue)
+                        if axis is 'ry':
+                            self.ryaxisSignal.emit(fvalue)
+
 
     @pyqtSlot()
     def process(self):
@@ -213,6 +221,8 @@ class GamepadThread(QObject):
             self.YSignal.disconnect()
             self.xaxisSignal.disconnect()
             self.yaxisSignal.disconnect()
+            self.rxaxisSignal.disconnect()
+            self.ryaxisSignal.disconnect()
         except TypeError:
             pass
         self.abort = True

@@ -224,10 +224,17 @@ class SCNR(QtWidgets.QMainWindow):
                     self.padthread.XSignal.connect(self.on_addpos_clicked)
                     self.padthread.YSignal.connect(self.on_stepup_clicked)
                     self.padthread.ASignal.connect(self.on_stepdown_clicked)
+
                     self.padthread.xaxisSignal.connect(self.on_xaxis)
                     self.xaxis = 0.0
                     self.padthread.yaxisSignal.connect(self.on_yaxis)
                     self.yaxis = 0.0
+
+                    self.padthread.rxaxisSignal.connect(self.on_rxaxis)
+                    self.rxaxis = 0.0
+                    self.padthread.ryaxisSignal.connect(self.on_ryaxis)
+                    self.ryaxis = 0.0
+
                     self.padthread.start()
                     self.gamepad_timer = QtCore.QTimer(self)
                     self.gamepad_timer.timeout.connect(self.check_pad_analog)
@@ -481,6 +488,14 @@ class SCNR(QtWidgets.QMainWindow):
     def on_yaxis(self, y):
         self.yaxis = -y
 
+    @QtCore.Slot(float)
+    def on_rxaxis(self, x):
+        self.rxaxis = x
+
+    @QtCore.Slot(float)
+    def on_ryaxis(self, y):
+        self.ryaxis = y
+
     @QtCore.Slot()
     def check_pad_analog(self):
         if self.pad_active:
@@ -496,6 +511,12 @@ class SCNR(QtWidgets.QMainWindow):
             else:
                 y_step = 0.0
 
+            z_step = self.ryaxis
+            if abs(z_step) > 0.001:
+                z_step = z_step * 1.0
+            else:
+                z_step = 0.0
+
             if abs(x_step) > 0.0001:
                 if abs(y_step) > 0.0001:
                     self.set_searchmax_ontarget(False)
@@ -506,7 +527,14 @@ class SCNR(QtWidgets.QMainWindow):
             elif abs(y_step) > 0.001:
                 self.set_searchmax_ontarget(False)
                 self.stage.moverel(dy=y_step)
+
+            if abs(z_step) > 0.0001:
+                self.stage.moverel(dz=z_step)
+                self.set_autofocus_ontarget(False)
+
             self.show_pos()
+
+
     # ----- END Slots for Gamepad
 
 
