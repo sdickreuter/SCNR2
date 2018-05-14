@@ -986,7 +986,7 @@ class Ui_MainWindow(object):
         self.label_22.setText(_translate("MainWindow", "Autofocus Mode:"))
         self.autofocus_combobox.setItemText(0, _translate("MainWindow", "Gauss-Fit"))
         self.autofocus_combobox.setItemText(1, _translate("MainWindow", "Maximum"))
-        self.offset_button.setText(_translate("MainWindow", "PushButton"))
+        self.offset_button.setText(_translate("MainWindow", "Set Offsets"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temperature:"))

@@ -1432,7 +1432,7 @@
           <item>
            <widget class="QPushButton" name="offset_button">
             <property name="text">
-             <string>PushButton</string>
+             <string>Set Offsets</string>
             </property>
            </widget>
           </item>
