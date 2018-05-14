@@ -848,7 +848,12 @@ class SCNR(QtWidgets.QMainWindow):
             print("Error Saving file " + save_as)
             QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
 
-
+    @QtCore.Slot()
+    def on_offset_clicked(self):
+        detector_offset, grating_offset, ok = dialogs.Offset_Dialog.get_Offsets(self.spectrometer)
+        if ok:
+            self.spectrometer.SetGratingOffset(grating_offset)
+            self.spectrometer.SetDetectorOffset(grating_offset)
 
     # ----- END Slots for Buttons
 

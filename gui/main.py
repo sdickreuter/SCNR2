@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -596,6 +596,14 @@ class Ui_MainWindow(object):
         self.autofocus_combobox.addItem("")
         self.autofocus_combobox.addItem("")
         self.verticalLayout_5.addWidget(self.autofocus_combobox)
+        self.line_9 = QtWidgets.QFrame(self.scan3d_tab)
+        self.line_9.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_9.setObjectName("line_9")
+        self.verticalLayout_5.addWidget(self.line_9)
+        self.offset_button = QtWidgets.QPushButton(self.scan3d_tab)
+        self.offset_button.setObjectName("offset_button")
+        self.verticalLayout_5.addWidget(self.offset_button)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem)
         self.right_tab.addTab(self.scan3d_tab, "")
@@ -920,6 +928,7 @@ class Ui_MainWindow(object):
         self.use_background_image_button.clicked.connect(MainWindow.on_use_image_background_clicked)
         self.save_detectorimage_button.clicked.connect(MainWindow.on_save_detectorimage_clicked)
         self.single_button.clicked.connect(MainWindow.on_single_clicked)
+        self.offset_button.clicked.connect(MainWindow.on_offset_clicked)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -977,6 +986,7 @@ class Ui_MainWindow(object):
         self.label_22.setText(_translate("MainWindow", "Autofocus Mode:"))
         self.autofocus_combobox.setItemText(0, _translate("MainWindow", "Gauss-Fit"))
         self.autofocus_combobox.setItemText(1, _translate("MainWindow", "Maximum"))
+        self.offset_button.setText(_translate("MainWindow", "PushButton"))
         self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temperature:"))

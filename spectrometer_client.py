@@ -157,6 +157,24 @@ class SpectrometerClient:
         ret = self.make_request('setgrating',grating)
         self._return_value_is_ok(ret)
 
+    def GetGratingOffset(self):
+        # print("Send Request: getgrating")
+        return self.make_request('getgratingoffset', None)
+
+    def SetGratingOffset(self, offset):
+        # print("Send Request: setgrating")
+        ret = self.make_request('setgratingoffset', offset)
+        self._return_value_is_ok(ret)
+
+    def GetDetectorOffset(self):
+        # print("Send Request: getgrating")
+        return self.make_request('getdetectoroffset', None)
+
+    def SetDetectorOffset(self, offset):
+        # print("Send Request: setgrating")
+        ret = self.make_request('setdetectoroffset', offset)
+        self._return_value_is_ok(ret)
+
     def AbortAcquisition(self):
         #print("Send Request: abortacquisition")
         ret = self.make_request('abortacquisition',None)

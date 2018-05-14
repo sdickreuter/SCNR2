@@ -87,6 +87,20 @@ class SpectrometerServer:
                 self.spectrometer.SetGrating(param)
                 self.send_object('ok')
 
+            elif msg == 'getgratingoffset':
+                self.send_object(self.spectrometer.GetGratingOffset())
+
+            elif msg == 'setgratingoffset':
+                self.spectrometer.SetGratingOffset(param)
+                self.send_object('ok')
+
+            elif msg == 'getdetectoroffset':
+                self.send_object(self.spectrometer.GetDetectorOffset())
+
+            elif msg == 'setdetectoroffset':
+                self.spectrometer.SetDetectorOffset(param)
+                self.send_object('ok')
+
             elif msg == 'abortacquisition':
                 self.spectrometer.AbortAcquisition()
                 self.send_object('ok')

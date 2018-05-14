@@ -11,6 +11,7 @@ from qtpy import QtCore
 from gui.settingsdialog import Ui_SettingsDialog
 from gui.griddialog import Ui_SpanGridDialog
 from gui.startup import Ui_Startup_Dialog
+from gui.offsetdialog import Ui_OffsetDialog
 
 import numpy as np
 import string
@@ -223,6 +224,26 @@ class StartUp_Dialog(QtWidgets.QDialog):
         dialog = StartUp_Dialog(parent)
         result = dialog.exec_()
         return dialog.ui.setup_combobox.currentText(), dialog.ui.stage_checkbox.isChecked(), dialog.ui.cam_checkbox.isChecked(), result == QtWidgets.QDialog.Accepted
+
+
+class Offset_Dialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super(Offset_Dialog, self).__init__(parent)
+        self.ui = Ui_OffsetDialog()
+        self.ui.setupUi(self)
+
+    # static method to create the dialog and return (x steps, y steps, accepted)
+    @staticmethod
+    def get_Offsets(spectrometer,parent=None):
+        dialog = Offset_Dialog(parent)
+        dialog.ui.gratingoffset_label.setText("Grating Offset for Grating "+spectrometer.GetGrating())
+        dialog.ui.detectoroffset_spinBox.setValue(spectrometer.GetDetectorOffset())
+        dialog.ui.gratingoffset_spinBox.setValue(spectrometer.GetGratingOffset())
+
+        result = dialog.exec_()
+        return dialog.ui.detectoroffset_spinBox.value(), dialog.ui.gratingoffset_spinBox.value(), result == QtWidgets.QDialog.Accepted
+
+
 
 
 

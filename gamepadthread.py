@@ -81,6 +81,7 @@ class GamepadThread(QObject):
     BSignal = pyqtSignal()
     XSignal = pyqtSignal()
     YSignal = pyqtSignal()
+
     xaxisSignal = pyqtSignal(float)
     yaxisSignal = pyqtSignal(float)
 
