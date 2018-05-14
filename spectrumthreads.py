@@ -256,8 +256,8 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetSlitWidth(150)
 
                 #freespace
-                self.spectrometer.SetMinVertReadout(16)
-                self.spectrometer.SetSlitWidth(250)
+                self.spectrometer.SetMinVertReadout(20)
+                self.spectrometer.SetSlitWidth(300)
 
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
@@ -1124,6 +1124,7 @@ class ScanSearchThread(ScanThread):
         super(ScanSearchThread, self).__del__()
 
     def intermediatework(self):
+        self.searchthread.search()
         self.autofocusthread.focus()
         self.searchthread.search()
 
@@ -1348,6 +1349,14 @@ class ScanSearchMeanThread(ScanMeanThread):
             f.write('\n')
 
     def intermediatework(self):
+        if not self.abort:
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+            self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread.finishSignal.connect(self.search_finished)
+            self.searchthread.search()
+            self.searchthread.stop()
+            self.searchthread = None
+
         if not self.abort:
             self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
             self.autofocusthread.finishSignal.connect(self.autofocus_finished)

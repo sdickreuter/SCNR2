@@ -236,7 +236,7 @@ class Offset_Dialog(QtWidgets.QDialog):
     @staticmethod
     def get_Offsets(spectrometer,parent=None):
         dialog = Offset_Dialog(parent)
-        dialog.ui.gratingoffset_label.setText("Grating Offset for Grating "+spectrometer.GetGrating())
+        dialog.ui.gratingoffset_label.setText("Grating Offset for Grating "+str(spectrometer.GetGrating()))
         dialog.ui.detectoroffset_spinBox.setValue(spectrometer.GetDetectorOffset())
         dialog.ui.gratingoffset_spinBox.setValue(spectrometer.GetGratingOffset())
 

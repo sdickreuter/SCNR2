@@ -7,7 +7,7 @@ from scipy import signal
 from scipy import stats
 import peakutils
 import matplotlib.pyplot as plt
-from numba import jit
+#from numba import jit
 from scipy import ndimage
 
 

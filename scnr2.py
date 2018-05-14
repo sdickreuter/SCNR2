@@ -414,8 +414,8 @@ class SCNR(QtWidgets.QMainWindow):
                     image[:,i] = image[:,i] / (self.spectrum.lamp - self.spectrum.dark)
                 image = image - image.min()
                 image = image / image.max()
-                image = image * 1000
-                #image = np.array(image,dtype=np.int32)
+                image = image * 10000
+                image = np.array(image,dtype=np.int)
                 print('correct_image finished')
 
         return image
@@ -851,9 +851,13 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_offset_clicked(self):
         detector_offset, grating_offset, ok = dialogs.Offset_Dialog.get_Offsets(self.spectrometer)
+
         if ok:
+            print("1 ")
             self.spectrometer.SetGratingOffset(grating_offset)
-            self.spectrometer.SetDetectorOffset(grating_offset)
+            print("2 ")
+            self.spectrometer.SetDetectorOffset(detector_offset)
+            print("3 ")
 
     # ----- END Slots for Buttons
 
