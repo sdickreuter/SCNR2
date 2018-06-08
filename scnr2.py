@@ -161,7 +161,7 @@ class SCNR(QtWidgets.QMainWindow):
                 elif setup == 'Zeiss':  # Microscope Setup
                     self.cam = camerathread.CameraThread(xflip=False,yflip=False)
                 elif setup == 'Freespace':  # Freespace Setup
-                    self.cam = camerathread.CameraThread(xflip=True,yflip=False)
+                    self.cam = camerathread.CameraThread(xflip=False,yflip=True)
 
                 img = self.cam.get_image()
                 print(img.shape)
@@ -490,10 +490,12 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot(float)
     def on_rxaxis(self, x):
+        print(x)
         self.rxaxis = x
 
     @QtCore.Slot(float)
     def on_ryaxis(self, y):
+        print(y)
         self.ryaxis = y
 
     @QtCore.Slot()

@@ -198,9 +198,9 @@ class GamepadThread(QObject):
                             self.xaxisSignal.emit(fvalue)
                         if axis is 'y':
                             self.yaxisSignal.emit(fvalue)
-                        if axis is 'rx':
+                        if axis is 'z':
                             self.rxaxisSignal.emit(fvalue)
-                        if axis is 'ry':
+                        if axis is 'rz':
                             self.ryaxisSignal.emit(fvalue)
 
 
@@ -243,6 +243,8 @@ if __name__ == '__main__':
             self.pad.XSignal.connect(self.on_X)
             self.pad.xaxisSignal.connect(self.on_x)
             self.pad.yaxisSignal.connect(self.on_y)
+            self.pad.rxaxisSignal.connect(self.on_x)
+            self.pad.ryaxisSignal.connect(self.on_y)
             #self.pad.start()
 
         @pyqtSlot()

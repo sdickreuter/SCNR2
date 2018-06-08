@@ -385,7 +385,7 @@ class AutoFocusThread(MeasurementThread):
             amp = amp/amp.max()
             sigma = sigma - sigma.min() + 1
             sigma = sigma/sigma.max()
-            focus = amp / sigma
+            focus = amp #/ sigma
         else:
             focus = amp / 1
 
@@ -1349,13 +1349,13 @@ class ScanSearchMeanThread(ScanMeanThread):
             f.write('\n')
 
     def intermediatework(self):
-        if not self.abort:
-            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
-            self.searchthread.specSignal.connect(self.specslot)
-            self.searchthread.finishSignal.connect(self.search_finished)
-            self.searchthread.search()
-            self.searchthread.stop()
-            self.searchthread = None
+#        if not self.abort:
+#            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+#           self.searchthread.specSignal.connect(self.specslot)
+#            self.searchthread.finishSignal.connect(self.search_finished)
+#            self.searchthread.search()
+#            self.searchthread.stop()
+#            self.searchthread = None
 
         if not self.abort:
             self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
