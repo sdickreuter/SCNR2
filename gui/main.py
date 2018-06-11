@@ -575,7 +575,7 @@ class Ui_MainWindow(object):
         self.label_21.setObjectName("label_21")
         self.verticalLayout_5.addWidget(self.label_21)
         self.lockin_button = QtWidgets.QPushButton(self.scan3d_tab)
-        self.lockin_button.setEnabled(False)
+        self.lockin_button.setEnabled(True)
         self.lockin_button.setMinimumSize(QtCore.QSize(0, 25))
         self.lockin_button.setMaximumSize(QtCore.QSize(16777215, 35))
         self.lockin_button.setObjectName("lockin_button")
