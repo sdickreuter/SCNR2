@@ -227,7 +227,10 @@ class AutoFocusThread(MeasurementThread):
     def focus(self):
         def calc_f(plot = False):
 
-            if self.settings.af_use_bright:
+            amp = 0
+            sigma = 0
+
+            if self.settings.autofocus_mode == 'brightfield':
                 self.spectrometer.SetMinVertReadout(32)
                 self.spectrometer.SetSlitWidth(self.settings.slit_width)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
@@ -238,18 +241,36 @@ class AutoFocusThread(MeasurementThread):
                 time.sleep(0.3)
                 img = self.spectrometer.TakeSingleTrack(raw=True)
                 self.stage.moverel(dy=-1.0)
-                #time.sleep(0.5)
                 img -= buf
                 dist = 7
                 #img = ndimage.median_filter(img, 3)
                 img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
                 #img = ndimage.gaussian_filter(img, 2)
+                img = ndimage.gaussian_filter(img, 1)
 
-            else:
+                try:
+
+                    img = np.sum(img, axis=0)
+                    x = np.arange(img.shape[0])
+                    #img = img - (img[0]+img[-1])/2
+                    #img = img / 2000
+
+                    amp = np.abs((img.max()-img.min()))
+                    sigma = 1 #img.max()+img.min()
+
+                    plt.plot(x,img)
+                    plt.title(amp/sigma)
+                    plt.savefig("search_max/autofocus_image.png")
+                    plt.close()
+
+                except (RuntimeError, ValueError) as e:
+                    print(e)
+                    return 0
+                return amp/sigma
+
+            elif self.settings.autofocus_mode == 'gauss' or self.settings.autofocus_mode == 'gaussexport':
                 self.spectrometer.SetCentreWavelength(0)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-                #self.spectrometer.SetMinVertReadout(28)
-                #self.spectrometer.SetSlitWidth(500)
 
                 # nikon arthur
                 #self.spectrometer.SetMinVertReadout(16)
@@ -261,95 +282,102 @@ class AutoFocusThread(MeasurementThread):
 
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
-                #img = self.spectrometer.TakeSingleTrack(raw=True)[975+8:987+8,:]
-                #img = self.spectrometer.TakeSingleTrack(raw=True)[973+9:990+4,:]
 
-                #img = self.spectrometer.TakeSingleTrack(raw=True)
-                dist = 2
-
-            #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
-            #img = ndimage.median_filter(img, 2)
-            img = ndimage.gaussian_filter(img, 1)
+                #img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
+                #img = ndimage.median_filter(img, 2)
+                img = ndimage.gaussian_filter(img, 1)
 
 
-            #if True:
-            if plot:
+                x = np.arange(img.shape[0])
+                y = np.arange(img.shape[1])
+                x, y = np.meshgrid(x, y)
+                xdata = (x.ravel(), y.ravel())
+                ydata = img.T.ravel()
+
+                coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
+                if len(coordinates) < 1:
+                    coordinates = [img.shape[1] / 2, img.shape[0] / 2]
+                else:
+                    coordinates = coordinates[0]
+
+                try:
+                    initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 1, np.mean(img))
+                    bounds = ((0, 0, 0, 0, -np.inf),
+                              (np.inf, x.max(), y.max(), np.inf, np.inf))
+                    popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
+                    amp = popt[0]
+                    sigma = popt[3]
+
+                    plt.imshow(img.T)
+                    plt.title('amp: '+str(amp)+' | sigma: ' +str(sigma))
+                    plt.savefig("search_max/autofocus_image.png")
+                    plt.close()
+
+                    if self.settings.autofocus_mode == 'gaussexport':
+                        plt.imshow(img.T)
+                        plt.savefig("search_max/zmisc/"+str(np.round(self.stage.last_pos[2]))+".png")
+                        plt.close()
+
+                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos[2]))+".txt",img)
+
+
+                except (RuntimeError,ValueError) as e:
+                    print(e)
+                    plt.imshow(img.T)
+                    plt.title('no fit')
+                    plt.savefig("search_max/autofocus_image.png")
+                    plt.close()
+
+                    return 0
+                return amp/sigma
+
+
+            elif self.settings.autofocus_mode == 'maximum':
+                self.spectrometer.SetCentreWavelength(0)
+                self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+
+                # nikon arthur
+                # self.spectrometer.SetMinVertReadout(16)
+                # self.spectrometer.SetSlitWidth(150)
+
+                # freespace
+                self.spectrometer.SetMinVertReadout(20)
+                self.spectrometer.SetSlitWidth(300)
+
+                img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img,
+                      :]
+
+                # img = ndimage.median_filter(img, footprint=morphology.disk(3), mode="mirror")
+                # img = ndimage.median_filter(img, 2)
+                img = ndimage.gaussian_filter(img, 1)
+
+                img = ndimage.median_filter(img, 2)
+                amp = np.abs((img.max() - img.min()))
+
                 plt.imshow(img.T)
-                plt.title(str(np.abs((img.max()-img.mean()))))
+                plt.title(str(np.abs((img.max() - img.mean()))))
                 plt.savefig("search_max/autofocus_image.png")
                 plt.close()
+
+                return amp
+
+            elif self.settings.autofocus_mode == 'zscan':
+                self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+                spec = self.spectrometer.TakeSingleTrack()
+                mask = (self.spectrometer.GetWavelength() > (self.settings.zscan_centre+self.settings.zscan_width)) & (self.spectrometer.GetWavelength() < (self.settings.zscan_centre-self.settings.zscan_width))
+                spec = spec[mask]
+                return np.mean(spec)
+
+
             else:
-                amp = 0
-                sigma = 1
+                print('Error setting Autofocus Mode !!!')
 
-                if self.settings.af_use_bright:
-                    try:
 
-                        img = np.sum(img, axis=0)
-                        x = np.arange(img.shape[0])
-                        #img = img - (img[0]+img[-1])/2
-                        #img = img / 2000
 
-                        amp = np.abs((img.max()-img.min()))
-                        sigma = 1 #img.max()+img.min()
 
-                        plt.plot(x,img)
-                        plt.title(amp/sigma)
-                        plt.savefig("search_max/autofocus_image.png")
-                        plt.close()
 
-                    except (RuntimeError, ValueError) as e:
-                        print(e)
-                        return 0, 1
-                else:
 
-                    if self.settings.autofocus_mode == 'gauss':
-                        x = np.arange(img.shape[0])
-                        y = np.arange(img.shape[1])
-                        x, y = np.meshgrid(x, y)
-                        xdata = (x.ravel(), y.ravel())
-                        ydata = img.T.ravel()
 
-                        coordinates = feature.peak_local_max(img, min_distance=20, exclude_border=2)
-                        if len(coordinates) < 1:
-                            coordinates = [img.shape[1] / 2, img.shape[0] / 2]
-                        else:
-                            coordinates = coordinates[0]
-
-                        try:
-                            initial_guess = ( np.max(img) - np.min(img), coordinates[0], coordinates[1], 1, np.mean(img))
-                            bounds = ((0, 0, 0, 0, -np.inf),
-                                      (np.inf, x.max(), y.max(), np.inf, np.inf))
-                            popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
-                            amp = popt[0]
-                            sigma = popt[3]
-
-                            plt.imshow(img.T)
-                            plt.title('amp: '+str(amp)+' | sigma: ' +str(sigma))
-                            plt.savefig("search_max/autofocus_image.png")
-                            plt.close()
-
-                        except (RuntimeError,ValueError) as e:
-                            print(e)
-                            plt.imshow(img.T)
-                            plt.title('no fit')
-                            plt.savefig("search_max/autofocus_image.png")
-                            plt.close()
-
-                            return 0, 1
-                    elif self.settings.autofocus_mode == 'maximum':
-                        img = ndimage.median_filter(img, 2)
-                        amp = np.abs((img.max() - img.min()))
-
-                        plt.imshow(img.T)
-                        plt.title(str(np.abs((img.max() - img.mean()))))
-                        plt.savefig("search_max/autofocus_image.png")
-                        plt.close()
-
-                        return amp, 1
-                    else:
-                        print('Error setting Autofocus Mode !!!')
-                return amp, sigma
 
         self.stage.query_pos()
         startpos = self.stage.last_pos()
@@ -357,13 +385,11 @@ class AutoFocusThread(MeasurementThread):
         pos = d * self.settings.zmult + startpos[2]
 
         focus = np.zeros(self.settings.rasterdim)
-        amp = np.zeros(self.settings.rasterdim)
-        sigma = np.zeros(self.settings.rasterdim)
 
         self.progress = progress.Progress(max=len(pos))
         for k in range(len(pos)):
             self.stage.moveabs(z=pos[k])
-            amp[k], sigma[k] = calc_f()
+            focus[k] = calc_f()
 
             self.progress.next()
             self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
@@ -378,23 +404,12 @@ class AutoFocusThread(MeasurementThread):
                 self.stop()
                 return
 
-        #focus = amp/amp.max() * 1/(sigma/sigma.max())
 
-        if self.settings.autofocus_mode == 'gauss' and self.settings.af_use_bright == False:
-            amp = amp - amp.min() + 1
-            amp = amp/amp.max()
-            sigma = sigma - sigma.min() + 1
-            sigma = sigma/sigma.max()
-            focus = amp #/ sigma
-        else:
-            focus = amp / 1
-
-
-        valid_indices = focus > 0
+        valid_indices = focus > 0.05*focus.max()
         focus = focus[valid_indices]
         pos = pos[valid_indices]
 
-        focus_filt = savgol_filter(focus,5,1)
+        focus_filt = savgol_filter(focus,3,1)
         maxind = np.argmax(focus)
         minval = np.min(focus)
         maxval = np.max(focus)

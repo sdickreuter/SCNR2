@@ -63,8 +63,9 @@ class Settings(object):
 
         self.min_ind_img = int(self.config['autofocus']['min_ind_img'])
         self.max_ind_img = int(self.config['autofocus']['max_ind_img'])
-        self.af_use_bright = False
-        self.autofocus_mode = 'gauss'
+        self.autofocus_mode = self.config['autfocus']['mode']
+        self.zscan_centre = int(self.config['autofocus']['zscan_centre'])
+        self.zscan_width = int(self.config['autofocus']['zscan_width'])
 
     def save(self):
         self.config.set('spectrum', 'integration_time', str(self.integration_time))

@@ -91,6 +91,18 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.search_zmult_spin.setValue(self.settings.zmult)
         self.ui.exposure_time_spin.setValue(self.settings.cam_exposure_time)
         self.ui.label_stepsize.setText(str(self.settings.stepsize))
+        self.ui.zscan_centre_spinbox.setValue(self.settings.zscan_centre)
+        self.ui.zscan_width_spinbox.setValue(self.settings.zscan_width)
+        if self.settings.autofocus_mode == 'gauss':
+            self.ui.autofocus_combobox.setCurrentIndex(0)
+        elif self.settings.autofocus_mode == 'gaussexport':
+            self.ui.autofocus_combobox.setCurrentIndex(1)
+        elif self.settings.autofocus_mode == 'maximum':
+            self.ui.autofocus_combobox.setCurrentIndex(2)
+        elif self.settings.autofocus_mode == 'brightfield':
+            self.ui.autofocus_combobox.setCurrentIndex(3)
+        elif self.settings.autofocus_mode == 'zscan':
+            self.ui.autofocus_combobox.setCurrentIndex(4)
 
         self.pw = pg.PlotWidget()
         # vb = CustomViewBox()
@@ -1018,11 +1030,16 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot(int)
     def on_af_mode_changed(self, index):
-         if index == 0:
+        if index == 0:
             self.settings.autofocus_mode = 'gauss'
-         elif index == 1:
+        elif index == 1:
+            self.settings.autofocus_mode = 'gaussexport'
+        elif index == 2:
             self.settings.autofocus_mode = 'maximum'
-
+        elif index == 3:
+            self.settings.autofocus_mode = 'brightfield'
+        elif index == 4:
+            self.settings.autofocus_mode = 'zscan'
 
 
 
