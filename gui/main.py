@@ -957,6 +957,8 @@ class Ui_MainWindow(object):
         self.save_detectorimage_button.clicked.connect(MainWindow.on_save_detectorimage_clicked)
         self.single_button.clicked.connect(MainWindow.on_single_clicked)
         self.offset_button.clicked.connect(MainWindow.on_offset_clicked)
+        self.zscan_centre_spinbox.editingFinished.connect(MainWindow.on_zscan_centre_edited)
+        self.zscan_width_spinbox.editingFinished.connect(MainWindow.on_zscan_width_edited)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

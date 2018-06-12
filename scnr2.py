@@ -1036,6 +1036,14 @@ class SCNR(QtWidgets.QMainWindow):
         elif index == 5:
             self.settings.autofocus_mode = 'gausswidth'
 
+    @QtCore.Slot()
+    def on_zscan_centre_edited(self):
+        self.settings.zscan_centre = self.ui.zscan_centre_spinbox.value()
+
+    @QtCore.Slot()
+    def on_zscan_width_edited(self):
+        self.settings.zscan_width = self.ui.zscan_width_spinbox.value()
+
 
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
