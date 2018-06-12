@@ -63,7 +63,7 @@ class Settings(object):
 
         self.min_ind_img = int(self.config['autofocus']['min_ind_img'])
         self.max_ind_img = int(self.config['autofocus']['max_ind_img'])
-        self.autofocus_mode = self.config['autfocus']['mode']
+        self.autofocus_mode = self.config['autofocus']['mode']
         self.zscan_centre = int(self.config['autofocus']['zscan_centre'])
         self.zscan_width = int(self.config['autofocus']['zscan_width'])
 
@@ -99,6 +99,13 @@ class Settings(object):
 
         self.config.set('autofocus', 'min_ind_img', str(self.min_ind_img))
         self.config.set('autofocus', 'max_ind_img', str(self.max_ind_img))
+
+        self.config.set('autofocus','mode',self.autofocus_mode)
+        self.config.set('autofocus','zscan_centre',str(self.zscan_centre))
+        self.config.set('autofocus','zscan_width',str(self.zscan_width))
+
+
+
 
         try:
             with open(self._filename, 'w') as configfile:

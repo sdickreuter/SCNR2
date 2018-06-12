@@ -508,7 +508,7 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot(float)
     def on_ryaxis(self, y):
         print(y)
-        self.ryaxis = y
+        self.ryaxis = -y
 
     @QtCore.Slot()
     def check_pad_analog(self):
@@ -527,12 +527,12 @@ class SCNR(QtWidgets.QMainWindow):
 
             z_step = self.ryaxis
             if abs(z_step) > 0.001:
-                z_step = z_step * self.settings.stepsize/10
+                z_step = z_step * self.settings.stepsize
             else:
                 z_step = 0.0
 
-            if abs(x_step) > 0.0001:
-                if abs(y_step) > 0.0001:
+            if abs(x_step) > 0.001:
+                if abs(y_step) > 0.001:
                     self.set_searchmax_ontarget(False)
                     self.stage.moverel(dx=x_step, dy=y_step)
                 else:
@@ -1020,13 +1020,6 @@ class SCNR(QtWidgets.QMainWindow):
         else:
             self.ui.autofocus_button.setIcon(QtGui.QIcon())
 
-    @QtCore.Slot(bool)
-    def on_af_bright_toggled(self, state):
-        if state:
-            self.settings.af_use_bright = True
-        else:
-            self.settings.af_use_bright = False
-
 
     @QtCore.Slot(int)
     def on_af_mode_changed(self, index):
@@ -1040,7 +1033,8 @@ class SCNR(QtWidgets.QMainWindow):
             self.settings.autofocus_mode = 'brightfield'
         elif index == 4:
             self.settings.autofocus_mode = 'zscan'
-
+        elif index == 5:
+            self.settings.autofocus_mode = 'gausswidth'
 
 
 def sigint_handler(*args):

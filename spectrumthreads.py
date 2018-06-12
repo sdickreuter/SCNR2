@@ -268,7 +268,9 @@ class AutoFocusThread(MeasurementThread):
                     return 0
                 return amp/sigma
 
-            elif self.settings.autofocus_mode == 'gauss' or self.settings.autofocus_mode == 'gaussexport':
+            elif self.settings.autofocus_mode == 'gauss' \
+                    or self.settings.autofocus_mode == 'gaussexport' \
+                    or self.settings.autofocus_mode == 'gausswidth':
                 self.spectrometer.SetCentreWavelength(0)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
 
@@ -314,11 +316,31 @@ class AutoFocusThread(MeasurementThread):
                     plt.close()
 
                     if self.settings.autofocus_mode == 'gaussexport':
+                        self.stage.query_pos()
                         plt.imshow(img.T)
-                        plt.savefig("search_max/zmisc/"+str(np.round(self.stage.last_pos[2]))+".png")
+                        plt.savefig("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".png")
                         plt.close()
 
-                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos[2]))+".txt",img)
+                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".txt",img)
+
+                        self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
+                        self.spectrometer.SetExposureTime(self.settings.integration_time)
+                        self.spectrometer.SetMinVertReadout(1)
+                        self.spectrometer.SetSlitWidth(self.settings.slit_width)
+
+                        spec = self.spectrometer.TakeSingleTrack()
+                        wl = self.spectrometer.GetWavelength()
+                        data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
+                        with open("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_spec.txt", 'w') as f:
+                            f.write("wavelength,counts" + '\n')
+                            for i in range(len(data)):
+                                f.write(str(data[i][0]) + "," + str(data[i][1]) + '\n')
+
+                        self.spectrometer.SetCentreWavelength(0)
+                        self.spectrometer.SetExposureTime(self.settings.search_integration_time)
+                        self.spectrometer.SetMinVertReadout(20)
+                        self.spectrometer.SetSlitWidth(300)
+
 
 
                 except (RuntimeError,ValueError) as e:
@@ -329,8 +351,10 @@ class AutoFocusThread(MeasurementThread):
                     plt.close()
 
                     return 0
-                return amp/sigma
-
+                if self.settings.autofocus_mode == 'gauss':
+                    return amp/sigma
+                elif self.settings.autofocus_mode == 'gausswidth':
+                    return 1/sigma
 
             elif self.settings.autofocus_mode == 'maximum':
                 self.spectrometer.SetCentreWavelength(0)
@@ -364,7 +388,8 @@ class AutoFocusThread(MeasurementThread):
             elif self.settings.autofocus_mode == 'zscan':
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
                 spec = self.spectrometer.TakeSingleTrack()
-                mask = (self.spectrometer.GetWavelength() > (self.settings.zscan_centre+self.settings.zscan_width)) & (self.spectrometer.GetWavelength() < (self.settings.zscan_centre-self.settings.zscan_width))
+                wl = self.spectrometer.GetWavelength()
+                mask = (wl < (self.settings.zscan_centre+self.settings.zscan_width)) & (wl > (self.settings.zscan_centre-self.settings.zscan_width))
                 spec = spec[mask]
                 return np.mean(spec)
 
@@ -408,6 +433,8 @@ class AutoFocusThread(MeasurementThread):
         valid_indices = focus > 0.05*focus.max()
         focus = focus[valid_indices]
         pos = pos[valid_indices]
+        focus -= focus.min()
+        focus /= focus.max()
 
         focus_filt = savgol_filter(focus,3,1)
         maxind = np.argmax(focus)
@@ -466,10 +493,10 @@ class AutoFocusThread(MeasurementThread):
             ax.scatter(peakx,peaky/focus.max(),s=100,c="Red")
 
         ax.set_title("Focus")
-        ax.plot(pos, sigma, '.')
-        ax.plot(pos, amp, '.')
-        ax.plot(pos, focus/focus.max(), 'o')
-        ax.plot(pos, focus_filt/focus.max(), 'x')
+        #ax.plot(pos, sigma, '.')
+        #ax.plot(pos, focus, '.')
+        ax.plot(pos, focus, 'o')
+        ax.plot(pos, focus_filt, 'x')
         plt.savefig("search_max/autofocus.png")
         plt.close()
 
