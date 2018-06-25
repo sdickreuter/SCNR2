@@ -223,6 +223,8 @@ class AutoFocusThread(MeasurementThread):
         self.stage = stage
         self.settings = settings
         super(AutoFocusThread, self).__init__(spectrometer)
+        self.searchthread = None
+
 
     def focus(self):
         def calc_f(plot = False):
@@ -282,6 +284,12 @@ class AutoFocusThread(MeasurementThread):
                 self.spectrometer.SetMinVertReadout(20)
                 self.spectrometer.SetSlitWidth(300)
 
+                self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage)
+                #self.searchthread.specSignal.connect(self.specslot)
+                #self.searchthread.finishSignal.connect(self.search_finished)
+                self.searchthread.search()
+                self.searchthread.stop()
+                self.searchthread = None
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
 
@@ -396,12 +404,6 @@ class AutoFocusThread(MeasurementThread):
 
             else:
                 print('Error setting Autofocus Mode !!!')
-
-
-
-
-
-
 
 
         self.stage.query_pos()
