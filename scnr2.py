@@ -169,9 +169,9 @@ class SCNR(QtWidgets.QMainWindow):
 
             try:
                 if setup == 'Nikon':
-                    self.cam = camerathread.CameraThread(xflip=False,yflip=False)
+                    self.cam = camerathread.CameraThread(xflip=True,yflip=True)
                 elif setup == 'Zeiss':  # Microscope Setup
-                    self.cam = camerathread.CameraThread(xflip=False,yflip=False)
+                    self.cam = camerathread.CameraThread(xflip=True,yflip=True)
                 elif setup == 'Freespace':  # Freespace Setup
                     self.cam = camerathread.CameraThread(xflip=False,yflip=True)
 

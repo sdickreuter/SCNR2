@@ -223,7 +223,7 @@ class AutoFocusThread(MeasurementThread):
         self.stage = stage
         self.settings = settings
         super(AutoFocusThread, self).__init__(spectrometer)
-        self.searchthread = None
+        # self.searchthread = None
 
 
     def focus(self):
@@ -281,15 +281,9 @@ class AutoFocusThread(MeasurementThread):
                 #self.spectrometer.SetSlitWidth(150)
 
                 #freespace
-                self.spectrometer.SetMinVertReadout(20)
+                #self.spectrometer.SetMinVertReadout(20)
+                self.spectrometer.SetMinVertReadout(1)
                 self.spectrometer.SetSlitWidth(300)
-
-                self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage)
-                #self.searchthread.specSignal.connect(self.specslot)
-                #self.searchthread.finishSignal.connect(self.search_finished)
-                self.searchthread.search()
-                self.searchthread.stop()
-                self.searchthread = None
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
 
@@ -317,11 +311,21 @@ class AutoFocusThread(MeasurementThread):
                     popt, pcov = opt.curve_fit(gauss2D, xdata, ydata, p0=initial_guess, bounds=bounds)#, method='dogbox')
                     amp = popt[0]
                     sigma = popt[3]
+                    perr =np.sqrt(np.diag(pcov))
+
 
                     plt.imshow(img.T)
-                    plt.title('amp: '+str(amp)+' | sigma: ' +str(sigma))
+                    plt.title('amp: '+str(np.round(amp,2))+' +- '+str(np.round(perr[0],5))+' | sigma: ' +str(np.round(sigma,2))+' +- '+str(np.round(perr[3],5)))
                     plt.savefig("search_max/autofocus_image.png")
                     plt.close()
+
+                    if perr[3]/popt[3] > 0.1:
+                        sigma = np.NaN
+                        amp = np.NaN
+                    if perr[0]/popt[0] > 0.1:
+                        sigma = np.NaN
+                        amp = np.NaN
+
 
                     if self.settings.autofocus_mode == 'gaussexport':
                         self.stage.query_pos()
@@ -336,6 +340,16 @@ class AutoFocusThread(MeasurementThread):
                         self.spectrometer.SetMinVertReadout(1)
                         self.spectrometer.SetSlitWidth(self.settings.slit_width)
 
+                        # self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage)
+                        # # self.searchthread.specSignal.connect(self.specslot)
+                        # # self.searchthread.finishSignal.connect(self.search_finished)
+                        # self.searchthread.search()
+                        # self.searchthread.stop()
+                        # self.searchthread = None
+                        # self.stage.query_pos()
+
+                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_pos.txt",self.stage.last_pos())
+
                         spec = self.spectrometer.TakeSingleTrack()
                         wl = self.spectrometer.GetWavelength()
                         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
@@ -346,7 +360,8 @@ class AutoFocusThread(MeasurementThread):
 
                         self.spectrometer.SetCentreWavelength(0)
                         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
-                        self.spectrometer.SetMinVertReadout(20)
+                        #self.spectrometer.SetMinVertReadout(20)
+                        self.spectrometer.SetMinVertReadout(1)
                         self.spectrometer.SetSlitWidth(300)
 
 
@@ -373,7 +388,8 @@ class AutoFocusThread(MeasurementThread):
                 # self.spectrometer.SetSlitWidth(150)
 
                 # freespace
-                self.spectrometer.SetMinVertReadout(20)
+                #self.spectrometer.SetMinVertReadout(20)
+                self.spectrometer.SetMinVertReadout(1)
                 self.spectrometer.SetSlitWidth(300)
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img,
@@ -432,7 +448,8 @@ class AutoFocusThread(MeasurementThread):
                 return
 
 
-        valid_indices = focus > 0.05*focus.max()
+
+        valid_indices = focus > 0.01*np.nanmax(focus)
         focus = focus[valid_indices]
         pos = pos[valid_indices]
         focus -= focus.min()
