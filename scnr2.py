@@ -7,7 +7,7 @@ from qtpy import QtCore,QtWidgets,QtGui
 
 import pyqtgraph as pg
 from skimage import exposure
-
+from skimage import io
 # from PyQt5 import uic
 # Ui_MainWindow = uic.loadUiType("gui/main.ui")[0]
 # from qtpy import uic
@@ -397,6 +397,22 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_clear_reference_clicked(self):
         self.cam_reference_image = None
+
+    @QtCore.Slot()
+    def on_save_image_clicked(self):
+        img = self.img.image
+        save_as = QtWidgets.QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
+                                                        'CSV Files (*.csv)')
+        save_as = save_as[0]
+        if not save_as[-4:] == '.csv':
+            save_as += ".csv"
+
+        try:
+            np.savetxt(save_as, img)
+            io.imsave(save_as+'.jpg',img)
+        except:
+            print("Error Saving file " + save_as)
+            QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
 
     @QtCore.Slot(int)
     def on_lefttab_changed(self, index):
