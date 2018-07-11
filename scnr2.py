@@ -856,8 +856,11 @@ class SCNR(QtWidgets.QMainWindow):
             save_as += ".csv"
 
         try:
-            img = np.vstack((img.T,self.spectrometer.GetWavelength()))
-            np.savetxt(save_as,img)
+            if self.ui.mode_combobox.currentIndex() == 2:
+                img = np.vstack((img.T,self.spectrometer.GetWavelength()))
+                np.savetxt(save_as,img)
+            elif self.ui.mode_combobox.currentIndex() == 1:
+                np.savetxt(save_as,img)
         except:
             print("Error Saving file " + save_as)
             QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)

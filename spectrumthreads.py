@@ -273,17 +273,10 @@ class AutoFocusThread(MeasurementThread):
             elif self.settings.autofocus_mode == 'gauss' \
                     or self.settings.autofocus_mode == 'gaussexport' \
                     or self.settings.autofocus_mode == 'gausswidth':
-                self.spectrometer.SetCentreWavelength(0)
                 self.spectrometer.SetExposureTime(self.settings.search_integration_time)
 
-                # nikon arthur
-                #self.spectrometer.SetMinVertReadout(16)
-                #self.spectrometer.SetSlitWidth(150)
-
-                #freespace
-                #self.spectrometer.SetMinVertReadout(20)
-                self.spectrometer.SetMinVertReadout(1)
                 self.spectrometer.SetSlitWidth(300)
+                self.spectrometer.SetCentreWavelength(0)
 
                 img = self.spectrometer.TakeSingleTrack(raw=True)[self.settings.min_ind_img:self.settings.max_ind_img, :]
 
