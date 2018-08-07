@@ -1347,7 +1347,7 @@ class ScanTimeSeriesThread(ScanThread):
 
 
 class ScanSearchMeanThread(ScanMeanThread):
-    def __init__(self, spectrometer, settings, scanning_points, labels, stage, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
+    def __init__(self, spectrometer, settings, scanning_points, labels, stage, with_search, with_autofocus, ref_spec = None, dark_spec = None, bg_spec=None, parent=None):
         super(ScanSearchMeanThread, self).__init__(spectrometer, settings, scanning_points, labels, stage)
         self.ref_spec = ref_spec
         self.dark_spec = dark_spec
@@ -1356,6 +1356,8 @@ class ScanSearchMeanThread(ScanMeanThread):
         self.meanthread = None
         self.autofocusthread = None
         #self.autofocusthread.finishSignal.connect(self.focusfinishslot)
+        self.with_search = with_search
+        self.with_autofocus = with_autofocus
 
 
     @QtCore.Slot()
@@ -1411,14 +1413,14 @@ class ScanSearchMeanThread(ScanMeanThread):
 #            self.searchthread.stop()
 #            self.searchthread = None
 
-        if not self.abort:
+        if (not self.abort) and (self.with_autofocus):
             self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
             self.autofocusthread.finishSignal.connect(self.autofocus_finished)
             self.autofocusthread.focus()
             self.autofocusthread.stop()
             self.autofocusthread = None
 
-        if not self.abort:
+        if (not self.abort) and (self.with_search):
             self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
             self.searchthread.specSignal.connect(self.specslot)
             self.searchthread.finishSignal.connect(self.search_finished)

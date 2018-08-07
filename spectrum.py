@@ -292,14 +292,14 @@ class Spectrum(QtCore.QObject):
         self.updateStatus.emit('Scan Search finished')
         self.updatePositions.emit(pos)
 
-    def take_scan(self, positions, labels, savedir, with_lockin, with_search):
+    def take_scan(self, positions, labels, savedir, with_lockin, with_search, with_autofocus):
         self.save_path = savedir
         self.save_data(savedir)
         self.positions = positions
         if with_lockin:
             return True
-        elif with_search:
-            self.worker = ScanSearchMeanThread(self.spectrometer, self.settings, positions, labels, self.stage, self.lamp, self.dark, self.bg)
+        elif with_search or with_autofocus:
+            self.worker = ScanSearchMeanThread(self.spectrometer, self.settings, positions, labels, self.stage, with_search, with_autofocus, self.lamp, self.dark, self.bg)
         else:
             self.worker = ScanMeanThread(self.spectrometer, self.settings, positions, labels, self.stage)
             #self.workingthread = ScanThread(self._spectrometer, self.settings, positions, self.stage)

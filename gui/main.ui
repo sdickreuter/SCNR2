@@ -529,7 +529,14 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>with Search &amp; Autofocus</string>
+             <string>with Search Max</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="autofocus_checkBox">
+            <property name="text">
+             <string>with Autofocus</string>
             </property>
            </widget>
           </item>
@@ -707,6 +714,7 @@
          <zorder>line_7</zorder>
          <zorder>posTable</zorder>
          <zorder>scan_button</zorder>
+         <zorder>autofocus_checkBox</zorder>
         </widget>
         <widget class="QWidget" name="settings_tab">
          <attribute name="title">
@@ -2212,8 +2220,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>123</y>
+     <x>882</x>
+     <y>574</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2276,8 +2284,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>108</y>
+     <x>882</x>
+     <y>165</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -2532,8 +2540,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>888</y>
+     <x>119</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2612,8 +2620,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>106</y>
+     <x>882</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -2628,8 +2636,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>631</x>
-     <y>121</y>
+     <x>677</x>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2644,8 +2652,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>660</x>
-     <y>121</y>
+     <x>755</x>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2660,8 +2668,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>689</x>
-     <y>121</y>
+     <x>833</x>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2932,8 +2940,8 @@
    <slot>on_camreference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>920</y>
+     <x>119</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>999</x>
@@ -2948,8 +2956,8 @@
    <slot>on_clear_reference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>369</x>
-     <y>920</y>
+     <x>119</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>991</x>
@@ -3156,8 +3164,8 @@
    <slot>on_save_cam_image_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>499</x>
-     <y>917</y>
+     <x>119</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>1033</x>

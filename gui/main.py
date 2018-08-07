@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -218,6 +218,9 @@ class Ui_MainWindow(object):
         self.search_checkBox.setEnabled(False)
         self.search_checkBox.setObjectName("search_checkBox")
         self.verticalLayout_3.addWidget(self.search_checkBox)
+        self.autofocus_checkBox = QtWidgets.QCheckBox(self.scanning_tab)
+        self.autofocus_checkBox.setObjectName("autofocus_checkBox")
+        self.verticalLayout_3.addWidget(self.autofocus_checkBox)
         self.line_7 = QtWidgets.QFrame(self.scanning_tab)
         self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -308,6 +311,7 @@ class Ui_MainWindow(object):
         self.line_7.raise_()
         self.posTable.raise_()
         self.scan_button.raise_()
+        self.autofocus_checkBox.raise_()
         self.right_tab.addTab(self.scanning_tab, "")
         self.settings_tab = QtWidgets.QWidget()
         self.settings_tab.setObjectName("settings_tab")
@@ -986,7 +990,8 @@ class Ui_MainWindow(object):
         self.spangrid_button.setText(_translate("MainWindow", "Span Grid"))
         self.searchgrid_button.setText(_translate("MainWindow", "Search Max Grid"))
         self.lockin_checkBox.setText(_translate("MainWindow", "with Lock-In"))
-        self.search_checkBox.setText(_translate("MainWindow", "with Search & Autofocus"))
+        self.search_checkBox.setText(_translate("MainWindow", "with Search Max"))
+        self.autofocus_checkBox.setText(_translate("MainWindow", "with Autofocus"))
         self.label_5.setText(_translate("MainWindow", "Scanning Positions"))
         self.remove_button.setText(_translate("MainWindow", "-"))
         self.clear_button.setText(_translate("MainWindow", "clear"))

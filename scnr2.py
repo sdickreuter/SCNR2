@@ -589,7 +589,7 @@ class SCNR(QtWidgets.QMainWindow):
             # self.spectrum.make_scan(self.scan_store, path, self.button_searchonoff.get_active(), self.button_lockinonoff.get_active())
             self.on_disableButtons()
             self.spectrum.take_scan(self.posModel.getMatrix(), self.labels, path, self.ui.lockin_checkBox.isChecked(),
-                                    self.ui.search_checkBox.isChecked())
+                                    self.ui.search_checkBox.isChecked(),self.ui.autofocus_checkBox.isChecked())
 
 
     @QtCore.Slot()
