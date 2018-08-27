@@ -1405,13 +1405,13 @@ class ScanSearchMeanThread(ScanMeanThread):
             f.write('\n')
 
     def intermediatework(self):
-#        if not self.abort:
-#            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
-#           self.searchthread.specSignal.connect(self.specslot)
-#            self.searchthread.finishSignal.connect(self.search_finished)
-#            self.searchthread.search()
-#            self.searchthread.stop()
-#            self.searchthread = None
+        if (not self.abort) and (self.with_search):
+            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+            self.searchthread.specSignal.connect(self.specslot)
+            self.searchthread.finishSignal.connect(self.search_finished)
+            self.searchthread.search()
+            self.searchthread.stop()
+            self.searchthread = None
 
         if (not self.abort) and (self.with_autofocus):
             self.autofocusthread = AutoFocusThread(self.spectrometer,self.settings,self.stage, self)
@@ -1420,13 +1420,13 @@ class ScanSearchMeanThread(ScanMeanThread):
             self.autofocusthread.stop()
             self.autofocusthread = None
 
-        if (not self.abort) and (self.with_search):
-            self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
-            self.searchthread.specSignal.connect(self.specslot)
-            self.searchthread.finishSignal.connect(self.search_finished)
-            self.searchthread.search()
-            self.searchthread.stop()
-            self.searchthread = None
+        # if (not self.abort) and (self.with_search):
+        #     self.searchthread = SearchThread(self.spectrometer, self.settings, self.stage,self.ref_spec,self.dark_spec,self.bg_spec,self)
+        #     self.searchthread.specSignal.connect(self.specslot)
+        #     self.searchthread.finishSignal.connect(self.search_finished)
+        #     self.searchthread.search()
+        #     self.searchthread.stop()
+        #     self.searchthread = None
 
         if not self.abort:
             self.initMeanThread()
