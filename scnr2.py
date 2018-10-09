@@ -987,12 +987,12 @@ class SCNR(QtWidgets.QMainWindow):
     def on_search_corrected_toggled(self,state):
         self.settings.correct_search = self.ui.search_correct_checkBox.isChecked()
 
-    @QtCore.Slot(bool)
-    def on_increase_minimum_readout_toggled(self,state):
-        if state:
-            self.spectrometer.SetMinVertReadout(7)
-        else:
-            self.spectrometer.SetMinVertReadout(1)
+    # @QtCore.Slot(bool)
+    # def on_increase_minimum_readout_toggled(self,state):
+    #     if state:
+    #         self.spectrometer.SetMinVertReadout(7)
+    #     else:
+    #         self.spectrometer.SetMinVertReadout(1)
 
     @QtCore.Slot()
     def on_savesettings_clicked(self):
@@ -1067,7 +1067,7 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_set_min_vert_readout_edited(self):
         self.spectrometer.SetMinVertReadout(self.ui.min_vert_readout_spinbox.value())
-
+        self.settings.minvertreadout = self.ui.min_vert_readout_spinbox.value()
 
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""

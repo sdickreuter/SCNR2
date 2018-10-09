@@ -67,6 +67,11 @@ class Settings(object):
         self.zscan_centre = int(self.config['autofocus']['zscan_centre'])
         self.zscan_width = int(self.config['autofocus']['zscan_width'])
 
+        # settings not saved to file:
+        self.minvertreadout = 0
+
+
+
     def save(self):
         self.config.set('spectrum', 'integration_time', str(self.integration_time))
         self.config.set('spectrum', 'number_of_samples', str(self.number_of_samples))
