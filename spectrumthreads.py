@@ -944,7 +944,7 @@ class SearchThread(MeasurementThread):
                 print("Could not determine particle position: Fit error")
             return None, None, measured, None
 
-
+        self.spectrometer.SetMinVertReadout(1)
         self.spectrometer.SetExposureTime(self.settings.search_integration_time)
         spec = self.spectrometer.TakeSingleTrack()
         if spec is None:
@@ -1027,6 +1027,7 @@ class SearchThread(MeasurementThread):
             self.finishSignal.emit(np.array([]))
 
         self.spectrometer.SetExposureTime(self.settings.integration_time)
+        self.spectrometer.SetMinVertReadout(self.settings.minvertreadout)
 
 
 class Scan3DThread(MeasurementThread):
