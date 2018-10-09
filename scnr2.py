@@ -1063,6 +1063,10 @@ class SCNR(QtWidgets.QMainWindow):
     def on_zscan_width_edited(self):
         self.settings.zscan_width = self.ui.zscan_width_spinbox.value()
 
+    @QtCore.Slot()
+    def on_set_min_vert_readout_edited(self):
+        self.spectrometer.SetMinVertReadout(self.ui.min_vert_readout_spinbox.value())
+
 
 def sigint_handler(*args):
     """Handler for the SIGINT signal."""
