@@ -56,9 +56,10 @@ class xmovableCrosshair(QtGui.QGraphicsRectItem):
             ev.ignore()
 
     def mouseMoveEvent(self, ev):
-        newpos = self.mapToParent(ev.pos()) - self.pressDelta
-        newpos.setY(self.pos().y())
-        self.setPos(newpos)
+        # newpos = self.mapToParent(ev.pos()) - self.pressDelta
+        # newpos.setY(self.pos().y())
+        # self.setPos(newpos)
+        pass
 
     def boundingRect(self):
         return QtCore.QRectF(-self.size, -self.size, self.size*2, self.size*2)

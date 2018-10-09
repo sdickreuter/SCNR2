@@ -399,7 +399,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.cam_reference_image = None
 
     @QtCore.Slot()
-    def on_save_image_clicked(self):
+    def on_save_cam_image_clicked(self):
         img = self.img.image
         save_as = QtWidgets.QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
                                                         'CSV Files (*.csv)')
@@ -409,10 +409,11 @@ class SCNR(QtWidgets.QMainWindow):
 
         try:
             np.savetxt(save_as, img)
-            io.imsave(save_as+'.jpg',img)
         except:
             print("Error Saving file " + save_as)
             QtWidgets.QMessageBox.warning(self, 'Error', "Error Saving file " + save_as, QtWidgets.QMessageBox.Ok)
+
+
 
     @QtCore.Slot(int)
     def on_lefttab_changed(self, index):
