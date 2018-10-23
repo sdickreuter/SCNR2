@@ -524,11 +524,12 @@ class AutoFocusThread(MeasurementThread):
         #     self.stage.moveabs(z=startpos[2])
         #     self.finishSignal.emit(np.array([]))
 
-        if len(indexes) > 0:
+        if (len(indexes) > 0) and (peakx>1.0) :
             self.stage.moveabs(z=peakx)
             calc_f(plot=True)
             self.finishSignal.emit(np.array([peakx,0.0]))
         else:
+            print("ERROR: Could not find focus position")
             self.stage.moveabs(z=startpos[2])
             self.finishSignal.emit(np.array([]))
 
