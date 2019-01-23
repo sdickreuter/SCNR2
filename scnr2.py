@@ -865,7 +865,7 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_save_detectorimage_clicked(self):
-        img = self.correct_image(self.last_image)
+        img = self.last_image#self.correct_image(self.last_image)
         save_as = QtWidgets.QFileDialog.getSaveFileName(self, "Save currently shown Spectrum as", './spectra/',
                                               'CSV Files (*.csv)')
         save_as = save_as[0]
