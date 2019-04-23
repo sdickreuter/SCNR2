@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -651,6 +652,20 @@ class Ui_MainWindow(object):
         self.offset_button = QtWidgets.QPushButton(self.scan3d_tab)
         self.offset_button.setObjectName("offset_button")
         self.verticalLayout_5.addWidget(self.offset_button)
+        self.horizontalLayout_24 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_24.setObjectName("horizontalLayout_24")
+        self.label_26 = QtWidgets.QLabel(self.scan3d_tab)
+        self.label_26.setObjectName("label_26")
+        self.horizontalLayout_24.addWidget(self.label_26)
+        self.detector_temp_spinbox = QtWidgets.QSpinBox(self.scan3d_tab)
+        self.detector_temp_spinbox.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.detector_temp_spinbox.setMinimum(-75)
+        self.detector_temp_spinbox.setMaximum(20)
+        self.detector_temp_spinbox.setSingleStep(1)
+        self.detector_temp_spinbox.setProperty("value", -40)
+        self.detector_temp_spinbox.setObjectName("detector_temp_spinbox")
+        self.horizontalLayout_24.addWidget(self.detector_temp_spinbox)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_24)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem)
         self.right_tab.addTab(self.scan3d_tab, "")
@@ -982,6 +997,7 @@ class Ui_MainWindow(object):
         self.zscan_width_spinbox.editingFinished.connect(MainWindow.on_zscan_width_edited)
         self.save_cam_image_button.clicked.connect(MainWindow.on_save_cam_image_clicked)
         self.min_vert_readout_spinbox.editingFinished.connect(MainWindow.on_set_min_vert_readout_edited)
+        self.detector_temp_spinbox.editingFinished.connect(MainWindow.on_detector_temp_edited)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -1047,6 +1063,7 @@ class Ui_MainWindow(object):
         self.label_25.setText(_translate("MainWindow", "Z-Scan Width [nm]:"))
         self.label_24.setText(_translate("MainWindow", "Min. Vert. Readout [px]"))
         self.offset_button.setText(_translate("MainWindow", "Set Offsets"))
+        self.label_26.setText(_translate("MainWindow", "Detector Temp."))
         self.right_tab.setTabText(self.right_tab.indexOf(self.scan3d_tab), _translate("MainWindow", "Misc"))
         self.temp_button.setText(_translate("MainWindow", "Update Detector Temperature"))
         self.label_temp.setText(_translate("MainWindow", "Detector Temperature:"))
@@ -1077,5 +1094,6 @@ class Ui_MainWindow(object):
         self.use_background_image_button.setText(_translate("MainWindow", "Use Last Image as Background"))
         self.save_detectorimage_button.setText(_translate("MainWindow", "Save"))
         self.left_tab.setTabText(self.left_tab.indexOf(self.detector_tab), _translate("MainWindow", "Detector"))
+
 
 import resources_rc

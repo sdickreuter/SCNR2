@@ -90,6 +90,10 @@ class SpectrometerServer:
             elif msg == 'getgratingoffset':
                 self.send_object(self.spectrometer.GetGratingOffset())
 
+            elif msg == 'settemperature':
+                self.send_object(self.spectrometer.SetTemperature(param))
+                self.send_object('ok')
+
             elif msg == 'setgratingoffset':
                 self.spectrometer.SetGratingOffset(param)
                 self.send_object('ok')
@@ -161,14 +165,15 @@ class SpectrometerServer:
 
 if __name__ == '__main__':
     running = True
+    server = SpectrometerServer()
 
     def stop(*params):
-        raise KeyboardInterrupt()
+        server.spectrometer.Shutdown()
+        #raise KeyboardInterrupt()
 
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
 
-    server = SpectrometerServer()
     try:
         server.run()
     except KeyboardInterrupt:

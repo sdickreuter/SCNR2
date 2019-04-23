@@ -983,6 +983,10 @@ class SCNR(QtWidgets.QMainWindow):
     def on_search_zmult_edited(self):
         self.settings.zmult = self.ui.search_zmult_spin.value()
 
+    @QtCore.Slot()
+    def on_detector_temp_edited(self):
+        self.spectrometer.SetTemperature(self.ui.detector_temp_spinbox.value())
+
     @QtCore.Slot(bool)
     def on_search_corrected_toggled(self,state):
         self.settings.correct_search = self.ui.search_correct_checkBox.isChecked()

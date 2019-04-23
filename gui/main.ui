@@ -1548,6 +1548,36 @@
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_24">
+            <item>
+             <widget class="QLabel" name="label_26">
+              <property name="text">
+               <string>Detector Temp.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="detector_temp_spinbox">
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="minimum">
+               <number>-75</number>
+              </property>
+              <property name="maximum">
+               <number>20</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>-40</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2250,8 +2280,8 @@
    <slot>on_start_scan_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>574</y>
+     <x>686</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
      <x>850</x>
@@ -2314,8 +2344,8 @@
    <slot>on_searchgrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>165</y>
+     <x>686</x>
+     <y>107</y>
     </hint>
     <hint type="destinationlabel">
      <x>852</x>
@@ -2570,8 +2600,8 @@
    <slot>on_exposure_time_edited()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>888</y>
+     <x>135</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
      <x>847</x>
@@ -2650,8 +2680,8 @@
    <slot>on_spangrid_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>134</y>
+     <x>686</x>
+     <y>105</y>
     </hint>
     <hint type="destinationlabel">
      <x>804</x>
@@ -2666,8 +2696,8 @@
    <slot>on_scan_add()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>677</x>
-     <y>317</y>
+     <x>631</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>813</x>
@@ -2682,8 +2712,8 @@
    <slot>on_scan_remove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>317</y>
+     <x>660</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
@@ -2698,8 +2728,8 @@
    <slot>on_scan_clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>833</x>
-     <y>317</y>
+     <x>689</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
@@ -2923,7 +2953,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>343</y>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>1006</x>
@@ -2970,8 +3000,8 @@
    <slot>on_camreference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>920</y>
+     <x>43</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
      <x>999</x>
@@ -2986,8 +3016,8 @@
    <slot>on_clear_reference_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>373</x>
-     <y>920</y>
+     <x>71</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
      <x>991</x>
@@ -3003,7 +3033,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>881</x>
-     <y>279</y>
+     <y>277</y>
     </hint>
     <hint type="destinationlabel">
      <x>976</x>
@@ -3083,7 +3113,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>406</y>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel">
      <x>1010</x>
@@ -3098,8 +3128,8 @@
    <slot>on_use_image_background_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>55</x>
-     <y>920</y>
+     <x>43</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>618</x>
@@ -3114,8 +3144,8 @@
    <slot>on_save_detectorimage_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>500</x>
-     <y>920</y>
+     <x>100</x>
+     <y>57</y>
     </hint>
     <hint type="destinationlabel">
      <x>610</x>
@@ -3147,7 +3177,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>548</y>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
      <x>965</x>
@@ -3163,7 +3193,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>881</x>
-     <y>439</y>
+     <y>435</y>
     </hint>
     <hint type="destinationlabel">
      <x>946</x>
@@ -3179,7 +3209,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>881</x>
-     <y>473</y>
+     <y>468</y>
     </hint>
     <hint type="destinationlabel">
      <x>944</x>
@@ -3194,8 +3224,8 @@
    <slot>on_save_cam_image_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>543</x>
-     <y>920</y>
+     <x>100</x>
+     <y>61</y>
     </hint>
     <hint type="destinationlabel">
      <x>1033</x>
@@ -3216,6 +3246,22 @@
     <hint type="destinationlabel">
      <x>958</x>
      <y>540</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>detector_temp_spinbox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_detector_temp_edited()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>794</x>
+     <y>566</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>940</x>
+     <y>588</y>
     </hint>
    </hints>
   </connection>
@@ -3288,5 +3334,6 @@
   <slot>on_zscan_width_edited()</slot>
   <slot>on_save_cam_image_clicked()</slot>
   <slot>on_set_min_vert_readout_edited()</slot>
+  <slot>on_detector_temp_edited()</slot>
  </slots>
 </ui>
