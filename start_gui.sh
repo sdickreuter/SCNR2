@@ -1,4 +1,4 @@
 #! /usr/bin/sh
 
 cd /home/iap/PyCharmProjects/SCNR2
-gnome-terminal -e "python scnr2.py"
+mate-terminal -e "python scnr2.py"

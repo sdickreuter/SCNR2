@@ -31,7 +31,7 @@ class SpectrometerServer:
 
         print("You can now start the Graphical User Interface.")
         print("IMPORTANT:")
-        print("After you have finished please close this program by pressing CTRL+C\nand wait for detector warmup")
+        print("After you have finished please close this program \nand wait for detector warmup")
 
 
     def __del__(self):
@@ -167,18 +167,30 @@ if __name__ == '__main__':
     running = True
     server = SpectrometerServer()
 
-    def stop(*params):
+    def stop(_signo=None, _stack_frame=None):
+        print('Got termination signal, shutting down ...')
         server.spectrometer.Shutdown()
+        print('Shutdown complete.')
+        time.sleep(1.0)
         #raise KeyboardInterrupt()
+        sys.exit(0)
 
+    signal.signal(signal.SIGHUP, stop)
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
+    #signal.signal(signal.SIGABRT, stop)
+    #signal.signal(signal.SIGKILL, stop)
+    #signal.signal(signal.SIGSTOP, stop)
+    #signal.signal(signal.SIGQUIT, stop)
+    #signal.signal(signal.SIGSEGV, stop)
 
-    try:
-        server.run()
-    except KeyboardInterrupt:
-        print("Exiting ...")
-        print("IMPORTANT:")
-        print("Please wait until the Spectrometer warmup is finished!")
+    #import atexit
+    #atexit.register(stop)
 
+    # try:
+    server.run()
+    # except KeyboardInterrupt:
+    #     print("Exiting ...")
+    #     print("IMPORTANT:")
+    #     print("Please wait until the Spectrometer warmup is finished!")
     server = None
