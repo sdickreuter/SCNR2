@@ -12,8 +12,10 @@ class SpectrometerServer:
 
     def __init__(self):
         print("Initializing Spectrometer ...")
+        sys.stdout.flush()
         self.spectrometer = AndorSpectrometer.Spectrometer(start_cooler=True,init_shutter=True,verbosity=1)
         print("Spectrometer initialized !")
+        sys.stdout.flush()
 
         self.spectrometer.SetTemperature(-40)
         #self.spectrometer.SetTemperature(-10)
@@ -32,7 +34,7 @@ class SpectrometerServer:
         print("You can now start the Graphical User Interface.")
         print("IMPORTANT:")
         print("After you have finished please close this program \nand wait for detector warmup")
-
+        sys.stdout.flush()
 
     def __del__(self):
         #self.spectrometer.Shutdown()
@@ -46,12 +48,14 @@ class SpectrometerServer:
             self.socket.send_pyobj(data)
         else:
             print("lost connection to client")
+            sys.stdout.flush()
 
     def run(self):
         while self.running:
             if self.in_poller.poll(1000):
                 msg, param = self.socket.recv_pyobj()
                 print('Received Message: ' + msg +' '+ str(param))
+                sys.stdout.flush()
             else:
                 msg = '...'
                 param = None
@@ -60,6 +64,7 @@ class SpectrometerServer:
                 self.send_object('!')
             elif msg == 'quit':
                 print('Quiting by request of client')
+                sys.stdout.flush()
                 self.send_object('ok')
                 self.running = False
                 break
@@ -91,7 +96,7 @@ class SpectrometerServer:
                 self.send_object(self.spectrometer.GetGratingOffset())
 
             elif msg == 'settemperature':
-                self.send_object(self.spectrometer.SetTemperature(param))
+                self.spectrometer.SetTemperature(param)
                 self.send_object('ok')
 
             elif msg == 'setgratingoffset':
@@ -169,8 +174,10 @@ if __name__ == '__main__':
 
     def stop(_signo=None, _stack_frame=None):
         print('Got termination signal, shutting down ...')
+        sys.stdout.flush()
         server.spectrometer.Shutdown()
         print('Shutdown complete.')
+        sys.stdout.flush()
         time.sleep(1.0)
         #raise KeyboardInterrupt()
         sys.exit(0)

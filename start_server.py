@@ -42,21 +42,22 @@ class gui(QtWidgets.QMainWindow):
             event.ignore()
 
     def initUI(self):
+        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
         # Layout are better for placing widgets
         layout = QtWidgets.QHBoxLayout()
-        #self.runButton = QtWidgets.QPushButton('Exit')
-        #self.runButton.clicked.connect(self.exitProgram)
+        self.closeButton = QtWidgets.QPushButton('Exit')
+        self.closeButton.clicked.connect(self.exitProgram)
 
         self.output = QtWidgets.QTextEdit()
 
         layout.addWidget(self.output)
-        #layout.addWidget(self.runButton)
+        layout.addWidget(self.closeButton)
 
         centralWidget = QtWidgets.QWidget()
         centralWidget.setLayout(layout)
         self.setCentralWidget(centralWidget)
 
-        self.setGeometry(0, 0, 500, 500)
+        self.setGeometry(0, 0, 700, 400)
 
         self.setWindowTitle("Spectrometer Server")
 
@@ -67,9 +68,6 @@ class gui(QtWidgets.QMainWindow):
         self.process = QtCore.QProcess(self)
         # QProcess emits `readyRead` when there is data to be read
         self.process.readyRead.connect(self.dataReady)
-
-
-
 
 
 if __name__ == '__main__':

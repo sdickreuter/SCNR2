@@ -98,14 +98,14 @@ class SpectrometerClient:
                 print(ret)
                 return False
         else:
-            print('Communiction out of sync, please retry')
+            print('Communication out of sync, please retry')
             print(ret)
             return False
         return True
 
     def _return_value_is_data(self, ret):
         if type(ret) is not np.ndarray:
-            print('Communiction out of sync, please retry')
+            print('Communication out of sync, please retry')
             print(ret)
             return False
         return True
