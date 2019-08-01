@@ -254,6 +254,7 @@ class Spectrum(QtCore.QObject):
         # x, y, z = self.stage.last_pos()
         # pos = np.matrix([[x, y]])
         self.positions = pos
+        self.labels = labels
         self.save_path = "search_max/"
         self.worker = ScanSearchThread(self.spectrometer, self.settings, pos, labels, self.stage, self.lamp, self.dark, self.bg)
         self.worker.specSignal.connect(self.specCallback)
@@ -283,6 +284,8 @@ class Spectrum(QtCore.QObject):
     def finishedScanSearch(self, pos):
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
+        for i in range(self.positions.shape[0]):
+            plt.text(self.positions[i, 0], self.positions[i, 1],self.labels[i])
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
@@ -332,6 +335,9 @@ class Spectrum(QtCore.QObject):
     def finishedScanMean(self, pos):
         grid, = plt.plot(self.positions[:, 0], self.positions[:, 1], "r.")
         search, = plt.plot(pos[:, 0], pos[:, 1], "bx")
+        for i in range(self.positions.shape[0]):
+            plt.text(self.positions[i, 0], self.positions[i, 1],self.labels[i])
+
         plt.legend([grid, search], ["Calculated Grid", "Searched Positions"], bbox_to_anchor=(0., 1.02, 1., .102),
                    loc=3, ncol=2, mode="expand", borderaxespad=0.)
         plt.savefig(self.save_path + "grid.png")
