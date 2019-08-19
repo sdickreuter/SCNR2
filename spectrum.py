@@ -138,6 +138,21 @@ class Spectrum(QtCore.QObject):
         self.worker.finishSignal.connect(self.finishedSingleCallback)
         self.start_process(self.worker)
 
+    def take_mean_fullimage(self):
+        self.worker = FullImageMeanThread(self.spectrometer, self.settings.number_of_samples)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.finishSignal.connect(self.finishedSingleCallback)
+        self.start_process(self.worker)
+
+
+    def take_mean_image(self):
+        self.worker = ImageMeanThread(self.spectrometer, self.settings.number_of_samples)
+        self.worker.specSignal.connect(self.specCallback)
+        self.worker.progressSignal.connect(self.progressCallback)
+        self.worker.finishSignal.connect(self.finishedSingleCallback)
+        self.start_process(self.worker)
+
 
     @QtCore.Slot(np.ndarray)
     def finishedSingleCallback(self, spec):

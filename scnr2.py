@@ -488,6 +488,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.lockin_button.setDisabled(True)
         self.ui.lockin_checkBox.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
+        self.ui.mean_button.setDisabled(False)
 
     @QtCore.Slot()
     def on_enableButtons(self):
@@ -749,14 +750,20 @@ class SCNR(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def on_lamp_clicked(self):
         self.on_disableButtons()
-        self.ui.status.setText('Taking Lamp Spectrum')
+        self.ui.status.setText('Taking Ref Spectrum')
         self.spectrum.take_lamp()
 
     @QtCore.Slot()
     def on_mean_clicked(self):
         self.on_disableButtons()
-        self.ui.status.setText('Taking Normal Spectrum')
-        self.spectrum.take_mean()
+        self.ui.status.setText('Taking Mean Spectrum')
+        if self.spectrometer.mode == 'singletrack':
+            self.spectrum.take_mean()
+        elif self.spectrometer.mode == 'imageofslit':
+            self.spectrum.take_mean_image()
+        elif self.spectrometer.mode == 'fullimage':
+            self.spectrum.take_mean_fullimage()
+
 
     @QtCore.Slot()
     def on_bg_clicked(self):

@@ -150,7 +150,6 @@ class LiveThread(MeasurementThread):
 
 
 class ImageThread(MeasurementThread):
-
     def __init__(self, spectrometer, single = False, parent=None):
         super(ImageThread, self).__init__(spectrometer,parent)
         self.single = single
@@ -182,6 +181,41 @@ class ImageThread(MeasurementThread):
             if self.single:
                 self.abort = True
                 self.finishSignal.emit(np.zeros(0))
+
+
+class ImageMeanThread(MeasurementThread):
+    def __init__(self, spectrometer, number_of_samples, parent=None):
+        self.number_of_samples = number_of_samples
+        super(MeanThread, self).__init__(spectrometer)
+        self.init()
+
+    def init(self):
+        self.progress = progress.Progress(max=self.number_of_samples)
+        self.mean = None
+        self.i = 0
+        self.abort = False
+
+    def work(self):
+        self.spec = self.spec = self.spectrometer.TakeImageofSlit()
+        if self.mean is None:
+            self.mean = np.zeros(self.spec.shape)
+
+        if self.spec is not None:
+            self.mean = (self.mean + self.spec)  # / 2
+            self.progress.next()
+            self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+            self.i += 1
+            if not self.abort:
+                self.specSignal.emit(self.mean / (self.i))
+        else:
+            self.stop()
+            print("Communication out of sync, try again")
+        if self.i >= (self.number_of_samples):
+            if not self.abort:
+                self.progressSignal.emit(100, str(self.progress.eta_td))
+                self.finishSignal.emit(self.mean / (self.number_of_samples))
+                self.stop()
+
 
 class FullImageThread(MeasurementThread):
 
@@ -216,6 +250,41 @@ class FullImageThread(MeasurementThread):
             if self.single:
                 self.abort = True
                 self.finishSignal.emit(np.zeros(0))
+
+class FullImageMeanThread(MeasurementThread):
+    def __init__(self, spectrometer, number_of_samples, parent=None):
+        self.number_of_samples = number_of_samples
+        super(MeanThread, self).__init__(spectrometer)
+        self.init()
+
+    def init(self):
+        self.progress = progress.Progress(max=self.number_of_samples)
+        self.mean = None
+        self.i = 0
+        self.abort = False
+
+    def work(self):
+        self.spec = np.flipud(self.spectrometer.TakeFullImage())
+        if self.mean is None:
+            self.mean = np.zeros(self.spec.shape)
+
+        if self.spec is not None:
+            self.mean = (self.mean + self.spec)  # / 2
+            self.progress.next()
+            self.progressSignal.emit(self.progress.percent, str(self.progress.eta_td))
+            self.i += 1
+            if not self.abort:
+                self.specSignal.emit(self.mean / (self.i))
+        else :
+            self.stop()
+            print("Communication out of sync, try again")
+        if self.i >= (self.number_of_samples):
+            if not self.abort:
+                self.progressSignal.emit(100, str(self.progress.eta_td))
+                self.finishSignal.emit(self.mean / (self.number_of_samples))
+                self.stop()
+
+
 
 
 class AutoFocusThread(MeasurementThread):
