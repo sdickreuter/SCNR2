@@ -345,7 +345,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.dark_button.setDisabled(True)
         self.ui.bg_button.setDisabled(True)
         self.ui.ref_button.setDisabled(True)
-        self.ui.mean_button.setDisabled(True)
+        #self.ui.mean_button.setDisabled(True)
         self.ui.series_button.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
         self.ui.lockin_button.setDisabled(True)
@@ -359,7 +359,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.dark_button.setDisabled(True)
         self.ui.bg_button.setDisabled(True)
         self.ui.ref_button.setDisabled(True)
-        self.ui.mean_button.setDisabled(True)
+        #self.ui.mean_button.setDisabled(True)
         self.ui.series_button.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
         self.ui.lockin_button.setDisabled(True)
@@ -478,11 +478,7 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_disableButtons(self):
-        #self.ui.right_tab.setDisabled(True)
-        self.ui.dark_button.setDisabled(True)
-        self.ui.bg_button.setDisabled(True)
-        self.ui.ref_button.setDisabled(True)
-        self.ui.series_button.setDisabled(True)
+        self.ui.right_tab.setDisabled(True)
         self.ui.stage_frame.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
         self.ui.autofocus_button.setDisabled(True)
@@ -492,7 +488,7 @@ class SCNR(QtWidgets.QMainWindow):
         self.ui.lockin_button.setDisabled(True)
         self.ui.lockin_checkBox.setDisabled(True)
         self.ui.stop_button.setDisabled(False)
-        self.ui.mean_button.setDisabled(False)
+
 
     @QtCore.Slot()
     def on_enableButtons(self):
