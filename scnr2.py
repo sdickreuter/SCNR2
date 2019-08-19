@@ -478,7 +478,11 @@ class SCNR(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def on_disableButtons(self):
-        self.ui.right_tab.setDisabled(True)
+        #self.ui.right_tab.setDisabled(True)
+        self.ui.dark_button.setDisabled(True)
+        self.ui.bg_button.setDisabled(True)
+        self.ui.ref_button.setDisabled(True)
+        self.ui.series_button.setDisabled(True)
         self.ui.stage_frame.setDisabled(True)
         self.ui.searchmax_button.setDisabled(True)
         self.ui.autofocus_button.setDisabled(True)
