@@ -18,6 +18,7 @@ class gui(QtWidgets.QMainWindow):
         # `start` takes the exec and a list of arguments
         #self.process.start('ping',['-c 10','127.0.0.1'])
         self.process.start('python', ['spectrometer_server.py'])
+        time.sleep(1.0)
 
     def exitProgram(self):
         self.process.terminate()
@@ -31,22 +32,16 @@ class gui(QtWidgets.QMainWindow):
         super(gui, self).close()
 
     def closeEvent(self, event):
-        close = QtWidgets.QMessageBox.question(self,
-                                     "QUIT",
-                                     "Sure?",
-                                      QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-        if close == QtWidgets.QMessageBox.Yes:
-            self.exitProgram()
-            event.accept()
-        else:
-            event.ignore()
+        self.closeButton.setEnabled(False)
+        self.exitProgram()
+        #event.accept()
 
     def initUI(self):
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
         # Layout are better for placing widgets
         layout = QtWidgets.QHBoxLayout()
-        self.closeButton = QtWidgets.QPushButton('Exit')
-        self.closeButton.clicked.connect(self.exitProgram)
+        self.closeButton = QtWidgets.QPushButton('Close')
+        self.closeButton.clicked.connect(self.closeEvent)
 
         self.output = QtWidgets.QTextEdit()
 
