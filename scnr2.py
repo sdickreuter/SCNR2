@@ -435,7 +435,11 @@ class SCNR(QtWidgets.QMainWindow):
     def correct_image(self, image):
         if self.ui.correct_image_checkBox.isChecked():
             if self.background_image is not None:
-                image = np.subtract(image,self.background_image)
+                if self.background_image.shape == image.shape:
+                    image = np.subtract(image,self.background_image)
+                else:
+                    QtWidgets.QMessageBox.warning(self, 'Error', "Image shapes not compatible, could not subtract background" ,
+                                                  QtWidgets.QMessageBox.Ok)
             if not self.spectrum.dark is None and not self.spectrum.lamp is None:
                 image = np.array(image,dtype=np.float32)
                 print('correct_image '+ str(image.shape))

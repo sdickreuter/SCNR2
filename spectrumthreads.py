@@ -186,7 +186,7 @@ class ImageThread(MeasurementThread):
 class ImageMeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
-        super(MeanThread, self).__init__(spectrometer)
+        super(ImageMeanThread, self).__init__(spectrometer)
         self.init()
 
     def init(self):
@@ -254,7 +254,7 @@ class FullImageThread(MeasurementThread):
 class FullImageMeanThread(MeasurementThread):
     def __init__(self, spectrometer, number_of_samples, parent=None):
         self.number_of_samples = number_of_samples
-        super(MeanThread, self).__init__(spectrometer)
+        super(FullImageMeanThread, self).__init__(spectrometer)
         self.init()
 
     def init(self):
