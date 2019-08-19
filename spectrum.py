@@ -250,9 +250,11 @@ class Spectrum(QtCore.QObject):
         self.save_data(savedir)
 
         #def __init__(self, spectrometer, stage, settings, number_of_samples, parent=None):
-        self.worker = EndlessSeriesThread(self.spectrometer,self.stage,self.settings)
+        #self.worker = EndlessSeriesThread(self.spectrometer,self.stage,self.settings)
+        self.worker = TimeSeriesThread(self.spectrometer, self.settings.number_of_samples)
         self.worker.specSignal.connect(self.specCallback)
-        self.worker.saveSignal.connect(self.save_nameless_data)
+        #self.worker.saveSignal.connect(self.save_nameless_data)
+        self.worker.saveSignal.connect(self.save_timeseries_data)
         self.start_process(self.worker)
 
 
@@ -286,6 +288,7 @@ class Spectrum(QtCore.QObject):
         if len(pos) > 0:
             self.set_autofocus_ontarget.emit(True)
         self.updateStatus.emit('Autofocus finished')
+        self.updatePositions.emit(pos)
 
     @QtCore.Slot(np.ndarray)
     def finishedSearch(self, pos):
@@ -314,6 +317,7 @@ class Spectrum(QtCore.QObject):
         self.save_path = savedir
         self.save_data(savedir)
         self.positions = positions
+        self.labels = labels
         if with_lockin:
             return True
         elif with_search or with_autofocus:
