@@ -297,7 +297,7 @@ class AutoFocusThread(MeasurementThread):
 
     def focus(self):
         def calc_f(plot = False):
-
+            i = 0
             amp = 0
             sigma = 0
 
@@ -480,6 +480,11 @@ class AutoFocusThread(MeasurementThread):
                 wl = self.spectrometer.GetWavelength()
                 mask = (wl < (self.settings.zscan_centre+self.settings.zscan_width)) & (wl > (self.settings.zscan_centre-self.settings.zscan_width))
                 spec = spec[mask]
+
+                plt.imshow(wl,spec)
+                plt.savefig("search_max/zscan_"+str(i)+".png")
+                plt.close()
+
                 return np.mean(spec)
 
 
