@@ -297,7 +297,7 @@ class AutoFocusThread(MeasurementThread):
 
     def focus(self):
         def calc_f(plot = False):
-            i = 0
+            name_counter = 0
             amp = 0
             sigma = 0
 
@@ -480,8 +480,8 @@ class AutoFocusThread(MeasurementThread):
                 wl = self.spectrometer.GetWavelength()
                 mask = (wl < (self.settings.zscan_centre+self.settings.zscan_width)) & (wl > (self.settings.zscan_centre-self.settings.zscan_width))
                 spec = spec[mask]
-
-                with open("search_max/zscan_"+str(i)+".csv", 'w') as f:
+                name_counter += 1
+                with open("search_max/zscan_"+str(name_counter)+".csv", 'w') as f:
                     data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
                     f.write("wavelength,counts\n")
                     for i in range(len(data)):
