@@ -293,11 +293,10 @@ class AutoFocusThread(MeasurementThread):
         self.settings = settings
         super(AutoFocusThread, self).__init__(spectrometer)
         # self.searchthread = None
-
+        self.name_counter = 0
 
     def focus(self):
         def calc_f(plot = False):
-            name_counter = 0
             amp = 0
             sigma = 0
 
@@ -480,8 +479,8 @@ class AutoFocusThread(MeasurementThread):
                 wl = self.spectrometer.GetWavelength()
                 mask = (wl < (self.settings.zscan_centre+self.settings.zscan_width)) & (wl > (self.settings.zscan_centre-self.settings.zscan_width))
                 spec = spec[mask]
-                name_counter += 1
-                with open("search_max/zscan_"+str(name_counter)+".csv", 'w') as f:
+                self.name_counter += 1
+                with open("search_max/zscan_"+str(self.name_counter)+".csv", 'w') as f:
                     data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
                     f.write("wavelength,counts\n")
                     for i in range(len(data)):
@@ -615,7 +614,7 @@ class AutoFocusThread(MeasurementThread):
         self.spectrometer.SetSlitWidth(self.settings.slit_width)
         self.spectrometer.SetExposureTime(self.settings.integration_time)
 
-
+        self.name_counter = 0
         self.stop()
 
     def work(self):
