@@ -330,7 +330,7 @@ class AutoFocusThread(MeasurementThread):
 
                     plt.plot(x,img)
                     plt.title(amp/sigma)
-                    plt.savefig("search_max/autofocus_image.png")
+                    plt.savefig("/home/messminion/Desktop/search_max/autofocus_image.png")
                     plt.close()
 
                 except (RuntimeError, ValueError) as e:
@@ -377,7 +377,7 @@ class AutoFocusThread(MeasurementThread):
 
                     plt.imshow(img.T)
                     plt.title('amp: '+str(np.round(amp,2))+' +- '+str(np.round(perr[0],5))+' | sigma: ' +str(np.round(sigma,2))+' +- '+str(np.round(perr[3],5)))
-                    plt.savefig("search_max/autofocus_image.png")
+                    plt.savefig("/home/messminion/Desktop/search_max/autofocus_image.png")
                     plt.close()
 
                     if perr[3]/popt[3] > 0.1:
@@ -391,10 +391,10 @@ class AutoFocusThread(MeasurementThread):
                     if self.settings.autofocus_mode == 'gaussexport':
                         self.stage.query_pos()
                         plt.imshow(img.T)
-                        plt.savefig("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".png")
+                        plt.savefig("/home/messminion/Desktop/search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".png")
                         plt.close()
 
-                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".txt",img)
+                        np.savetxt("/home/messminion/Desktop/search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+".txt",img)
 
                         self.spectrometer.SetCentreWavelength(self.settings.centre_wavelength)
                         self.spectrometer.SetExposureTime(self.settings.integration_time)
@@ -410,12 +410,12 @@ class AutoFocusThread(MeasurementThread):
                         # self.searchthread = None
                         # self.stage.query_pos()
 
-                        np.savetxt("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_pos.txt",self.stage.last_pos())
+                        np.savetxt("/home/messminion/Desktop/search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_pos.txt",self.stage.last_pos())
 
                         spec = self.spectrometer.TakeSingleTrack()
                         wl = self.spectrometer.GetWavelength()
                         data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
-                        with open("search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_spec.txt", 'w') as f:
+                        with open("/home/messminion/Desktop/search_max/zmisc/"+str(np.round(self.stage.last_pos()[2],2))+"_spec.txt", 'w') as f:
                             f.write("wavelength,counts" + '\n')
                             for i in range(len(data)):
                                 f.write(str(data[i][0]) + "," + str(data[i][1]) + '\n')
@@ -433,7 +433,7 @@ class AutoFocusThread(MeasurementThread):
                     print(e)
                     plt.imshow(img.T)
                     plt.title('no fit')
-                    plt.savefig("search_max/autofocus_image.png")
+                    plt.savefig("/home/messminion/Desktop/search_max/autofocus_image.png")
                     plt.close()
 
                     return 0
@@ -468,7 +468,7 @@ class AutoFocusThread(MeasurementThread):
 
                 plt.imshow(img.T)
                 plt.title(str(np.abs((img.max() - img.mean()))))
-                plt.savefig("search_max/autofocus_image.png")
+                plt.savefig("/home/messminion/Desktop/search_max/autofocus_image.png")
                 plt.close()
 
                 return amp
@@ -480,7 +480,7 @@ class AutoFocusThread(MeasurementThread):
                 mask = (wl < (self.settings.zscan_centre+self.settings.zscan_width)) & (wl > (self.settings.zscan_centre-self.settings.zscan_width))
                 spec = spec[mask]
                 self.name_counter += 1
-                with open("search_max/zscan_"+str(self.name_counter)+".csv", 'w') as f:
+                with open("/home/messminion/Desktop/search_max/zscan_"+str(self.name_counter)+".csv", 'w') as f:
                     data = np.append(np.round(wl, 1).reshape(wl.shape[0], 1), spec.reshape(spec.shape[0], 1), 1)
                     f.write("wavelength,counts\n")
                     for i in range(len(data)):
@@ -588,7 +588,7 @@ class AutoFocusThread(MeasurementThread):
         #ax.plot(pos, focus, '.')
         ax.plot(pos, focus, 'o')
         ax.plot(pos, focus_filt, 'x')
-        plt.savefig("search_max/autofocus.png")
+        plt.savefig("/home/messminion/Desktop/search_max/autofocus.png")
         plt.close()
 
         # if popt is not None:
@@ -712,7 +712,7 @@ class EndlessSeriesThread(MeasurementThread):
 
     @QtCore.Slot(np.ndarray)
     def autofocus_finished(self, pos):
-       with open("search_max/scan_status.txt", "a") as f:
+       with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             f.write(str(self.i)+': ')
             if len(pos) == 2:
                 f.write("autofocus successful, ")
@@ -723,7 +723,7 @@ class EndlessSeriesThread(MeasurementThread):
 
     @QtCore.Slot(np.ndarray)
     def search_finished(self, pos):
-        with open("search_max/scan_status.txt", "a") as f:
+        with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             if len(pos) == 4:
                 f.write("search successful, ")
                 f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))
@@ -850,7 +850,7 @@ class LockinThread(MeasurementThread):
             ax.plot(x, buf/np.max(buf)+i)
             ax.plot(x, ref/ref.max()+i)
         #ax.plot(x, ref/np.max(ref), 'g-')
-        plt.savefig("search_max/traces.png")
+        plt.savefig("/home/messminion/Desktop/search_max/traces.png")
         plt.close()
 
 
@@ -873,14 +873,14 @@ class LockinThread(MeasurementThread):
         ax = fig.add_subplot(111)
         ax.plot(self.spectrometer.GetWavelength(), res_phase / res_phase.max())  # /lamp[mask])
         ax.plot(self.spectrometer.GetWavelength(), res_amp / res_amp.max())
-        plt.savefig("search_max/lockin_nopsd.png")
+        plt.savefig("/home/messminion/Desktop/search_max/lockin_nopsd.png")
         plt.close()
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.plot(self.spectrometer.GetWavelength(), res_phase / res_phase.max())  # /lamp[mask])
         ax.plot(self.spectrometer.GetWavelength(),res / res.max())
-        plt.savefig("search_max/lockin.png")
+        plt.savefig("/home/messminion/Desktop/search_max/lockin.png")
         plt.close()
 
 
@@ -963,7 +963,7 @@ class SearchThread(MeasurementThread):
                 ax2.plot(pos, maxwl, 'r.')
                 ax2.set_ylabel('maxwl', color='r')
                 ax2.tick_params('y', colors='r')
-            plt.savefig("search_max/search_"+title+'_'+ str(j) + ".png")
+            plt.savefig("/home/messminion/Desktop/search_max/search_"+title+'_'+ str(j) + ".png")
             plt.close()
 
 
@@ -1466,7 +1466,7 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     @QtCore.Slot(np.ndarray)
     def autofocus_finished(self, pos):
-       with open("search_max/scan_status.txt", "a") as f:
+       with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             f.write(self.labels[self.i]+': ')
             if len(pos) == 2:
                 f.write("autofocus successful, ")
@@ -1477,7 +1477,7 @@ class ScanSearchMeanThread(ScanMeanThread):
 
     @QtCore.Slot(np.ndarray)
     def search_finished(self, pos):
-        with open("search_max/scan_status.txt", "a") as f:
+        with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             if len(pos) == 4:
                 f.write("search successful, ")
                 f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))
@@ -1561,7 +1561,7 @@ class ScanSearchTimeSeriesThread(ScanMeanThread):
 
     @QtCore.Slot(np.ndarray)
     def autofocus_finished(self, pos):
-       with open("search_max/scan_status.txt", "a") as f:
+       with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             f.write(self.labels[self.i]+': ')
             if len(pos) == 2:
                 f.write("autofocus successful, ")
@@ -1572,7 +1572,7 @@ class ScanSearchTimeSeriesThread(ScanMeanThread):
 
     @QtCore.Slot(np.ndarray)
     def search_finished(self, pos):
-        with open("search_max/scan_status.txt", "a") as f:
+        with open("/home/messminion/Desktop/search_max/scan_status.txt", "a") as f:
             if len(pos) == 4:
                 f.write("search successful, ")
                 f.write("x:" + str(round(pos[0], 3)) + ' +- ' + str(round(pos[1], 5)))

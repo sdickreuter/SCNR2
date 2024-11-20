@@ -37,6 +37,10 @@ class Ui_Startup_Dialog(object):
         self.cam_checkbox.setChecked(True)
         self.cam_checkbox.setObjectName("cam_checkbox")
         self.verticalLayout.addWidget(self.cam_checkbox)
+        self.rotationmount_checkbox = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.rotationmount_checkbox.setChecked(True)
+        self.rotationmount_checkbox.setObjectName("rotationmount_checkbox")
+        self.verticalLayout.addWidget(self.rotationmount_checkbox)
         self.buttonBox = QtWidgets.QDialogButtonBox(self.verticalLayoutWidget)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
@@ -58,4 +62,5 @@ class Ui_Startup_Dialog(object):
         self.setup_combobox.setItemText(2, _translate("Startup_Dialog", "Zeiss"))
         self.stage_checkbox.setText(_translate("Startup_Dialog", "Use Piezo-Stage"))
         self.cam_checkbox.setText(_translate("Startup_Dialog", "Use Camera"))
+        self.rotationmount_checkbox.setText(_translate("Startup_Dialog", "Use Rotationmount"))
 

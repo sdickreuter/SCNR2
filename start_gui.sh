@@ -1,4 +1,3 @@
-#! /usr/bin/sh
-
-cd /home/iap/PyCharmProjects/SCNR2
-mate-terminal -e "python scnr2.py"
+#!/bin/sh
+cd /home/messminion/software/SCNR2
+gnome-terminal -e "python3 scnr2.py"

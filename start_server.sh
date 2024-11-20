@@ -1,4 +1,3 @@
-#! /usr/bin/sh
-
-cd /home/iap/PyCharmProjects/SCNR2
-python start_server.py
+#!/bin/sh
+cd /home/messminion/software/SCNR2
+sudo python3 start_server.py

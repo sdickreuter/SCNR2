@@ -12,20 +12,18 @@ class Settings(object):
 
         if filename is not None:
             try:
-                self.config.read(filename)
+                with open(filename, 'r', encoding='utf-8') as f:
+                    self.config.read_file(f)
+                #self.config.read(filename)
                 self._filename = filename
             except:
                 print("Error loading settings.")
                 RuntimeError("Error loading settings.")
                 return
         else:
-            try:
-                self.config.read(self._filename)
-
-            except:
-                print("Error loading settings.")
-                RuntimeError("Error loading settings.")
-                return
+        	print("Did not specify File -> Error loading settings.")
+        	RuntimeError("Error loading settings.")
+        	return
 
         self.correct_search = False
 
@@ -51,8 +49,8 @@ class Settings(object):
 
         self.cam_exposure_time = float(self.config['camera']['exposure_time'])
 
-        self.slit_width = int(self.config['spectrometer']['slit_width'])
         self.centre_wavelength = int(self.config['spectrometer']['centre_wavelength'])
+        self.slit_width = 100#int(self.config['spectrometer']['slit_width'])
 
 
         self.cammarker_x = float(self.config['cammarker']['x'])

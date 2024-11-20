@@ -34,6 +34,7 @@ from gui.main import Ui_MainWindow
 init_pad = True
 init_cam = True
 init_stage = True
+init_rotationmount = True
 init_spectrometer = True
 
 
@@ -49,26 +50,26 @@ class SCNR(QtWidgets.QMainWindow):
     background_image = None
     last_image = None
 
-    savedir = "./Spectra/"
-    path = "./"
+    savedir = "/home/messminion/Desktop/Spectra/"
+    #path = "./"
 
     def __init__(self, options,parent=None):
         super(SCNR, self).__init__(parent)
         self.ui = Ui_MainWindow()
 
         #setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
-        setup, stage_ok, cam_ok = options
+        setup, stage_ok, cam_ok, rotationmount_ok = options
         #print(setup)
 
         if ok:
             init_cam = cam_ok
             init_stage = stage_ok
             if setup == 'Nikon' :
-                self.settings = settings.Settings('config_nikon.ini')
+                self.settings = settings.Settings('/home/messminion/software/SCNR2/config_nikon.ini')
             elif setup == 'Zeiss':
-                self.settings = settings.Settings('config_zeiss.ini')
+                self.settings = settings.Settings('/home/messminion/software/SCNR2/config_zeiss.ini')
             elif setup == 'Freespace': #Freespace Setup
-                self.settings = settings.Settings('config_freespace.ini')
+                self.settings = settings.Settings('/home/messminion/software/SCNR2/config_freespace.ini')
             else:
                 raise RuntimeError("Setup not specified!")
                 #print("Setup not specified, quitting.")
@@ -256,7 +257,11 @@ class SCNR(QtWidgets.QMainWindow):
                     self.pad_active = False
                     self.padthread = None
                     print("Could not initialize Gamepad")
-                    QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QtWidgets.QMessageBox.Ok)
+                    #QtWidgets.QMessageBox.critical(self, 'Error', "Could not initialize Gamepad.", QtWidgets.QMessageBox.Ok)
+
+        # initialize rotationmounts
+        if init_rotationmount:
+            print("here one would detect and initialize the rotation mount(s)")
 
         # init spectrum stuff
         self.spectrum = spectrum.Spectrum(self.spectrometer, self.stage, self.settings)
@@ -1101,7 +1106,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, sigint_handler)
 
     app = QtWidgets.QApplication(sys.argv)
-    setup, stage_ok, cam_ok, ok = dialogs.StartUp_Dialog.getOptions()
+    setup, stage_ok, cam_ok, rotationmount_ok, ok = dialogs.StartUp_Dialog.getOptions()
     #app.quit()
 
 
@@ -1111,7 +1116,7 @@ if __name__ == '__main__':
     #timer.start(500)  # You may change this if you wish.
     #timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
     if ok:
-        main = SCNR([setup,stage_ok,cam_ok])
+        main = SCNR([setup,stage_ok,cam_ok,rotationmount_ok])
         main.show()
     #except Exception as e:
     #    print(e)
