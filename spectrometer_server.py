@@ -5,7 +5,8 @@ import random
 import sys
 import time
 import signal
-import AndorSpectrometer
+# import AndorSpectrometer
+import spectrometer_dummy as AndorSpectrometer
 
 class SpectrometerServer:
     running = True
